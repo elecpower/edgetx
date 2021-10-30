@@ -18,8 +18,7 @@
  * GNU General Public License for more details.
  */
 
-#ifndef OPENTX_MULTI_H
-#define OPENTX_MULTI_H
+#pragma once
 
 #include <vector>
 #include <QtCore>
@@ -84,5 +83,3 @@ class Multiprotocols
 };
 
 extern const Multiprotocols multiProtocols;
-
-#endif //OPENTX_MULTI_H
