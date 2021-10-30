@@ -23,6 +23,8 @@
 #include "multiprotocols.h"
 #include "radiodata.h"
 
+#define MM_RF_CUSTOM_SELECTED 0xff
+
 #define STR_MULTI_SUBTYPE                    QT_TRANSLATE_NOOP("Multiprotocols", "Subtype")
 #define STR_MULTI_VIDFREQ                    QT_TRANSLATE_NOOP("Multiprotocols", "Video TX frequency")
 #define STR_MULTI_RFTUNE                     QT_TRANSLATE_NOOP("Multiprotocols", "CC2500 frequency fine tune")
