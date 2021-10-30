@@ -24,136 +24,48 @@
 #include <QtCore>
 #include "moduledata.h"
 
-// generated from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multiprotocol.h
-#define MODULE_MULTI_VERSION_MAJOR		1
-#define MODULE_MULTI_VERSION_MINOR		3
-#define MODULE_MULTI_VERSION_REVISION	3
-#define MODULE_MULTI_VERSION_PATCH_LEVEL	4
-
-// generated from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multiprotocol.h
-enum MultiModuleRFProtocols {
-  MODULE_SUBTYPE_MULTI_FLYSKY = 0,
-  MODULE_SUBTYPE_MULTI_FIRST = MODULE_SUBTYPE_MULTI_FLYSKY,
-  MODULE_SUBTYPE_MULTI_HUBSAN,
-  MODULE_SUBTYPE_MULTI_FRSKY,
-  MODULE_SUBTYPE_MULTI_HISKY,
-  MODULE_SUBTYPE_MULTI_V2X2,
-  MODULE_SUBTYPE_MULTI_DSM2,
-  MODULE_SUBTYPE_MULTI_DEVO,
-  MODULE_SUBTYPE_MULTI_YD717,
-  MODULE_SUBTYPE_MULTI_KN,
-  MODULE_SUBTYPE_MULTI_SYMAX,
-  MODULE_SUBTYPE_MULTI_SLT,
-  MODULE_SUBTYPE_MULTI_CX10,
-  MODULE_SUBTYPE_MULTI_CG023,
-  MODULE_SUBTYPE_MULTI_BAYANG,
-  MODULE_SUBTYPE_MULTI_ESky,
-  MODULE_SUBTYPE_MULTI_MT99XX,
-  MODULE_SUBTYPE_MULTI_MJXQ,
-  MODULE_SUBTYPE_MULTI_SHENQI,
-  MODULE_SUBTYPE_MULTI_FY326,
-  MODULE_SUBTYPE_MULTI_FUTABA,
-  MODULE_SUBTYPE_MULTI_J6PRO,
-  MODULE_SUBTYPE_MULTI_FQ777,
-  MODULE_SUBTYPE_MULTI_ASSAN,
-  MODULE_SUBTYPE_MULTI_HONTAI,
-  MODULE_SUBTYPE_MULTI_OLRS,
-  MODULE_SUBTYPE_MULTI_FS_AFHDS2A,
-  MODULE_SUBTYPE_MULTI_Q2X2,
-  MODULE_SUBTYPE_MULTI_WK_2X01,
-  MODULE_SUBTYPE_MULTI_Q303,
-  MODULE_SUBTYPE_MULTI_GW008,
-  MODULE_SUBTYPE_MULTI_DM002,
-  MODULE_SUBTYPE_MULTI_CABELL,
-  MODULE_SUBTYPE_MULTI_ESKY150,
-  MODULE_SUBTYPE_MULTI_H83D,
-  MODULE_SUBTYPE_MULTI_CORONA,
-  MODULE_SUBTYPE_MULTI_CFLIE,
-  MODULE_SUBTYPE_MULTI_HITEC,
-  MODULE_SUBTYPE_MULTI_WFLY,
-  MODULE_SUBTYPE_MULTI_BUGS,
-  MODULE_SUBTYPE_MULTI_BUGS_MINI,
-  MODULE_SUBTYPE_MULTI_TRAXXAS,
-  MODULE_SUBTYPE_MULTI_NCC1701,
-  MODULE_SUBTYPE_MULTI_E01X,
-  MODULE_SUBTYPE_MULTI_V911S,
-  MODULE_SUBTYPE_MULTI_GD00X,
-  MODULE_SUBTYPE_MULTI_V761,
-  MODULE_SUBTYPE_MULTI_KF606,
-  MODULE_SUBTYPE_MULTI_REDPINE,
-  MODULE_SUBTYPE_MULTI_POTENSIC,
-  MODULE_SUBTYPE_MULTI_ZSX,
-  MODULE_SUBTYPE_MULTI_HEIGHT,
-  MODULE_SUBTYPE_MULTI_SCANNER,
-  MODULE_SUBTYPE_MULTI_FRSKYX_RX,
-  MODULE_SUBTYPE_MULTI_AFHDS2A_RX,
-  MODULE_SUBTYPE_MULTI_HOTT,
-  MODULE_SUBTYPE_MULTI_FX816,
-  MODULE_SUBTYPE_MULTI_BAYANG_RX,
-  MODULE_SUBTYPE_MULTI_PELIKAN,
-  MODULE_SUBTYPE_MULTI_TIGER,
-  MODULE_SUBTYPE_MULTI_XK,
-  MODULE_SUBTYPE_MULTI_XN297DUMP,
-  MODULE_SUBTYPE_MULTI_FRSKYX2,
-  MODULE_SUBTYPE_MULTI_FRSKY_R9,
-  MODULE_SUBTYPE_MULTI_PROPEL,
-  MODULE_SUBTYPE_MULTI_FRSKYL,
-  MODULE_SUBTYPE_MULTI_SKYARTEC,
-  MODULE_SUBTYPE_MULTI_ESKY150V2,
-  MODULE_SUBTYPE_MULTI_DSM_RX,
-  MODULE_SUBTYPE_MULTI_JJRC345,
-  MODULE_SUBTYPE_MULTI_Q90C,
-  MODULE_SUBTYPE_MULTI_KYOSHO,
-  MODULE_SUBTYPE_MULTI_RLINK,
-  MODULE_SUBTYPE_MULTI_ELRS,
-  MODULE_SUBTYPE_MULTI_REALACC,
-  MODULE_SUBTYPE_MULTI_OMP,
-  MODULE_SUBTYPE_MULTI_MLINK,
-  MODULE_SUBTYPE_MULTI_WFLY2,
-  MODULE_SUBTYPE_MULTI_E016HV2,
-  MODULE_SUBTYPE_MULTI_COUNT,
-  MODULE_SUBTYPE_MULTI_LAST = MODULE_SUBTYPE_MULTI_COUNT - 1
-};
-
 class Multiprotocols
 {
     Q_DECLARE_TR_FUNCTIONS(Multiprotocols)
 
   public:
 
+//  Protocol number, Protocol String, Sub_protocol strings, Number of sub_protocols, Option type, Failsafe, ChMap, RF switch, Init, Callback
     struct radio_mm_definition {
       int protocol;
       QString protocolStr;
+      QStringList subProtocols;
       unsigned int maxSubtype;
+      QString optionStr;
       bool hasFailsafe;
-      QStringList protocols;
-      QString optionsstr;
+      int channelMap;
+      int rfSwitch;
+      int funcInit;
+      int funcCallback;
     };
 
     struct MultiProtocolDefinition {
       const int protocol;
-      QString protocolStr;
+      const QString protocolStr;
       const bool hasFailsafe;
       const QStringList subTypeStrings;
-      const QString optionsstr;
+      const QString optionStr;
 
-      unsigned int numSubTypes() const
-      {
-        return protocol > MODULE_SUBTYPE_MULTI_LAST ? 8 : (unsigned int) subTypeStrings.length();
-      }
+      unsigned int numSubTypes() const;
 
       int getOptionMin() const;
 
       int getOptionMax() const;
 
       MultiProtocolDefinition(const radio_mm_definition &rd) :
+        // do not use all the fields required for the radio so drop them
         protocol(rd.protocol),
         protocolStr(rd.protocolStr),
         hasFailsafe(rd.hasFailsafe),
-        subTypeStrings(rd.protocols),
-        optionsstr(rd.optionsstr)
+        subTypeStrings(rd.subProtocols),
+        optionStr(rd.optionStr)
       {
-        Q_ASSERT(rd.maxSubtype + 1 == (unsigned int) rd.protocols.length());
+        Q_ASSERT(rd.maxSubtype + 1 == (unsigned int) rd.subProtocols.length());
       }
     };
 

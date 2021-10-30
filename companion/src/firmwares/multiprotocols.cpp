@@ -23,6 +23,12 @@
 #include "multiprotocols.h"
 #include "radiodata.h"
 
+// generated from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multiprotocol.h
+#define VERSION_MAJOR		1
+#define VERSION_MINOR		3
+#define VERSION_REVISION	3
+#define VERSION_PATCH_LEVEL	4
+
 #define MM_RF_CUSTOM_SELECTED 0xff
 
 #define STR_MULTI_SUBTYPE                    QT_TRANSLATE_NOOP("Multiprotocols", "Subtype")
@@ -145,6 +151,97 @@ const char STR_LOSI[]       ="Losi";
 const char STR_MOULDKG[]    ="MouldKg";
 const char STR_XERALL[]     ="Xerall";
 
+//  generated from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multiprotocol.h
+//  source example
+//  enum PROTOCOLS
+// {
+//  	PROTO_PROTOLIST	= 0,	// NO RF
+//  	PROTO_FLYSKY 	= 1,	// =>A7105
+
+enum MultiModuleRFProtocols {
+  MODULE_SUBTYPE_MULTI_FLYSKY = 0,
+  MODULE_SUBTYPE_MULTI_FIRST = MODULE_SUBTYPE_MULTI_FLYSKY,
+  MODULE_SUBTYPE_MULTI_HUBSAN,
+  MODULE_SUBTYPE_MULTI_FRSKY,
+  MODULE_SUBTYPE_MULTI_HISKY,
+  MODULE_SUBTYPE_MULTI_V2X2,
+  MODULE_SUBTYPE_MULTI_DSM2,
+  MODULE_SUBTYPE_MULTI_DEVO,
+  MODULE_SUBTYPE_MULTI_YD717,
+  MODULE_SUBTYPE_MULTI_KN,
+  MODULE_SUBTYPE_MULTI_SYMAX,
+  MODULE_SUBTYPE_MULTI_SLT,
+  MODULE_SUBTYPE_MULTI_CX10,
+  MODULE_SUBTYPE_MULTI_CG023,
+  MODULE_SUBTYPE_MULTI_BAYANG,
+  MODULE_SUBTYPE_MULTI_ESky,
+  MODULE_SUBTYPE_MULTI_MT99XX,
+  MODULE_SUBTYPE_MULTI_MJXQ,
+  MODULE_SUBTYPE_MULTI_SHENQI,
+  MODULE_SUBTYPE_MULTI_FY326,
+  MODULE_SUBTYPE_MULTI_FUTABA,
+  MODULE_SUBTYPE_MULTI_J6PRO,
+  MODULE_SUBTYPE_MULTI_FQ777,
+  MODULE_SUBTYPE_MULTI_ASSAN,
+  MODULE_SUBTYPE_MULTI_HONTAI,
+  MODULE_SUBTYPE_MULTI_OLRS,
+  MODULE_SUBTYPE_MULTI_FS_AFHDS2A,
+  MODULE_SUBTYPE_MULTI_Q2X2,
+  MODULE_SUBTYPE_MULTI_WK_2X01,
+  MODULE_SUBTYPE_MULTI_Q303,
+  MODULE_SUBTYPE_MULTI_GW008,
+  MODULE_SUBTYPE_MULTI_DM002,
+  MODULE_SUBTYPE_MULTI_CABELL,
+  MODULE_SUBTYPE_MULTI_ESKY150,
+  MODULE_SUBTYPE_MULTI_H83D,
+  MODULE_SUBTYPE_MULTI_CORONA,
+  MODULE_SUBTYPE_MULTI_CFLIE,
+  MODULE_SUBTYPE_MULTI_HITEC,
+  MODULE_SUBTYPE_MULTI_WFLY,
+  MODULE_SUBTYPE_MULTI_BUGS,
+  MODULE_SUBTYPE_MULTI_BUGS_MINI,
+  MODULE_SUBTYPE_MULTI_TRAXXAS,
+  MODULE_SUBTYPE_MULTI_NCC1701,
+  MODULE_SUBTYPE_MULTI_E01X,
+  MODULE_SUBTYPE_MULTI_V911S,
+  MODULE_SUBTYPE_MULTI_GD00X,
+  MODULE_SUBTYPE_MULTI_V761,
+  MODULE_SUBTYPE_MULTI_KF606,
+  MODULE_SUBTYPE_MULTI_REDPINE,
+  MODULE_SUBTYPE_MULTI_POTENSIC,
+  MODULE_SUBTYPE_MULTI_ZSX,
+  MODULE_SUBTYPE_MULTI_HEIGHT,
+  MODULE_SUBTYPE_MULTI_SCANNER,
+  MODULE_SUBTYPE_MULTI_FRSKYX_RX,
+  MODULE_SUBTYPE_MULTI_AFHDS2A_RX,
+  MODULE_SUBTYPE_MULTI_HOTT,
+  MODULE_SUBTYPE_MULTI_FX816,
+  MODULE_SUBTYPE_MULTI_BAYANG_RX,
+  MODULE_SUBTYPE_MULTI_PELIKAN,
+  MODULE_SUBTYPE_MULTI_TIGER,
+  MODULE_SUBTYPE_MULTI_XK,
+  MODULE_SUBTYPE_MULTI_XN297DUMP,
+  MODULE_SUBTYPE_MULTI_FRSKYX2,
+  MODULE_SUBTYPE_MULTI_FRSKY_R9,
+  MODULE_SUBTYPE_MULTI_PROPEL,
+  MODULE_SUBTYPE_MULTI_FRSKYL,
+  MODULE_SUBTYPE_MULTI_SKYARTEC,
+  MODULE_SUBTYPE_MULTI_ESKY150V2,
+  MODULE_SUBTYPE_MULTI_DSM_RX,
+  MODULE_SUBTYPE_MULTI_JJRC345,
+  MODULE_SUBTYPE_MULTI_Q90C,
+  MODULE_SUBTYPE_MULTI_KYOSHO,
+  MODULE_SUBTYPE_MULTI_RLINK,
+  MODULE_SUBTYPE_MULTI_ELRS,
+  MODULE_SUBTYPE_MULTI_REALACC,
+  MODULE_SUBTYPE_MULTI_OMP,
+  MODULE_SUBTYPE_MULTI_MLINK,
+  MODULE_SUBTYPE_MULTI_WFLY2,
+  MODULE_SUBTYPE_MULTI_E016HV2,
+  MODULE_SUBTYPE_MULTI_COUNT,
+  MODULE_SUBTYPE_MULTI_LAST = MODULE_SUBTYPE_MULTI_COUNT - 1
+};
+
 //  generated from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multi_Protos.ino
 //  source example
 //  const char STR_SUBTYPE_FLYSKY[] =     "\x04""Std\0""V9x9""V6x6""V912""CX20";
@@ -220,7 +317,7 @@ static const QStringList NO_SUBTYPE            {STR_MULTI_DEFAULT};
 //  {PROTO_FRSKY_RX,   STR_FRSKY_RX,  STR_SUB_FRSKY_RX, FRCPPM, OPTION_RFTUNE,  0, 0, SW_CC2500, FRSKY_RX_init,   FRSKY_RX_callback   },
 
 const Multiprotocols multiProtocols {
-  {MODULE_SUBTYPE_MULTI_FLYSKY,     4, false,      STR_SUBTYPE_FLYSKY,    nullptr},
+  {PROTO_FRSKY_RX,     STR_FLYSKY, 4, false,      STR_SUBTYPE_FLYSKY,    nullptr},
   {MODULE_SUBTYPE_MULTI_HUBSAN,     2, false,      STR_SUBTYPE_HUBSAN,    STR_MULTI_VIDFREQ},
   {MODULE_SUBTYPE_MULTI_FRSKY,      7, false,      STR_SUBTYPE_FRSKY,     STR_MULTI_RFTUNE},
   {MODULE_SUBTYPE_MULTI_HISKY,      1, false,      STR_SUBTYPE_HISKY,     nullptr},
@@ -308,6 +405,12 @@ int Multiprotocols::MultiProtocolDefinition::getOptionMax() const {
     return 127;
 }
 
+unsigned int Multiprotocols::MultiProtocolDefinition::numSubTypes() const
+{
+  return protocol > MODULE_SUBTYPE_MULTI_LAST ? 8 : (unsigned int) subTypeStrings.length();
+}
+
+
 const Multiprotocols::MultiProtocolDefinition & Multiprotocols::getProtocol(int protocol) const {
   for (const Multiprotocols::MultiProtocolDefinition & proto: protocols)
     if (proto.protocol == protocol)
@@ -319,20 +422,13 @@ const Multiprotocols::MultiProtocolDefinition & Multiprotocols::getProtocol(int 
 }
 
 // static
-QString Multiprotocols::protocolToString(int protocol, bool custom)   //  TODO get from array as subType below
+QString Multiprotocols::protocolToString(int protocol)
 {
-  static const QStringList strings({
-    "FlySky", "Hubsan", "FrSky", "Hisky", "V2x2", "DSM", "Devo", "YD717", "KN", "SymaX", "SLT", "CX10", "CG023",
-    "Bayang", "ESky", "MT99XX", "MJXQ", "Shenqi", "FY326", "Futaba", "J6 PRO","FQ777","Assan","Hontai","Open LRS",
-    "FlySky AFHDS2A", "Q2x2", "WK2x01", "Q303", "GW008", "DM002", "Cabell", "ESky 150", "H8 3D", "Corona", "CFlie",
-    "Hitec", "Wfly", "Bugs", "Bugs Mini", "Traxxas", "NCC-1701-A", "E01X", "WL Heli V911S", "GD00X", "Volantex V761",
-    "KFPlan KF606", "Redpine", "Potensic", "ZSX", "Height", "Scanner", "FrSky RX", "FlySky AFHDS2A RX", "HoTT", "Fx816",
-    "Bayang RX", "Pelikan", "Tiger", "XK", "XN297 Dump", "FrSky X 2.1", "FrSky R9", "Propel", "FrSky L", "Skyartec",
-    "ESky 150v2", "DSM RX", "JJRC345", "Q90C", "Kyosho", "RadioLink", "ExpressLRS", "Realacc", "OMP", "M-Link", "Wfly 2",
-    "E016H v2"
-  });
+  for (const Multiprotocols::MultiProtocolDefinition & proto: protocols)
+    if (proto.protocol == protocol)
+      return proto.protocolStr;
 
-  return strings.value(protocol, CPN_STR_UNKNOWN_ITEM);
+  return CPN_STR_UNKNOWN_ITEM;
 }
 
 // static
