@@ -224,3 +224,12 @@ QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
   else
     return tr(qPrintable(multiProtocols.getProtocol(protocol).subTypeStrings.value(subType, CPN_STR_UNKNOWN_ITEM)));
 }
+
+// static
+QString Multiprotocols::getMaxChannelCount(int protocol, unsigned subType)
+{
+  if (subType == MODULE_SUBTYPE_MULTI_DSM2)
+    return 12;
+  else
+    return 16;
+}

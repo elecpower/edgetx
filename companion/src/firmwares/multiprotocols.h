@@ -75,6 +75,7 @@ class Multiprotocols
     const MultiProtocolDefinition &getProtocol(int protocol) const;
     static QString protocolToString(int protocol, bool custom = false);
     static QString subTypeToString(int protocol, unsigned subType);
+    static int getMaxChannelCount(int protocol, unsigned subType);
 
   private:
 
