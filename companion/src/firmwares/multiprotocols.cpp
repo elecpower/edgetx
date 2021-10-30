@@ -35,6 +35,25 @@
 #define STR_MULTI_FIXEDID                    QT_TRANSLATE_NOOP("Multiprotocols", "Fixed ID value")
 #define STR_MULTI_DEFAULT                    QT_TRANSLATE_NOOP("Multiprotocols", "DEFAULT")
 
+// generated from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multi_Protos.ino
+
+enum
+{
+	MULTI_OPTION_NONE,
+	MULTI_OPTION_OPTION,
+	MULTI_OPTION_RFTUNE,
+	MULTI_OPTION_VIDFREQ,
+	MULTI_OPTION_FIXEDID,
+	MULTI_OPTION_TELEM,
+	MULTI_OPTION_SRVFREQ,
+	MULTI_OPTION_MAXTHR,
+	MULTI_OPTION_RFCHAN,
+	MULTI_OPTION_RFPOWER,
+	MULTI_OPTION_WBUS
+};
+
+// generated from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multi_Protos.ino
+
 static const QStringList STR_SUBTYPE_CUSTOM    ({
                                                   STR_MULTI_SUBTYPE " 0", STR_MULTI_SUBTYPE " 1", STR_MULTI_SUBTYPE " 2", STR_MULTI_SUBTYPE " 3",
                                                   STR_MULTI_SUBTYPE " 4", STR_MULTI_SUBTYPE " 5", STR_MULTI_SUBTYPE " 6", STR_MULTI_SUBTYPE " 7"
@@ -101,6 +120,8 @@ static const QStringList NO_SUBTYPE            {STR_MULTI_DEFAULT};
 
 
 // Table is designed to be shared with gui_common_arm.cpp
+
+// generated from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multi_Protos.ino
 
 const Multiprotocols multiProtocols {
   {MODULE_SUBTYPE_MULTI_FLYSKY,     4, false,      STR_SUBTYPE_FLYSKY,    nullptr},

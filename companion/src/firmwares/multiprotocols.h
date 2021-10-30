@@ -24,6 +24,13 @@
 #include <QtCore>
 #include "moduledata.h"
 
+// generated from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multiprotocol.h
+#define MODULE_MULTI_VERSION_MAJOR		1
+#define MODULE_MULTI_VERSION_MINOR		3
+#define MODULE_MULTI_VERSION_REVISION	3
+#define MODULE_MULTI_VERSION_PATCH_LEVEL	4
+
+// generated from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multiprotocol.h
 enum MultiModuleRFProtocols {
   MODULE_SUBTYPE_MULTI_FLYSKY = 0,
   MODULE_SUBTYPE_MULTI_FIRST = MODULE_SUBTYPE_MULTI_FLYSKY,
