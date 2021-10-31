@@ -30,26 +30,14 @@ class Multiprotocols
 
   public:
 
-//  Protocol number, Protocol String, Sub_protocol strings, Number of sub_protocols, Option type, Failsafe, ChMap, RF switch, Init, Callback
-    struct radio_mm_definition {
-      int protocol;
-      QString protocolStr;
-      QStringList subProtocols;
-      unsigned int maxSubtype;
-      QString optionStr;
-      bool hasFailsafe;
-      int channelMap;
-      int rfSwitch;
-      int funcInit;
-      int funcCallback;
-    };
+#include "multiprotocols_radio.h"
 
     struct MultiProtocolDefinition {
       const int protocol;
-      const QString protocolStr;
+      const QString protocolString;
       const bool hasFailsafe;
       const QStringList subTypeStrings;
-      const QString optionStr;
+      const int optionType;
 
       unsigned int numSubTypes() const;
 
@@ -57,11 +45,11 @@ class Multiprotocols
 
       int getOptionMax() const;
 
-      MultiProtocolDefinition(const radio_mm_definition &rd) :
-        // do not use all the fields required for the radio so drop them
+      MultiProtocolDefinition(const radio_protocol_definition &rd) :
+        // we do not use all the fields required for the radio
         protocol(rd.protocol),
-        protocolStr(rd.protocolStr),
-        hasFailsafe(rd.hasFailsafe),
+        protocolStr(rd.ProtoString),
+        hasFailsafe(rd.failsafe),
         subTypeStrings(rd.subProtocols),
         optionStr(rd.optionStr)
       {
@@ -69,9 +57,9 @@ class Multiprotocols
       }
     };
 
-    Multiprotocols(std::initializer_list<radio_mm_definition> l)
+    Multiprotocols(std::initializer_list<radio_protocol_definition> l)
     {
-      for (radio_mm_definition rd: l)
+      for (radio_protocol_definition rd: l)
         protocols.push_back(MultiProtocolDefinition(rd));
     }
 
@@ -79,6 +67,7 @@ class Multiprotocols
     static QString protocolToString(int protocol, bool custom = false);
     static QString subTypeToString(int protocol, unsigned subType);
     static int getMaxChannelCount(int protocol, unsigned subType);
+    static QString getDefinitionVersion();
 
   private:
 
