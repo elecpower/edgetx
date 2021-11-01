@@ -22,7 +22,7 @@
 
 #include "multiprotocols.h"
 #include "radiodata.h"
-#include "multiprotocols_radio.h"
+#include "multiprotocols_diy.h"
 
 #define STR_MULTI_SUBTYPE                    QT_TRANSLATE_NOOP("Multiprotocols", "Subtype")
 #define STR_MULTI_VIDFREQ                    QT_TRANSLATE_NOOP("Multiprotocols", "Video TX frequency")
@@ -33,6 +33,23 @@
 #define STR_MULTI_OPTION                     QT_TRANSLATE_NOOP("Multiprotocols", "Option value")
 #define STR_MULTI_FIXEDID                    QT_TRANSLATE_NOOP("Multiprotocols", "Fixed ID value")
 #define STR_MULTI_DEFAULT                    QT_TRANSLATE_NOOP("Multiprotocols", "DEFAULT")
+
+Multiprotocols::MultiProtocolDefinition::MultiProtocolDefinition(const MultiProtocolsDIY::mm_protocol_definition &rd) :
+  // we do not use all the fields required for the radio
+  protocol(rd.protocol),
+  protocolStr(rd.ProtoString),
+  hasFailsafe(rd.failsafe),
+  subTypeStrings(rd.subProtocols),
+  optionStr(rd.optionStr)
+{
+  Q_ASSERT(rd.maxSubtype + 1 == (unsigned int) rd.subProtocols.length());
+}
+
+Multiprotocols::Multiprotocols(std::initializer_list<MultiProtocolsDIY::mm_protocol_definition> l)
+{
+  for (MultiProtocolsDIY::mm_protocol_definition rd: l)
+    protocols.push_back(MultiProtocolDefinition(rd));
+}
 
 int Multiprotocols::MultiProtocolDefinition::getOptionMin() const {
   if (optionsstr == STR_MULTI_RFPOWER)

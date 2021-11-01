@@ -24,13 +24,13 @@
 #include <QtCore>
 #include "moduledata.h"
 
+class MultiProtocolsDIY;
+
 class Multiprotocols
 {
     Q_DECLARE_TR_FUNCTIONS(Multiprotocols)
 
   public:
-
-#include "multiprotocols_radio.h"
 
     struct MultiProtocolDefinition {
       const int protocol;
@@ -45,23 +45,10 @@ class Multiprotocols
 
       int getOptionMax() const;
 
-      MultiProtocolDefinition(const radio_protocol_definition &rd) :
-        // we do not use all the fields required for the radio
-        protocol(rd.protocol),
-        protocolStr(rd.ProtoString),
-        hasFailsafe(rd.failsafe),
-        subTypeStrings(rd.subProtocols),
-        optionStr(rd.optionStr)
-      {
-        Q_ASSERT(rd.maxSubtype + 1 == (unsigned int) rd.subProtocols.length());
-      }
+      MultiProtocolDefinition(const MultiProtocolsDIY::mm_protocol_definition &rd);
     };
 
-    Multiprotocols(std::initializer_list<radio_protocol_definition> l)
-    {
-      for (radio_protocol_definition rd: l)
-        protocols.push_back(MultiProtocolDefinition(rd));
-    }
+    Multiprotocols(std::initializer_list<MultiProtocolsDIY::mm_protocol_definition> l);
 
     const MultiProtocolDefinition &getProtocol(int protocol) const;
     static QString protocolToString(int protocol, bool custom = false);
