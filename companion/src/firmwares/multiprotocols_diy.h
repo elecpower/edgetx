@@ -484,6 +484,7 @@ typedef void     (*void_function_t  ) (void);	//pointer to a function with no pa
 //Protocols definition
 class MultiProtocolsDIY
 {
+public:
 struct __attribute__((__packed__)) mm_protocol_definition {
 	uint8_t protocol;
 	const char *ProtoString;

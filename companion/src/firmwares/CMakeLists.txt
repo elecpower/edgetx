@@ -15,6 +15,7 @@ set(firmwares_SRCS
   mixdata.cpp
   modeldata.cpp
   moduledata.cpp
+  multiprotocols_diy.cpp
   multiprotocols.cpp
   output_data.cpp
   radiodata.cpp
