@@ -24,6 +24,7 @@
 #include "radiodata.h"
 #include "multiprotocols_diy.h"
 
+//  TODO how is this handled in the DIY code??????
 #define STR_MULTI_SUBTYPE                    QT_TRANSLATE_NOOP("Multiprotocols", "Subtype")
 #define STR_MULTI_VIDFREQ                    QT_TRANSLATE_NOOP("Multiprotocols", "Video TX frequency")
 #define STR_MULTI_RFTUNE                     QT_TRANSLATE_NOOP("Multiprotocols", "CC2500 frequency fine tune")
@@ -34,21 +35,21 @@
 #define STR_MULTI_FIXEDID                    QT_TRANSLATE_NOOP("Multiprotocols", "Fixed ID value")
 #define STR_MULTI_DEFAULT                    QT_TRANSLATE_NOOP("Multiprotocols", "DEFAULT")
 
-Multiprotocols::MultiProtocolDefinition::MultiProtocolDefinition(const MultiProtocolsDIY::mm_protocol_definition &rd) :
-  // we do not use all the fields required for the radio
-  protocol(rd.protocol),
-  protocolStr(rd.ProtoString),
-  hasFailsafe(rd.failsafe),
-  subTypeStrings(rd.subProtocols),
-  optionStr(rd.optionStr)
+Multiprotocols::MultiProtocolDefinition::MultiProtocolDefinition(const MultiProtocolsDIY::mm_protocol_definition &diy) :
+  // we do not use all the fields
+  protocol(diy.protocol),
+  protocolStr(diy.ProtoString),
+  hasFailsafe(diy.failsafe),
+  subTypeStrings(diy.subProtocols),
+  optionStr(diy.optionStr)
 {
-  Q_ASSERT(rd.maxSubtype + 1 == (unsigned int) rd.subProtocols.length());
+  Q_ASSERT(diy.maxSubtype + 1 == (unsigned int) diy.subProtocols.length());
 }
 
 Multiprotocols::Multiprotocols(std::initializer_list<MultiProtocolsDIY::mm_protocol_definition> l)
 {
-  for (MultiProtocolsDIY::mm_protocol_definition rd: l)
-    protocols.push_back(MultiProtocolDefinition(rd));
+  for (MultiProtocolsDIY::mm_protocol_definition diy: l)
+    protocols.push_back(MultiProtocolDefinition(diy));
 }
 
 int Multiprotocols::MultiProtocolDefinition::getOptionMin() const {
@@ -98,23 +99,13 @@ QString Multiprotocols::protocolToString(int protocol)
 // static
 QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
 {
-  if (protocol > MODULE_SUBTYPE_MULTI_LAST)
-    return tr(qPrintable(QString::number(subType)));
-  else
-    return tr(qPrintable(multiProtocols.getProtocol(protocol).subTypeStrings.value(subType, CPN_STR_UNKNOWN_ITEM)));
-
-//============================
-  if(multiProtocols.getProtocol(protocol).numSubTypes > 0) {
+  if (subType < multiProtocols.getProtocol(protocol).numSubTypes) {
     const unsigned int sub_len = multiProtocols.getProtocol(protocol).subTypeStrings[0];
     if (sub_len > 0)
       return multiProtocols.getProtocol(protocol).subTypeStrings[subType * sub_len]);
   }
-  else
-    return QString();
 
   return CPN_STR_UNKNOWN_ITEM;
-//=======================================
-
 }
 
 // static

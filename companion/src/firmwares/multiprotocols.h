@@ -45,7 +45,7 @@ class Multiprotocols
 
       int getOptionMax() const;
 
-      MultiProtocolDefinition(const MultiProtocolsDIY::mm_protocol_definition &rd);
+      MultiProtocolDefinition(const MultiProtocolsDIY::mm_protocol_definition &diy);
     };
 
     Multiprotocols(std::initializer_list<MultiProtocolsDIY::mm_protocol_definition> l);
