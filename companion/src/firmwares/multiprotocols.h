@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "moduledata.h"
 
-class MultiProtocolsDIY;
+//class MultiProtocolsDIY;
 
 class Multiprotocols
 {
@@ -32,7 +32,8 @@ class Multiprotocols
 
   public:
 
-    struct MultiProtocolDefinition {
+      /*
+      struct MultiProtocolDefinition {
       const int protocol;
       const QString protocolString;
       const bool hasFailsafe;
@@ -51,15 +52,22 @@ class Multiprotocols
     Multiprotocols(std::initializer_list<MultiProtocolsDIY::mm_protocol_definition> l);
 
     const MultiProtocolDefinition &getProtocol(int protocol) const;
+    */
     static QString protocolToString(int protocol, bool custom = false);
     static QString subTypeToString(int protocol, unsigned subType);
     static int getMaxChannelCount(int protocol, unsigned subType);
     static QString getDefinitionVersion();
+    // int getOptionMin() const;
+    // int getOptionMax() const;
+    // Range getOptionRange();
+    // static QString optionTypeToString(int protocol);
+    // protocol item model sorted alphabetically and a filtered item model
+    // subType item model sorted alphabetically and a filtered item model based on protocol
 
   private:
 
-    std::vector<MultiProtocolDefinition> protocols;
+    //std::vector<MultiProtocolDefinition> protocols;
 
 };
 
-extern const Multiprotocols multiProtocols;
+//extern const Multiprotocols multiProtocols;

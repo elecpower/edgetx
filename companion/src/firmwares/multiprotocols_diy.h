@@ -1,6 +1,11 @@
 //  This file has been generated using multiprotocoldiy.py
 //  Content sourced from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multiprotocol.h
 
+//  typedefs
+#include <stdint.h>
+
+//  copied verbatim from source
+
 /*
  This project is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -481,10 +486,6 @@ struct PPM_Parameters
 typedef uint16_t (*uint16_function_t) (void);	//pointer to a function with no parameters which return an uint16_t integer
 typedef void     (*void_function_t  ) (void);	//pointer to a function with no parameters which returns nothing
 
-//Protocols definition
-class MultiProtocolsDIY
-{
-public:
 struct __attribute__((__packed__)) mm_protocol_definition {
 	uint8_t protocol;
 	const char *ProtoString;
@@ -498,8 +499,7 @@ struct __attribute__((__packed__)) mm_protocol_definition {
 	uint16_function_t	CallBack;
 };
 
-};
-//extern const mm_protocol_definition multi_protocols[];
+extern const mm_protocol_definition multi_protocols[];
 
 enum RF_SWITCH
 {

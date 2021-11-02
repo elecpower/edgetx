@@ -16,6 +16,8 @@
  along with Multiprotocol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "multiprotocols_diy.h"
+
 const char STR_FLYSKY[]		="FlySky";
 const char STR_HUBSAN[]		="Hubsan";
 const char STR_FRSKYD[]		="FrSky D";
@@ -177,7 +179,7 @@ const char STR_SUBTYPE_KF606[] =      "\x06""KF606\0""MIG320";
 	#define FRCPPM   3
 	#define STR_CPPM NO_SUBTYPE
 	#define NBR_CPPM 0
-//#endif
+#endif
 
 enum
 {
@@ -197,14 +199,14 @@ enum
 const mm_protocol_definition multi_protocols[] = {
 // Protocol number, Protocol String, Sub_protocol strings, Number of sub_protocols, Option type, Failsafe, ChMap, RF switch, Init, Callback
 	//#if defined(MULTI_CONFIG_INO)
-		{PROTO_CONFIG,     STR_CONFIG,    NO_SUBTYPE,            0, OPTION_NONE,    0, 0, 0,         CONFIG_init,     CONFIG_callback     },
+		{PROTO_CONFIG,     STR_CONFIG,    NO_SUBTYPE,            0, OPTION_NONE,    0, 0, 0,         nullptr,     nullptr     },
 	//#endif
 	//#if defined(ASSAN_NRF24L01_INO)
-		{PROTO_ASSAN,      STR_ASSAN,     NO_SUBTYPE,            0, OPTION_NONE,    0, 0, SW_NRF,    ASSAN_init,      ASSAN_callback      },
+		{PROTO_ASSAN,      STR_ASSAN,     NO_SUBTYPE,            0, OPTION_NONE,    0, 0, SW_NRF,    nullptr,      nullptr      },
 	//#endif
 	//#if defined(BAYANG_NRF24L01_INO)
-		{PROTO_BAYANG,     STR_BAYANG,    STR_SUBTYPE_BAYANG,    6, OPTION_TELEM,   0, 0, SW_NRF,    BAYANG_init,     BAYANG_callback     },
-	//#endif
+		{PROTO_BAYANG,     STR_BAYANG,    STR_SUBTYPE_BAYANG,    6, OPTION_TELEM,   0, 0, SW_NRF,    nullptr,     nullptr     },
+	/*#endif
 	//#if defined(BAYANG_RX_NRF24L01_INO)
 		{PROTO_BAYANG_RX,  STR_BAYANG_RX, STR_CPPM,       NBR_CPPM, OPTION_NONE,    0, 0, SW_NRF,    BAYANG_RX_init,  BAYANG_RX_callback  },
 	//#endif
@@ -297,7 +299,7 @@ const mm_protocol_definition multi_protocols[] = {
 	//#endif
 	//#if defined(FRSKYR9_SX1276_INO)
 		//#if MULTI_5IN1_INTERNAL == T18
-		{PROTO_FRSKY_R9,   STR_FRSKYR9,   STR_SUBTYPE_FRSKYR9,   8, OPTION_NONE,    1, 0, 0,         FRSKYR9_init,    FRSKYR9_callback    },
+		//{PROTO_FRSKY_R9,   STR_FRSKYR9,   STR_SUBTYPE_FRSKYR9,   8, OPTION_NONE,    1, 0, 0,         FRSKYR9_init,    FRSKYR9_callback    },
 		//#else	// DIY & T-Lite
 		{PROTO_FRSKY_R9,   STR_FRSKYR9,   STR_SUBTYPE_FRSKYR9,   8, OPTION_RFPOWER, 1, 0, 0,         FRSKYR9_init,    FRSKYR9_callback    },
 		//#endif
@@ -471,5 +473,6 @@ const mm_protocol_definition multi_protocols[] = {
 	//#if defined(NANORF_NRF24L01_INO)
 		{PROTO_NANORF,     STR_NANORF,    NO_SUBTYPE,            0, OPTION_NONE,    0, 0, SW_NRF,    NANORF_init,     NANORF_callback     },
 	//#endif
+	*/
 		{0xFF,             nullptr,       nullptr,               0, 0,              0, 0, 0,         nullptr,         nullptr             }
 };
