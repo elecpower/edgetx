@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <vector>
+//#include <vector>
 #include <QtCore>
 #include "moduledata.h"
 

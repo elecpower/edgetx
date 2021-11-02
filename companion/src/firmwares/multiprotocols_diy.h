@@ -1,8 +1,8 @@
 //  This file has been generated using multiprotocoldiy.py
 //  Content sourced from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multiprotocol.h
 
-//  typedefs
-#include <stdint.h>
+//  setup the compile environment since we are using part of the project
+#include "multiprotocols_diy_inc.h"
 
 //  copied verbatim from source
 
