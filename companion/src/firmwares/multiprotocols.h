@@ -23,6 +23,7 @@
 //#include <vector>
 #include <QtCore>
 #include "moduledata.h"
+#include "datahelpers.h"
 
 //class MultiProtocolsDIY;
 
@@ -50,17 +51,18 @@ class Multiprotocols
     };
 
     Multiprotocols(std::initializer_list<MultiProtocolsDIY::mm_protocol_definition> l);
-
-    const MultiProtocolDefinition &getProtocol(int protocol) const;
     */
-    static QString protocolToString(int protocol, bool custom = false);
+
+    //const MultiProtocolDefinition &getProtocol(int protocol) const;
+    static QString getDefinitionVersion();
+    static QString protocolToString(int protocol);
     static QString subTypeToString(int protocol, unsigned subType);
     static int getMaxChannelCount(int protocol, unsigned subType);
-    static QString getDefinitionVersion();
-    // int getOptionMin() const;
-    // int getOptionMax() const;
-    // Range getOptionRange();
-    // static QString optionTypeToString(int protocol);
+    static QString optionTypeToString(int protocol, unsigned subType);
+    static int optionTypeMin(int protocol, unsigned subType);
+    static int optionTypeMax(int protocol, unsigned subType);
+    static int optionTypeDefault(int protocol, unsigned subType);
+    static FieldRange optionTypeRange(int protocol, unsigned subType);
     // protocol item model sorted alphabetically and a filtered item model
     // subType item model sorted alphabetically and a filtered item model based on protocol
 

@@ -18,23 +18,11 @@
  * GNU General Public License for more details.
  */
 
-#include <QObject>
+//#include <QObject>
 
 #include "multiprotocols.h"
-#include "radiodata.h"
+//#include "radiodata.h"
 #include "multiprotocols_diy.h"
-
-//  TODO how is this handled in the DIY code??????
-//  convert to optionTypeToString(protocol)
-#define STR_MULTI_SUBTYPE                    QT_TRANSLATE_NOOP("Multiprotocols", "Subtype")
-#define STR_MULTI_VIDFREQ                    QT_TRANSLATE_NOOP("Multiprotocols", "Video TX frequency")
-#define STR_MULTI_RFTUNE                     QT_TRANSLATE_NOOP("Multiprotocols", "CC2500 frequency fine tune")
-#define STR_MULTI_RFPOWER                    QT_TRANSLATE_NOOP("Multiprotocols", "RF power")
-#define STR_MULTI_TELEMETRY                  QT_TRANSLATE_NOOP("Multiprotocols", "Telemetry")
-#define STR_MULTI_SERVOFREQ                  QT_TRANSLATE_NOOP("Multiprotocols", "Servo output frequency")
-#define STR_MULTI_OPTION                     QT_TRANSLATE_NOOP("Multiprotocols", "Option value")
-#define STR_MULTI_FIXEDID                    QT_TRANSLATE_NOOP("Multiprotocols", "Fixed ID value")
-#define STR_MULTI_DEFAULT                    QT_TRANSLATE_NOOP("Multiprotocols", "DEFAULT")
 
 /*
 Multiprotocols::MultiProtocolDefinition::MultiProtocolDefinition(const MultiProtocolsDIY::mm_protocol_definition &diy) :
@@ -111,55 +99,41 @@ QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
 }
 */
 
-int Multiprotocols::getOptionMin() const {
-  if (optionsstr == STR_MULTI_RFPOWER)
-    return -1;
-  else if (optionsstr == STR_MULTI_SERVOFREQ)
-    return 0;
-  else
-    return -128;
-}
-
-int Multiprotocols::getOptionMax() const {
-  if (optionsstr == STR_MULTI_RFPOWER)
-    return 7;
-  else if (optionsstr == STR_MULTI_SERVOFREQ)
-    return 70;
-  else
-    return 127;
-}
-
-unsigned int Multiprotocols::numSubTypes() const
+const mm_protocol_definition * getProtocolDefinition(int protocol)
 {
-  return protocol > MODULE_SUBTYPE_MULTI_LAST ? 8 : (unsigned int) subTypeStrings.length();
+  for (int i = 0; ; i++) {
+    if (multi_protocols[i].protocol == 0xFF)
+      break;
+    else if (multi_protocols[i].protocol == (unsigned int)protocol)
+      return &multi_protocols[i];
+  }
+
+  return nullptr;
 }
 
-
-static mm_protocol_definition & Multiprotocols::getProtocol(int protocol) const {
-  for (const Multiprotocols::MultiProtocolDefinition & proto: protocols)
-    if (proto.protocol == protocol)
-      return proto;
-
-  // Protocol not found, return the default (last) proto
-  Q_ASSERT(protocols.rbegin()->protocol == 0xfe);
-  return *protocols.rbegin();
+// static
+QString Multiprotocols::getDefinitionVersion()
+{
+  return QString("%1.%2.%3.%4").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_REVISION).arg(VERSION_PATCH_LEVEL);
 }
 
 // static
 int Multiprotocols::getMaxChannelCount(int protocol, unsigned subType)
 {
-  if (subType == MODULE_SUBTYPE_MULTI_DSM2)
+  if (subType == PROTO_DSM)
     return 12;
   else
     return 16;
 }
 
 // static
-QString Multiprotocols::protocolToString(int protocol, bool custom) //  TODO if custom param used????
+QString Multiprotocols::protocolToString(int protocol)
 {
-  for (int i = 0; multi_protocols[i].protocol == 0xFF; i++) {
-    if (multi_protocols[i].protocol == protocol)
-      return multi_protocols[i].ProtoString;
+  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+
+  for (int i = 0; pd->protocol == 0xFF; i++) {
+    if (pd->protocol == protocol)
+      return pd->ProtoString;
   }
 
   return CPN_STR_UNKNOWN_ITEM;
@@ -168,17 +142,109 @@ QString Multiprotocols::protocolToString(int protocol, bool custom) //  TODO if 
 // static
 QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
 {
-  if (subType < multiProtocols.getProtocol(protocol).numSubTypes) {
-    const unsigned int sub_len = multiProtocols.getProtocol(protocol).subTypeStrings[0];
+  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+
+  if (subType < pd->nbrSubProto) {
+    const unsigned int sub_len = pd->SubProtoString[0];
     if (sub_len > 0)
-      return multiProtocols.getProtocol(protocol).subTypeStrings[subType * sub_len]);
+      return pd->SubProtoString[subType * sub_len];
   }
 
   return CPN_STR_UNKNOWN_ITEM;
 }
 
+/*
+			OPTION_NONE		0	Hidden field
+			OPTION_OPTION	1	"Option:"		value=-128..0(default)..127
+			OPTION_RFTUNE	2	"RF freq tune:"	value=-128..0(default)..127
+			OPTION_VIDFREQ	3	"Video freq:"	value=-128..0(default)..127
+			OPTION_FIXEDID	4	"ID type:"		value="Auto":0(default), "Fixed":1
+			OPTION_TELEM	5	"Telem:"		value="Off":0(default), "On":1, "Off+Aux":2, "On+Aux":3
+			OPTION_SRVFREQ	6	"Servo freq(Hz):"	value="50":0(default).."400":70 => display=50+5*option with option=0..70
+			OPTION_MAXTHR	7	"Max throw:"	value="Disabled":0, "Enabled":1
+			OPTION_RFCHAN	8	"Select RF chan:"	value=-128..0(default)..127
+			OPTION_RFPOWER	9	"RF power:"		"1.6mW":0(default),"2.0mW":1,"2.5mW":2,"3.2mW":3,"4.0mW":4,"5.0mW":5,"6.3mW":6,"7.9mW":7,"10mW\0":8,"13mW\0":9,"16mW\0":10,"20mW\0":11,"25mW\0":12,"32mW\0":13,"40mW\0":14,"50mW\0":15
+			OPTION_WBUS		10	"Output:"		"WBUS":0(default),"PPM":1
+*/
+
 // static
-QString Multiprotocols::getDefinitionVersion()
+QString Multiprotocols::optionTypeToString(int protocol, unsigned subType)
 {
-  return QString("%1.%2.%3.%4").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_REVISION).arg(VERSION_PATCH_LEVEL);
+  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+
+  switch (pd->optionType) {
+    case OPTION_NONE:
+      return tr("NONE");
+		case OPTION_OPTION:
+      return tr("Option");
+		case OPTION_RFTUNE:
+      return tr("RF freq tune");
+    case OPTION_VIDFREQ:
+      return tr("Video freq");
+    case OPTION_FIXEDID:
+      return tr("ID type");
+    case OPTION_TELEM:
+      return tr("Telemetry");
+    case OPTION_SRVFREQ:
+      return tr("Servo freq(Hz)");
+    case OPTION_MAXTHR:
+      return tr("Max throw");
+		case OPTION_RFCHAN:
+      return tr("RF channel");
+		case OPTION_RFPOWER:
+      return tr("RF power");
+    case OPTION_WBUS:
+      return tr("Output");
+    default:
+      return CPN_STR_UNKNOWN_ITEM;
+  }
+}
+
+int Multiprotocols::optionTypeMin(int protocol, unsigned subType)
+{
+  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+
+  switch (pd->optionType) {
+    case OPTION_RFPOWER:
+      return -1;
+    case OPTION_SRVFREQ:
+      return 0;
+    default:
+      return -128;
+  }
+}
+
+int Multiprotocols::optionTypeMax(int protocol, unsigned subType)
+{
+  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+
+  switch (pd->optionType) {
+    case OPTION_RFPOWER:
+      return 7;
+    case OPTION_SRVFREQ:
+      return 70;
+    default:
+      return 127;
+  }
+}
+
+int Multiprotocols::optionTypeDefault(int protocol, unsigned subType)
+{
+  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+
+  switch (pd->optionType) {
+    default:
+      return 0;
+  }
+}
+
+FieldRange Multiprotocols::optionTypeRange(int protocol, unsigned subType)
+{
+  FieldRange result;
+
+  result.min = optionTypeMin(protocol, subType);
+  result.max = optionTypeMax(protocol, subType);
+  result.dflt = optionTypeDefault(protocol, subType);
+
+  return result;
 }
