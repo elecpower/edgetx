@@ -1,8 +1,24 @@
-//  This file has been generated using multiprotocoldiy.py
+//  This file has been generated using multiprotocol_diy.py
 //  This file must be #include in multiprotocols_diy.h
 
 //  typedefs
 #include <stdint.h>
+
+//  replicate from multiprotocols_diy.cpp with prefix (to avoid ambiguity) so referenceable by multiprotocols.cpp
+enum
+{
+	MM_OPTION_NONE,
+	MM_OPTION_OPTION,
+	MM_OPTION_RFTUNE,
+	MM_OPTION_VIDFREQ,
+	MM_OPTION_FIXEDID,
+	MM_OPTION_TELEM,
+	MM_OPTION_SRVFREQ,
+	MM_OPTION_MAXTHR,
+	MM_OPTION_RFCHAN,
+	MM_OPTION_RFPOWER,
+	MM_OPTION_WBUS,
+};
 
 //  force all subTypes for FRSKY RX protocol. Need to filter when used.
 #define SEND_CPPM

@@ -146,8 +146,9 @@ QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
 
   if (subType < pd->nbrSubProto) {
     const unsigned int sub_len = pd->SubProtoString[0];
-    if (sub_len > 0)
-      return pd->SubProtoString[subType * sub_len];
+    if (sub_len > 0) {
+      return &pd->SubProtoString[subType * sub_len];
+    }
   }
 
   return CPN_STR_UNKNOWN_ITEM;
@@ -173,27 +174,27 @@ QString Multiprotocols::optionTypeToString(int protocol, unsigned subType)
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
 
   switch (pd->optionType) {
-    case OPTION_NONE:
+    case MM_OPTION_NONE:
       return tr("NONE");
-		case OPTION_OPTION:
+		case MM_OPTION_OPTION:
       return tr("Option");
-		case OPTION_RFTUNE:
+		case MM_OPTION_RFTUNE:
       return tr("RF freq tune");
-    case OPTION_VIDFREQ:
+    case MM_OPTION_VIDFREQ:
       return tr("Video freq");
-    case OPTION_FIXEDID:
+    case MM_OPTION_FIXEDID:
       return tr("ID type");
-    case OPTION_TELEM:
+    case MM_OPTION_TELEM:
       return tr("Telemetry");
-    case OPTION_SRVFREQ:
+    case MM_OPTION_SRVFREQ:
       return tr("Servo freq(Hz)");
-    case OPTION_MAXTHR:
+    case MM_OPTION_MAXTHR:
       return tr("Max throw");
-		case OPTION_RFCHAN:
+		case MM_OPTION_RFCHAN:
       return tr("RF channel");
-		case OPTION_RFPOWER:
+		case MM_OPTION_RFPOWER:
       return tr("RF power");
-    case OPTION_WBUS:
+    case MM_OPTION_WBUS:
       return tr("Output");
     default:
       return CPN_STR_UNKNOWN_ITEM;
@@ -205,9 +206,13 @@ int Multiprotocols::optionTypeMin(int protocol, unsigned subType)
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
 
   switch (pd->optionType) {
-    case OPTION_RFPOWER:
-      return -1;
-    case OPTION_SRVFREQ:
+    case MM_OPTION_NONE:
+    case MM_OPTION_FIXEDID:
+    case MM_OPTION_MAXTHR:
+    case MM_OPTION_RFPOWER:
+    case MM_OPTION_SRVFREQ:
+    case MM_OPTION_TELEM:
+    case MM_OPTION_WBUS:
       return 0;
     default:
       return -128;
@@ -219,9 +224,17 @@ int Multiprotocols::optionTypeMax(int protocol, unsigned subType)
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
 
   switch (pd->optionType) {
-    case OPTION_RFPOWER:
-      return 7;
-    case OPTION_SRVFREQ:
+    case MM_OPTION_NONE:
+      return 0;
+    case MM_OPTION_FIXEDID:
+    case MM_OPTION_TELEM:
+    case MM_OPTION_WBUS:
+      return 1;
+    case MM_OPTION_MAXTHR:
+      return 3;
+    case MM_OPTION_RFPOWER:
+      return 15;
+    case MM_OPTION_SRVFREQ:
       return 70;
     default:
       return 127;

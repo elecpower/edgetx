@@ -1,4 +1,4 @@
-//  This file has been generated using multiprotocoldiy.py
+//  This file has been generated using multiprotocol_diy.py
 //  Content sourced from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multiprotocol.h
 
 //  setup the compile environment since we are using part of the project
