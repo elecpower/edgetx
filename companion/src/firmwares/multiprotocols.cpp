@@ -241,23 +241,12 @@ int Multiprotocols::optionTypeMax(int protocol, unsigned subType)
   }
 }
 
-int Multiprotocols::optionTypeDefault(int protocol, unsigned subType)
-{
-  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
-
-  switch (pd->optionType) {
-    default:
-      return 0;
-  }
-}
-
 FieldRange Multiprotocols::optionTypeRange(int protocol, unsigned subType)
 {
   FieldRange result;
 
   result.min = optionTypeMin(protocol, subType);
   result.max = optionTypeMax(protocol, subType);
-  result.dflt = optionTypeDefault(protocol, subType);
 
   return result;
 }

@@ -72,8 +72,7 @@ class FieldRange
       step(1.0),
       offset(0.0),
       prefix(""),
-      unit(""),
-      dflt(0.0)
+      unit("")
     {
     }
 
@@ -86,7 +85,6 @@ class FieldRange
     double offset;
     QString prefix;
     QString unit;
-    double dflt;
 };
 
 
