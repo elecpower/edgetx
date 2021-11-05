@@ -131,12 +131,10 @@ QString Multiprotocols::protocolToString(int protocol)
 {
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
 
-  for (int i = 0; pd->protocol == 0xFF; i++) {
-    if (pd->protocol == protocol)
-      return pd->ProtoString;
-  }
-
-  return CPN_STR_UNKNOWN_ITEM;
+  if (pd)
+    return pd->ProtoString;
+  else
+    return CPN_STR_UNKNOWN_ITEM;
 }
 
 // static
@@ -144,10 +142,12 @@ QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
 {
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
 
-  if (subType < pd->nbrSubProto) {
-    const unsigned int sub_len = pd->SubProtoString[0];
-    if (sub_len > 0) {
-      return &pd->SubProtoString[subType * sub_len];
+  if (pd) {
+    if (subType < pd->nbrSubProto) {
+      const unsigned int sub_len = pd->SubProtoString[0];
+      if (sub_len > 0) {
+        return &pd->SubProtoString[subType * sub_len];
+      }
     }
   }
 
@@ -173,72 +173,84 @@ QString Multiprotocols::optionTypeToString(int protocol, unsigned subType)
 {
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
 
-  switch (pd->optionType) {
-    case MM_OPTION_NONE:
-      return tr("NONE");
-		case MM_OPTION_OPTION:
-      return tr("Option");
-		case MM_OPTION_RFTUNE:
-      return tr("RF freq tune");
-    case MM_OPTION_VIDFREQ:
-      return tr("Video freq");
-    case MM_OPTION_FIXEDID:
-      return tr("ID type");
-    case MM_OPTION_TELEM:
-      return tr("Telemetry");
-    case MM_OPTION_SRVFREQ:
-      return tr("Servo freq(Hz)");
-    case MM_OPTION_MAXTHR:
-      return tr("Max throw");
-		case MM_OPTION_RFCHAN:
-      return tr("RF channel");
-		case MM_OPTION_RFPOWER:
-      return tr("RF power");
-    case MM_OPTION_WBUS:
-      return tr("Output");
-    default:
-      return CPN_STR_UNKNOWN_ITEM;
+  if (pd) {
+    switch (pd->optionType) {
+      case MM_OPTION_NONE:
+        return tr("NONE");
+      case MM_OPTION_OPTION:
+        return tr("Option");
+      case MM_OPTION_RFTUNE:
+        return tr("RF freq tune");
+      case MM_OPTION_VIDFREQ:
+        return tr("Video freq");
+      case MM_OPTION_FIXEDID:
+        return tr("ID type");
+      case MM_OPTION_TELEM:
+        return tr("Telemetry");
+      case MM_OPTION_SRVFREQ:
+        return tr("Servo freq(Hz)");
+      case MM_OPTION_MAXTHR:
+        return tr("Max throw");
+      case MM_OPTION_RFCHAN:
+        return tr("RF channel");
+      case MM_OPTION_RFPOWER:
+        return tr("RF power");
+      case MM_OPTION_WBUS:
+        return tr("Output");
+      default:
+        return CPN_STR_UNKNOWN_ITEM;
+    }
   }
+  else
+    return CPN_STR_UNKNOWN_ITEM;
 }
 
 int Multiprotocols::optionTypeMin(int protocol, unsigned subType)
 {
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
 
-  switch (pd->optionType) {
-    case MM_OPTION_NONE:
-    case MM_OPTION_FIXEDID:
-    case MM_OPTION_MAXTHR:
-    case MM_OPTION_RFPOWER:
-    case MM_OPTION_SRVFREQ:
-    case MM_OPTION_TELEM:
-    case MM_OPTION_WBUS:
-      return 0;
-    default:
-      return -128;
+  if (pd) {
+    switch (pd->optionType) {
+      case MM_OPTION_NONE:
+      case MM_OPTION_FIXEDID:
+      case MM_OPTION_MAXTHR:
+      case MM_OPTION_RFPOWER:
+      case MM_OPTION_SRVFREQ:
+      case MM_OPTION_TELEM:
+      case MM_OPTION_WBUS:
+        return 0;
+      default:
+        return -128;
+    }
   }
+  else
+    return 0;
 }
 
 int Multiprotocols::optionTypeMax(int protocol, unsigned subType)
 {
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
 
-  switch (pd->optionType) {
-    case MM_OPTION_NONE:
-      return 0;
-    case MM_OPTION_FIXEDID:
-    case MM_OPTION_TELEM:
-    case MM_OPTION_WBUS:
-      return 1;
-    case MM_OPTION_MAXTHR:
-      return 3;
-    case MM_OPTION_RFPOWER:
-      return 15;
-    case MM_OPTION_SRVFREQ:
-      return 70;
-    default:
-      return 127;
+  if (pd) {
+    switch (pd->optionType) {
+      case MM_OPTION_NONE:
+        return 0;
+      case MM_OPTION_FIXEDID:
+      case MM_OPTION_TELEM:
+      case MM_OPTION_WBUS:
+        return 1;
+      case MM_OPTION_MAXTHR:
+        return 3;
+      case MM_OPTION_RFPOWER:
+        return 15;
+      case MM_OPTION_SRVFREQ:
+        return 70;
+      default:
+        return 127;
+    }
   }
+  else
+    return 0;
 }
 
 FieldRange Multiprotocols::optionTypeRange(int protocol, unsigned subType)
@@ -249,4 +261,133 @@ FieldRange Multiprotocols::optionTypeRange(int protocol, unsigned subType)
   result.max = optionTypeMax(protocol, subType);
 
   return result;
+}
+
+//  static
+int Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType)
+{
+  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+
+  if (pd) {
+    switch (pd->optionType) {
+      case MM_OPTION_NONE:
+        return VALUE_UI_WIDGET_NONE;
+      case MM_OPTION_OPTION:
+      case MM_OPTION_RFTUNE:
+      case MM_OPTION_VIDFREQ:
+      case MM_OPTION_RFCHAN:
+        return VALUE_UI_WIDGET_SPINBOX;
+      case MM_OPTION_FIXEDID:
+      case MM_OPTION_TELEM:
+      case MM_OPTION_SRVFREQ:
+      case MM_OPTION_MAXTHR:
+      case MM_OPTION_RFPOWER:
+      case MM_OPTION_WBUS:
+        return VALUE_UI_WIDGET_COMBOBOX;
+      default:
+    }
+  }
+  else
+    return VALUE_UI_WIDGET_NONE;
+}
+
+//  static
+AbstractStaticItemModel * Multiprotocols::protocolItemModel(int protocol, unsigned subType)
+{
+  AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
+  mdl->setName(AIM_MULTI_PROTOCOL);
+
+  for (int i = PROTOCOL_FIRST; i <= PROTOCOL_LAST; i++) {
+    mdl->appendToItemList(protocolToString(i), i);
+  }
+
+  mdl->sort(0);
+  mdl->loadItemList();
+  return mdl;
+}
+
+//  static
+AbstractStaticItemModel * Multiprotocols::subTypeItemModel(int protocol, unsigned subType)
+{
+  AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
+  mdl->setName(AIM_MULTI_SUBTYPE);
+
+  for (int i = PROTOCOL_FIRST; i <= PROTOCOL_LAST; i++) {
+    for (unsigned int j = SUBTYPE_FIRST; j <= SUBTYPE_LAST; j++) {
+      mdl->appendToItemList(subTypeToString(i, j), j, , ,i);    //  load all protocols and subtypes then filter when used
+    }
+  }
+
+  mdl->sort(0);
+  mdl->loadItemList();
+  return mdl;
+}
+
+//  static
+AbstractStaticItemModel * Multiprotocols::OptionTypeValueItemModel(int protocol, unsigned subType)
+{
+  AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
+  mdl->setName(AIM_MULTI_OPTIONVALUE);
+
+  for (int i = PROTOCOL_FIRST; i <= PROTOCOL_LAST; i++) {
+    mdl->appendToItemList(protocolToString(i, j), i);
+  }
+
+  mdl->sort(0);
+  mdl->loadItemList();
+  return mdl;
+}
+
+/*
+ * MultiprotocolsUIManager
+*/
+
+MultiprotocolsUIManager::MultiprotocolsUIManager(QLabel *optionTypeLabel, QSpinBox *optionTypeValueSpin, QComboBox *optionTypeValueCombo,
+                            int protocol, unsigned int subType, int & optionTypeValue, QObject * parent = nullptr);
+  QObject(parent),
+  optionTypeLabel(optionTypeLabel),
+  optionTypeValueSpin(optionTypeValueSpin),
+  optionTypeValueCombo(optionTypeValueCombo),
+  protocol(protocol),
+  subType(subType),
+  optionTypeValue(optionTypeValue)
+{
+  int valueUiWidget = Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType);
+
+  if ( valueUiWidget != VALUE_UI_WIDGET_NONE) {
+
+    if (optionTypeLabel) {
+      optionTypeLabel->setVisible(true);
+      optionTypeLabel->setText(Multiprotocols::optionTypeToString(int protocol, unsigned subType));
+    }
+
+    if (optionTypeValueSpin && valueUiWidget == VALUE_UI_WIDGET_SPINBOX) {
+      FieldRange rng = Multiprotocols::optionTypeRange(int protocol, unsigned subType);
+      optionTypeValueSpin->setMinimum(rng.min);
+      optionTypeValueSpin->setMaximum(rng.max);
+      connect(optionTypeValueSpin, &QSpinBox::editingFinished, this, [=]() {
+        if (!lock) {
+          optionTypeValue = optionTypeValueSpin->value();
+          update();
+        }
+      });
+    }
+
+    if (optionTypeValueCombo && valueUiWidget == VALUE_UI_WIDGET_COMBOBOX) {
+      optionTypeValueCombo->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+      optionTypeValueCombo->setMaxVisibleItems(10);
+      optionTypeValueCombo->setModel(Multiprotocols::optionTypeValueItemModel(int protocol, unsigned subType));
+      connect(optionTypeValueCombo, &QComboBox::currentIndexChanged, this, this, [=]() {
+        if (!lock) {
+          optionTypeValue = optionTypeValueCombo->itemData(optionTypeValueCombo->currentIndex()).toInt();
+          update();
+        }
+      });
+    }
+  }
+  else {
+    optionTypeLabel->setVisible(false);
+    optionTypeValueSpin->setVisible(false);
+    optionTypeValueCombo->setVisible(false);
+  }
 }

@@ -25,13 +25,25 @@
 #include "moduledata.h"
 #include "datahelpers.h"
 
-//class MultiProtocolsDIY;
+// identiying names of static abstract item models
+constexpr char AIM_MULTI_PROTOCOL[]        {"multi.protocol"};
+constexpr char AIM_MULTI_SUBTYPE[]         {"multi.subtype"};
+constexpr char AIM_MULTI_OPTIONVALUE[]     {"multi.optionvalue"};
+
+class AbstractStaticItemModel;
 
 class Multiprotocols
 {
     Q_DECLARE_TR_FUNCTIONS(Multiprotocols)
 
   public:
+    enum ValueUiWidget
+    {
+      VALUE_UI_WIDGET_NONE,
+      VALUE_UI_WIDGET_SPINBOX,
+      VALUE_UI_WIDGET_COMBOBOX
+    };
+
 
       /*
       struct MultiProtocolDefinition {
@@ -63,8 +75,10 @@ class Multiprotocols
     static int optionTypeMax(int protocol, unsigned subType);
     static int optionTypeDefault(int protocol, unsigned subType);
     static FieldRange optionTypeRange(int protocol, unsigned subType);
-    // protocol item model sorted alphabetically and a filtered item model
-    // subType item model sorted alphabetically and a filtered item model based on protocol
+    static int optionTypeValueUiWidget(int protocol, unsigned subType);
+    static AbstractStaticItemModel *protocolItemModel(int protocol, unsigned subType);
+    static AbstractStaticItemModel *subTypeItemModel(int protocol, unsigned subType);
+    static AbstractStaticItemModel *optionTypeValueItemModel(int protocol, unsigned subType);
 
   private:
 
@@ -73,3 +87,22 @@ class Multiprotocols
 };
 
 //extern const Multiprotocols multiProtocols;
+
+class MultiprotocolsUIManager : public QObject {
+
+  Q_OBJECT
+
+  public:
+    explicit MultiprotocolsUIManager(QLabel *optionTypeLabel, QSpinBox *optionTypeValueSpin, QComboBox *optionTypeValueCombo,
+                            int protocol, unsigned int subType, int & optionTypeValue, QObject * parent = nullptr);
+
+    virtual ~MultiprotocolsUIManager();
+
+  private:
+    QLabel *optionTypeLabel;
+    QSpinBox *optionTypeValueSpin;
+    QComboBox *optionTypeValueCombo;
+    int protocol;
+    unsigned int subType;
+    int &optionTypeValue;
+};
