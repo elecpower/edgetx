@@ -21,17 +21,17 @@
 
 #include "multiprotocols.h"
 #include "module_multi_diy.h"
+#include "ui_module_multi_diy.h"
 
-ModuleMultiDIY::ModuleMultiDIY(QLabel *optionTypeLabel, QSpinBox *optionTypeValueSpin, QComboBox *optionTypeValueCombo,
-                            int protocol, unsigned int subType, int & optionTypeValue, QObject * parent = nullptr);
-  QObject(parent),
-  optionTypeLabel(optionTypeLabel),
-  optionTypeValueSpin(optionTypeValueSpin),
-  optionTypeValueCombo(optionTypeValueCombo),
+ModuleMultiDIY::ModuleMultiDIY(int protocol, unsigned int subType, int & optionTypeValue, QWidget * parent = nullptr);
+  QWidget(parent),
   protocol(protocol),
   subType(subType),
-  optionTypeValue(optionTypeValue)
+  optionTypeValue(optionTypeValue),
+  ui(new Ui::ModuleMultiDIY)
 {
+  ui->setupUi(this);
+
   int valueUiWidget = Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType);
 
   if ( valueUiWidget != VALUE_UI_WIDGET_NONE) {
@@ -74,4 +74,9 @@ ModuleMultiDIY::ModuleMultiDIY(QLabel *optionTypeLabel, QSpinBox *optionTypeValu
     optionTypeValueSpin->setVisible(false);
     optionTypeValueCombo->setVisible(false);
   }
+}
+
+ModuleMultiDIY::~ModuleMultiDIY()
+{
+  delete ui;
 }

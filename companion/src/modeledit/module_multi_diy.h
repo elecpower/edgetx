@@ -26,15 +26,11 @@ class ModuleMultiDIY : public QObject {
   Q_OBJECT
 
   public:
-    explicit ModuleMultiDIY(QLabel *optionTypeLabel, QSpinBox *optionTypeValueSpin, QComboBox *optionTypeValueCombo,
-                            int protocol, unsigned int subType, int & optionTypeValue, QObject * parent = nullptr);
+    explicit ModuleMultiDIY(int protocol, unsigned int subType, int & optionTypeValue, QObject * parent = nullptr);
 
     virtual ~ModuleMultiDIY();
 
   private:
-    QLabel *optionTypeLabel;
-    QSpinBox *optionTypeValueSpin;
-    QComboBox *optionTypeValueCombo;
     int protocol;
     unsigned int subType;
     int &optionTypeValue;
