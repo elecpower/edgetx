@@ -23,11 +23,9 @@
 #include "module_multi_diy.h"
 #include "ui_module_multi_diy.h"
 
-ModuleMultiDIY::ModuleMultiDIY(int protocol, unsigned int subType, int & optionTypeValue, QWidget * parent = nullptr);
+ModuleMultiDIY::ModuleMultiDIY(ModuleData & moduleData, QWidget * parent = nullptr);
   QWidget(parent),
-  protocol(protocol),
-  subType(subType),
-  optionTypeValue(optionTypeValue),
+  moduleData(moduleData),
   ui(new Ui::ModuleMultiDIY)
 {
   ui->setupUi(this);

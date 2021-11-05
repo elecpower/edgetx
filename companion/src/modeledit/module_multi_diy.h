@@ -21,18 +21,18 @@
 
 #pragma once
 
+#include <QtCore>
+
 class ModuleMultiDIY : public QObject {
 
   Q_OBJECT
 
   public:
-    explicit ModuleMultiDIY(int protocol, unsigned int subType, int & optionTypeValue, QObject * parent = nullptr);
+    explicit ModuleMultiDIY(ModuleData & moduleData, QWidget * parent = nullptr);
 
     virtual ~ModuleMultiDIY();
 
   private:
-    int protocol;
-    unsigned int subType;
-    int &optionTypeValue;
+    ModuleData & moduleData;
 };
 
