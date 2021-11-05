@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -336,58 +337,4 @@ AbstractStaticItemModel * Multiprotocols::OptionTypeValueItemModel(int protocol,
   mdl->sort(0);
   mdl->loadItemList();
   return mdl;
-}
-
-/*
- * MultiprotocolsUIManager
-*/
-
-MultiprotocolsUIManager::MultiprotocolsUIManager(QLabel *optionTypeLabel, QSpinBox *optionTypeValueSpin, QComboBox *optionTypeValueCombo,
-                            int protocol, unsigned int subType, int & optionTypeValue, QObject * parent = nullptr);
-  QObject(parent),
-  optionTypeLabel(optionTypeLabel),
-  optionTypeValueSpin(optionTypeValueSpin),
-  optionTypeValueCombo(optionTypeValueCombo),
-  protocol(protocol),
-  subType(subType),
-  optionTypeValue(optionTypeValue)
-{
-  int valueUiWidget = Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType);
-
-  if ( valueUiWidget != VALUE_UI_WIDGET_NONE) {
-
-    if (optionTypeLabel) {
-      optionTypeLabel->setVisible(true);
-      optionTypeLabel->setText(Multiprotocols::optionTypeToString(int protocol, unsigned subType));
-    }
-
-    if (optionTypeValueSpin && valueUiWidget == VALUE_UI_WIDGET_SPINBOX) {
-      FieldRange rng = Multiprotocols::optionTypeRange(int protocol, unsigned subType);
-      optionTypeValueSpin->setMinimum(rng.min);
-      optionTypeValueSpin->setMaximum(rng.max);
-      connect(optionTypeValueSpin, &QSpinBox::editingFinished, this, [=]() {
-        if (!lock) {
-          optionTypeValue = optionTypeValueSpin->value();
-          update();
-        }
-      });
-    }
-
-    if (optionTypeValueCombo && valueUiWidget == VALUE_UI_WIDGET_COMBOBOX) {
-      optionTypeValueCombo->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-      optionTypeValueCombo->setMaxVisibleItems(10);
-      optionTypeValueCombo->setModel(Multiprotocols::optionTypeValueItemModel(int protocol, unsigned subType));
-      connect(optionTypeValueCombo, &QComboBox::currentIndexChanged, this, this, [=]() {
-        if (!lock) {
-          optionTypeValue = optionTypeValueCombo->itemData(optionTypeValueCombo->currentIndex()).toInt();
-          update();
-        }
-      });
-    }
-  }
-  else {
-    optionTypeLabel->setVisible(false);
-    optionTypeValueSpin->setVisible(false);
-    optionTypeValueCombo->setVisible(false);
-  }
 }

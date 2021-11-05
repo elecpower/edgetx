@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -87,22 +88,3 @@ class Multiprotocols
 };
 
 //extern const Multiprotocols multiProtocols;
-
-class MultiprotocolsUIManager : public QObject {
-
-  Q_OBJECT
-
-  public:
-    explicit MultiprotocolsUIManager(QLabel *optionTypeLabel, QSpinBox *optionTypeValueSpin, QComboBox *optionTypeValueCombo,
-                            int protocol, unsigned int subType, int & optionTypeValue, QObject * parent = nullptr);
-
-    virtual ~MultiprotocolsUIManager();
-
-  private:
-    QLabel *optionTypeLabel;
-    QSpinBox *optionTypeValueSpin;
-    QComboBox *optionTypeValueCombo;
-    int protocol;
-    unsigned int subType;
-    int &optionTypeValue;
-};
