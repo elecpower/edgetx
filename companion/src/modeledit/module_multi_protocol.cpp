@@ -19,7 +19,10 @@
  * GNU General Public License for more details.
  */
 
-ModuleMultiProtocol::ModuleMultiProtocol(QLabel *optionTypeLabel, QSpinBox *optionTypeValueSpin, QComboBox *optionTypeValueCombo,
+#include "multiprotocols.h"
+#include "module_multi_diy.h"
+
+ModuleMultiDIY::ModuleMultiDIY(QLabel *optionTypeLabel, QSpinBox *optionTypeValueSpin, QComboBox *optionTypeValueCombo,
                             int protocol, unsigned int subType, int & optionTypeValue, QObject * parent = nullptr);
   QObject(parent),
   optionTypeLabel(optionTypeLabel),

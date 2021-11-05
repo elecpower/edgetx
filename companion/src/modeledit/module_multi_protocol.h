@@ -21,15 +21,15 @@
 
 #pragma once
 
-class ModuleMultiProtocol : public QObject {
+class ModuleMultiDIY : public QObject {
 
   Q_OBJECT
 
   public:
-    explicit ModuleMultiProtocol(QLabel *optionTypeLabel, QSpinBox *optionTypeValueSpin, QComboBox *optionTypeValueCombo,
+    explicit ModuleMultiDIY(QLabel *optionTypeLabel, QSpinBox *optionTypeValueSpin, QComboBox *optionTypeValueCombo,
                             int protocol, unsigned int subType, int & optionTypeValue, QObject * parent = nullptr);
 
-    virtual ~ModuleMultiProtocol();
+    virtual ~ModuleMultiDIY();
 
   private:
     QLabel *optionTypeLabel;
