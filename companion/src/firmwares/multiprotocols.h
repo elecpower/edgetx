@@ -23,7 +23,7 @@
 
 //#include <vector>
 #include <QtCore>
-#include "moduledata.h"
+//#include "moduledata.h"
 #include "datahelpers.h"
 
 // identiying names of static abstract item models
@@ -72,14 +72,14 @@ class Multiprotocols
     static QString subTypeToString(int protocol, unsigned subType);
     static int getMaxChannelCount(int protocol, unsigned subType);
     static QString optionTypeToString(int protocol, unsigned subType);
+    static QString optionValueToString(int protocol, unsigned subType, int optionValue);
     static int optionTypeMin(int protocol, unsigned subType);
     static int optionTypeMax(int protocol, unsigned subType);
     static int optionTypeDefault(int protocol, unsigned subType);
     static FieldRange optionTypeRange(int protocol, unsigned subType);
     static int optionTypeValueUiWidget(int protocol, unsigned subType);
-    static AbstractStaticItemModel *protocolItemModel(int protocol, unsigned subType);
-    static AbstractStaticItemModel *subTypeItemModel(int protocol, unsigned subType);
-    static AbstractStaticItemModel *optionTypeValueItemModel(int protocol, unsigned subType);
+    static AbstractStaticItemModel *protocolItemModel();
+    static AbstractStaticItemModel *subTypeItemModel();
 
   private:
 

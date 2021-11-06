@@ -24,6 +24,7 @@
 #include "multiprotocols.h"
 //#include "radiodata.h"
 #include "multiprotocols_diy.h"
+#include "macros.h"
 
 /*
 Multiprotocols::MultiProtocolDefinition::MultiProtocolDefinition(const MultiProtocolsDIY::mm_protocol_definition &diy) :
@@ -100,13 +101,13 @@ QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
 }
 */
 
-const mm_protocol_definition * getProtocolDefinition(int protocol)
+static mm_protocol_definition * getProtocolDefinition(int protocol)
 {
-  for (int i = 0; ; i++) {
-    if (multi_protocols[i].protocol == 0xFF)
+  for (auto &proto : multi_protocols) {
+    if (proto.protocol == 0xFF)
       break;
-    else if (multi_protocols[i].protocol == (unsigned int)protocol)
-      return &multi_protocols[i];
+    else if (proto.protocol == (unsigned int)protocol)
+      return proto;
   }
 
   return nullptr;
@@ -156,17 +157,17 @@ QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
 }
 
 /*
-			OPTION_NONE		0	Hidden field
-			OPTION_OPTION	1	"Option:"		value=-128..0(default)..127
-			OPTION_RFTUNE	2	"RF freq tune:"	value=-128..0(default)..127
-			OPTION_VIDFREQ	3	"Video freq:"	value=-128..0(default)..127
-			OPTION_FIXEDID	4	"ID type:"		value="Auto":0(default), "Fixed":1
-			OPTION_TELEM	5	"Telem:"		value="Off":0(default), "On":1, "Off+Aux":2, "On+Aux":3
-			OPTION_SRVFREQ	6	"Servo freq(Hz):"	value="50":0(default).."400":70 => display=50+5*option with option=0..70
-			OPTION_MAXTHR	7	"Max throw:"	value="Disabled":0, "Enabled":1
-			OPTION_RFCHAN	8	"Select RF chan:"	value=-128..0(default)..127
-			OPTION_RFPOWER	9	"RF power:"		"1.6mW":0(default),"2.0mW":1,"2.5mW":2,"3.2mW":3,"4.0mW":4,"5.0mW":5,"6.3mW":6,"7.9mW":7,"10mW\0":8,"13mW\0":9,"16mW\0":10,"20mW\0":11,"25mW\0":12,"32mW\0":13,"40mW\0":14,"50mW\0":15
-			OPTION_WBUS		10	"Output:"		"WBUS":0(default),"PPM":1
+  OPTION_NONE		0	Hidden field
+  OPTION_OPTION	1	"Option:"		value=-128..0(default)..127
+  OPTION_RFTUNE	2	"RF freq tune:"	value=-128..0(default)..127
+  OPTION_VIDFREQ	3	"Video freq:"	value=-128..0(default)..127
+  OPTION_FIXEDID	4	"ID type:"		value="Auto":0(default), "Fixed":1
+  OPTION_TELEM	5	"Telem:"		value="Off":0(default), "On":1, "Off+Aux":2, "On+Aux":3
+  OPTION_SRVFREQ	6	"Servo freq(Hz):"	value="50":0(default).."400":70 => display=50+5*option with option=0..70
+  OPTION_MAXTHR	7	"Max throw:"	value="Disabled":0, "Enabled":1
+  OPTION_RFCHAN	8	"Select RF chan:"	value=-128..0(default)..127
+  OPTION_RFPOWER	9	"RF power:"		"1.6mW":0(default),"2.0mW":1,"2.5mW":2,"3.2mW":3,"4.0mW":4,"5.0mW":5,"6.3mW":6,"7.9mW":7,"10mW\0":8,"13mW\0":9,"16mW\0":10,"20mW\0":11,"25mW\0":12,"32mW\0":13,"40mW\0":14,"50mW\0":15
+  OPTION_WBUS		10	"Output:"		"WBUS":0(default),"PPM":1
 */
 
 // static
@@ -265,6 +266,42 @@ FieldRange Multiprotocols::optionTypeRange(int protocol, unsigned subType)
 }
 
 //  static
+QString Multiprotocols::optionValueToString(int protocol, unsigned subType, int optionValue)
+{
+  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+
+  if (pd) {
+    QStringList lst;
+    switch (pd->optionType) {
+      case MM_OPTION_FIXEDID:
+        lst << tr("Auto") << tr("Fixed");
+        break:
+      case MM_OPTION_TELEM:
+        lst << tr("Off") << tr("On") << tr("Off+Aux") << tr("On+Aux");
+        break:
+      case MM_OPTION_MAXTHR:
+        lst << tr("Disabled") << tr("Enabled");
+        break:
+      case MM_OPTION_RFPOWER:
+        lst << tr("1.6mW") << tr("2.0mW") << tr("2.5mW") << tr("3.2mW") << tr("4.0mW") << tr("5.0mW") << tr("6.3mW") << tr("7.9mW")
+            << tr("10mW") << tr("13mW") tr("16mW") << tr("20mW") << tr("25mW") << tr("32mW") << tr("40mW") << tr("50mW");
+        break:
+      case MM_OPTION_WBUS:
+        lst << tr("WBUS") << tr("PPM");
+        break:
+    }
+
+    if (optionValue < lst.count())
+      return lst[optionValue];
+    else
+      return CPN_STR_UNKNOWN_ITEM;
+  }
+
+  return CPN_STR_UNKNOWN_ITEM;
+}
+
+
+//  static
 int Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType)
 {
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
@@ -286,6 +323,7 @@ int Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType)
       case MM_OPTION_WBUS:
         return VALUE_UI_WIDGET_COMBOBOX;
       default:
+        return VALUE_UI_WIDGET_NONE;
     }
   }
   else
@@ -293,13 +331,15 @@ int Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType)
 }
 
 //  static
-AbstractStaticItemModel * Multiprotocols::protocolItemModel(int protocol, unsigned subType)
+AbstractStaticItemModel * Multiprotocols::protocolItemModel()
 {
   AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
   mdl->setName(AIM_MULTI_PROTOCOL);
 
-  for (int i = PROTOCOL_FIRST; i <= PROTOCOL_LAST; i++) {
-    mdl->appendToItemList(protocolToString(i), i);
+  for (auto &proto : multi_protocols) {
+    if (proto.protocol == 0xFF)
+      break;
+    mdl->appendToItemList(proto.ProtoString, proto.protocol);
   }
 
   mdl->sort(0);
@@ -308,30 +348,17 @@ AbstractStaticItemModel * Multiprotocols::protocolItemModel(int protocol, unsign
 }
 
 //  static
-AbstractStaticItemModel * Multiprotocols::subTypeItemModel(int protocol, unsigned subType)
+AbstractStaticItemModel * Multiprotocols::subTypeItemModel()
 {
   AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
   mdl->setName(AIM_MULTI_SUBTYPE);
 
-  for (int i = PROTOCOL_FIRST; i <= PROTOCOL_LAST; i++) {
-    for (unsigned int j = SUBTYPE_FIRST; j <= SUBTYPE_LAST; j++) {
-      mdl->appendToItemList(subTypeToString(i, j), j, , ,i);    //  load all protocols and subtypes then filter when used
+  for (auto &proto : multi_protocols) {
+    if (proto.protocol == 0xFF)
+      break;
+    for (unsigned int j = 0; j <= proto.nbrSubProto; j++) {
+      mdl->appendToItemList(subTypeToString(proto.protocol, j), j, , ,proto.protocol);    //  load all protocols and subtypes then filter when used
     }
-  }
-
-  mdl->sort(0);
-  mdl->loadItemList();
-  return mdl;
-}
-
-//  static
-AbstractStaticItemModel * Multiprotocols::OptionTypeValueItemModel(int protocol, unsigned subType)
-{
-  AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
-  mdl->setName(AIM_MULTI_OPTIONVALUE);
-
-  for (int i = PROTOCOL_FIRST; i <= PROTOCOL_LAST; i++) {
-    mdl->appendToItemList(protocolToString(i, j), i);
   }
 
   mdl->sort(0);
