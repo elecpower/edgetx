@@ -44,18 +44,19 @@ class Multiprotocols
     };
 
     static QString getDefinitionVersion();
-    static QString protocolToString(int protocol);
-    static QString subTypeToString(int protocol, unsigned subType);
     static int getMaxChannelCount(int protocol, unsigned subType);
-    static QString optionTypeToString(int protocol, unsigned subType);
 
+    static QString protocolToString(int protocol);
+    static AbstractStaticItemModel *protocolItemModel();
+
+    static QString subTypeToString(int protocol, unsigned subType);
+    static AbstractStaticItemModel *subTypeItemModel();
+
+    static QString optionTypeToString(int protocol, unsigned subType);
     static int optionTypeMin(int protocol, unsigned subType);
     static int optionTypeMax(int protocol, unsigned subType);
     static FieldRange optionTypeRange(int protocol, unsigned subType);
 
-    static QString optionValueToString(int protocol, unsigned subType, int optionValue);
     static int optionTypeValueUiWidget(int protocol, unsigned subType);
-
-    static AbstractStaticItemModel *protocolItemModel();
-    static AbstractStaticItemModel *subTypeItemModel();
+    static QString optionValueToString(int protocol, unsigned subType, int optionValue);
 };

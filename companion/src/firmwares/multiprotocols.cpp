@@ -21,6 +21,7 @@
 
 #include "multiprotocols.h"
 #include "multiprotocols_diy.h"
+#include "compounditemmodels.h"
 
 static mm_protocol_definition * getProtocolDefinition(int protocol)
 {
@@ -60,6 +61,23 @@ QString Multiprotocols::protocolToString(int protocol)
   return CPN_STR_UNKNOWN_ITEM;
 }
 
+//  static
+AbstractStaticItemModel * Multiprotocols::protocolItemModel()
+{
+  AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
+  mdl->setName(AIM_MULTI_PROTOCOL);
+
+  for (auto &pd : multi_protocols) {
+    if (pd.protocol == 0xFF)
+      break;
+    mdl->appendToItemList(pd.ProtoString, pd.protocol);
+  }
+
+  mdl->sort(0);
+  mdl->loadItemList();
+  return mdl;
+}
+
 // static
 QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
 {
@@ -75,6 +93,25 @@ QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
   }
 
   return CPN_STR_UNKNOWN_ITEM;
+}
+
+//  static
+AbstractStaticItemModel * Multiprotocols::subTypeItemModel()
+{
+  AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
+  mdl->setName(AIM_MULTI_SUBTYPE);
+
+  for (auto &pd : multi_protocols) {
+    if (pd.protocol == 0xFF)
+      break;
+    for (unsigned int j = 0; j <= pd.nbrSubProto; j++) {
+      mdl->appendToItemList(subTypeToString(pd.protocol, j), j, , ,pd.protocol);    //  load all protocols and subtypes then filter when used
+    }
+  }
+
+  mdl->sort(0);
+  mdl->loadItemList();
+  return mdl;
 }
 
 // static
@@ -176,6 +213,35 @@ FieldRange Multiprotocols::optionTypeRange(int protocol, unsigned subType)
 }
 
 //  static
+int Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType)
+{
+  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+
+  if (pd) {
+    switch (pd->optionType) {
+      case MM_OPTION_NONE:
+        return VALUE_UI_WIDGET_NONE;
+      case MM_OPTION_OPTION:
+      case MM_OPTION_RFTUNE:
+      case MM_OPTION_VIDFREQ:
+      case MM_OPTION_RFCHAN:
+        return VALUE_UI_WIDGET_SPINBOX;
+      case MM_OPTION_FIXEDID:
+      case MM_OPTION_TELEM:
+      case MM_OPTION_SRVFREQ:
+      case MM_OPTION_MAXTHR:
+      case MM_OPTION_RFPOWER:
+      case MM_OPTION_WBUS:
+        return VALUE_UI_WIDGET_COMBOBOX;
+      default:
+        return VALUE_UI_WIDGET_NONE;
+    }
+  }
+
+  return VALUE_UI_WIDGET_NONE;
+}
+
+//  static
 QString Multiprotocols::optionValueToString(int protocol, unsigned subType, int optionValue)
 {
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
@@ -206,70 +272,4 @@ QString Multiprotocols::optionValueToString(int protocol, unsigned subType, int 
   }
 
   return CPN_STR_UNKNOWN_ITEM;
-}
-
-
-//  static
-int Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType)
-{
-  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
-
-  if (pd) {
-    switch (pd->optionType) {
-      case MM_OPTION_NONE:
-        return VALUE_UI_WIDGET_NONE;
-      case MM_OPTION_OPTION:
-      case MM_OPTION_RFTUNE:
-      case MM_OPTION_VIDFREQ:
-      case MM_OPTION_RFCHAN:
-        return VALUE_UI_WIDGET_SPINBOX;
-      case MM_OPTION_FIXEDID:
-      case MM_OPTION_TELEM:
-      case MM_OPTION_SRVFREQ:
-      case MM_OPTION_MAXTHR:
-      case MM_OPTION_RFPOWER:
-      case MM_OPTION_WBUS:
-        return VALUE_UI_WIDGET_COMBOBOX;
-      default:
-        return VALUE_UI_WIDGET_NONE;
-    }
-  }
-
-  return VALUE_UI_WIDGET_NONE;
-}
-
-//  static
-AbstractStaticItemModel * Multiprotocols::protocolItemModel()
-{
-  AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
-  mdl->setName(AIM_MULTI_PROTOCOL);
-
-  for (auto &pd : multi_protocols) {
-    if (pd.protocol == 0xFF)
-      break;
-    mdl->appendToItemList(pd.ProtoString, pd.protocol);
-  }
-
-  mdl->sort(0);
-  mdl->loadItemList();
-  return mdl;
-}
-
-//  static
-AbstractStaticItemModel * Multiprotocols::subTypeItemModel()
-{
-  AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
-  mdl->setName(AIM_MULTI_SUBTYPE);
-
-  for (auto &pd : multi_protocols) {
-    if (pd.protocol == 0xFF)
-      break;
-    for (unsigned int j = 0; j <= pd.nbrSubProto; j++) {
-      mdl->appendToItemList(subTypeToString(pd.protocol, j), j, , ,pd.protocol);    //  load all protocols and subtypes then filter when used
-    }
-  }
-
-  mdl->sort(0);
-  mdl->loadItemList();
-  return mdl;
 }
