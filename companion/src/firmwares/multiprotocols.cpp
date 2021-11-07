@@ -23,13 +23,13 @@
 #include "multiprotocols_diy.h"
 #include "compounditemmodels.h"
 
-static mm_protocol_definition * getProtocolDefinition(int protocol)
+static const mm_protocol_definition * getProtocolDefinition(int protocol)
 {
-  for (auto &proto : multi_protocols) {
-    if (proto.protocol == 0xFF)
+  for (int i = 0; ; i++) {
+    if (multi_protocols[i].protocol == 0xFF)
       break;
-    else if (proto.protocol == (unsigned int)protocol)
-      return proto;
+    else if (multi_protocols[i].protocol == (unsigned int)protocol)
+      return &multi_protocols[i];
   }
 
   return nullptr;
@@ -67,10 +67,10 @@ AbstractStaticItemModel * Multiprotocols::protocolItemModel()
   AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
   mdl->setName(AIM_MULTI_PROTOCOL);
 
-  for (auto &pd : multi_protocols) {
-    if (pd.protocol == 0xFF)
+  for (int i = 0; ; i++) {
+    if (multi_protocols[i].protocol == 0xFF)
       break;
-    mdl->appendToItemList(pd.ProtoString, pd.protocol);
+    mdl->appendToItemList(multi_protocols[i].ProtoString, multi_protocols[i].protocol);
   }
 
   mdl->sort(0);
@@ -101,11 +101,12 @@ AbstractStaticItemModel * Multiprotocols::subTypeItemModel()
   AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
   mdl->setName(AIM_MULTI_SUBTYPE);
 
-  for (auto &pd : multi_protocols) {
-    if (pd.protocol == 0xFF)
+  for (int i = 0; ; i++) {
+    if (multi_protocols[i].protocol == 0xFF)
       break;
-    for (unsigned int j = 0; j <= pd.nbrSubProto; j++) {
-      mdl->appendToItemList(subTypeToString(pd.protocol, j), j, , ,pd.protocol);    //  load all protocols and subtypes then filter when used
+    for (unsigned int j = 0; j <= multi_protocols[i].nbrSubProto; j++) {
+      //  load all protocols and subtypes then filter when used
+      mdl->appendToItemList(subTypeToString(multi_protocols[i].protocol, j), j, true, 0, multi_protocols[i].protocol);
     }
   }
 
@@ -251,20 +252,20 @@ QString Multiprotocols::optionValueToString(int protocol, unsigned subType, int 
     switch (pd->optionType) {
       case MM_OPTION_FIXEDID:
         strl << tr("Auto") << tr("Fixed");
-        break:
+        break;
       case MM_OPTION_TELEM:
         strl << tr("Off") << tr("On") << tr("Off+Aux") << tr("On+Aux");
-        break:
+        break;
       case MM_OPTION_MAXTHR:
         strl << tr("Disabled") << tr("Enabled");
-        break:
+        break;
       case MM_OPTION_RFPOWER:
         strl << tr("1.6mW") << tr("2.0mW") << tr("2.5mW") << tr("3.2mW") << tr("4.0mW") << tr("5.0mW") << tr("6.3mW") << tr("7.9mW")
-            << tr("10mW") << tr("13mW") tr("16mW") << tr("20mW") << tr("25mW") << tr("32mW") << tr("40mW") << tr("50mW");
-        break:
+            << tr("10mW") << tr("13mW") << tr("16mW") << tr("20mW") << tr("25mW") << tr("32mW") << tr("40mW") << tr("50mW");
+        break;
       case MM_OPTION_WBUS:
         strl << tr("WBUS") << tr("PPM");
-        break:
+        break;
     }
 
     if (optionValue >= 0 && optionValue < strl.count())
