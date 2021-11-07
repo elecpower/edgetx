@@ -75,6 +75,7 @@ AbstractStaticItemModel * Multiprotocols::protocolItemModel()
 
   mdl->sort(0);
   mdl->loadItemList();
+  AbstractStaticItemModel::dumpItemModelContents(mdl);
   return mdl;
 }
 
@@ -112,6 +113,7 @@ AbstractStaticItemModel * Multiprotocols::subTypeItemModel()
 
   mdl->sort(0);
   mdl->loadItemList();
+  AbstractStaticItemModel::dumpItemModelContents(mdl);
   return mdl;
 }
 
@@ -284,5 +286,6 @@ AbstractStaticItemModel * Multiprotocols::optionValueItemModel()
 
   mdl->sort(0);
   mdl->loadItemList();
+  AbstractStaticItemModel::dumpItemModelContents(mdl);
   return mdl;
 }

@@ -25,9 +25,9 @@
 #include "datahelpers.h"
 
 // identiying names of static abstract item models
-constexpr char AIM_MULTI_PROTOCOL[]        {"multi.protocol"};
-constexpr char AIM_MULTI_SUBTYPE[]         {"multi.subtype"};
-constexpr char AIM_MULTI_OPTIONTYPEVALUE[] {"multi.optiontypevalue"};
+constexpr char AIM_MULTI_PROTOCOL[]        = {"multi.protocol"};
+constexpr char AIM_MULTI_SUBTYPE[]         = {"multi.subtype"};
+constexpr char AIM_MULTI_OPTIONTYPEVALUE[] = {"multi.optiontypevalue"};
 
 class AbstractStaticItemModel;
 

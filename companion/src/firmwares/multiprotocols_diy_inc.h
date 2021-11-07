@@ -6,7 +6,7 @@
 //  typedefs
 #include <stdint.h>
 
-//  replicate from multiprotocols_diy.cpp with prefix (to avoid ambiguity) so referenceable by multiprotocols.cpp
+//  replicate from multiprotocols_diy.cpp with MM_ prefix (to avoid ambiguity) and add count so referenceable by multiprotocols.cpp
 enum
 {
 	MM_OPTION_NONE,
