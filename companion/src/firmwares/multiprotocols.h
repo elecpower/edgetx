@@ -21,9 +21,7 @@
 
 #pragma once
 
-//#include <vector>
 #include <QtCore>
-//#include "moduledata.h"
 #include "datahelpers.h"
 
 // identiying names of static abstract item models
@@ -45,46 +43,19 @@ class Multiprotocols
       VALUE_UI_WIDGET_COMBOBOX
     };
 
-
-      /*
-      struct MultiProtocolDefinition {
-      const int protocol;
-      const QString protocolString;
-      const bool hasFailsafe;
-      const QStringList subTypeStrings;
-      const int optionType;
-
-      unsigned int numSubTypes() const;
-
-      int getOptionMin() const;
-
-      int getOptionMax() const;
-
-      MultiProtocolDefinition(const MultiProtocolsDIY::mm_protocol_definition &diy);
-    };
-
-    Multiprotocols(std::initializer_list<MultiProtocolsDIY::mm_protocol_definition> l);
-    */
-
-    //const MultiProtocolDefinition &getProtocol(int protocol) const;
     static QString getDefinitionVersion();
     static QString protocolToString(int protocol);
     static QString subTypeToString(int protocol, unsigned subType);
     static int getMaxChannelCount(int protocol, unsigned subType);
     static QString optionTypeToString(int protocol, unsigned subType);
-    static QString optionValueToString(int protocol, unsigned subType, int optionValue);
+
     static int optionTypeMin(int protocol, unsigned subType);
     static int optionTypeMax(int protocol, unsigned subType);
-    static int optionTypeDefault(int protocol, unsigned subType);
     static FieldRange optionTypeRange(int protocol, unsigned subType);
+
+    static QString optionValueToString(int protocol, unsigned subType, int optionValue);
     static int optionTypeValueUiWidget(int protocol, unsigned subType);
+
     static AbstractStaticItemModel *protocolItemModel();
     static AbstractStaticItemModel *subTypeItemModel();
-
-  private:
-
-    //std::vector<MultiProtocolDefinition> protocols;
-
 };
-
-//extern const Multiprotocols multiProtocols;

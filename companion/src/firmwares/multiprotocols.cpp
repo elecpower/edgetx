@@ -19,87 +19,8 @@
  * GNU General Public License for more details.
  */
 
-//#include <QObject>
-
 #include "multiprotocols.h"
-//#include "radiodata.h"
 #include "multiprotocols_diy.h"
-#include "macros.h"
-
-/*
-Multiprotocols::MultiProtocolDefinition::MultiProtocolDefinition(const MultiProtocolsDIY::mm_protocol_definition &diy) :
-  // we do not use all the fields
-  protocol(diy.protocol),
-  protocolStr(diy.ProtoString),
-  hasFailsafe(diy.failsafe),
-  subTypeStrings(diy.subProtocols),
-  optionStr(diy.optionStr)
-{
-  Q_ASSERT(diy.maxSubtype + 1 == (unsigned int) diy.subProtocols.length());
-}
-
-Multiprotocols::Multiprotocols(std::initializer_list<MultiProtocolsDIY::mm_protocol_definition> l)
-{
-  for (MultiProtocolsDIY::mm_protocol_definition diy: l)
-    protocols.push_back(MultiProtocolDefinition(diy));
-}
-
-int Multiprotocols::MultiProtocolDefinition::getOptionMin() const {
-  if (optionsstr == STR_MULTI_RFPOWER)
-    return -1;
-  else if (optionsstr == STR_MULTI_SERVOFREQ)
-    return 0;
-  else
-    return -128;
-}
-
-int Multiprotocols::MultiProtocolDefinition::getOptionMax() const {
-  if (optionsstr == STR_MULTI_RFPOWER)
-    return 7;
-  else if (optionsstr == STR_MULTI_SERVOFREQ)
-    return 70;
-  else
-    return 127;
-}
-
-unsigned int Multiprotocols::MultiProtocolDefinition::numSubTypes() const
-{
-  return protocol > MODULE_SUBTYPE_MULTI_LAST ? 8 : (unsigned int) subTypeStrings.length();
-}
-
-
-const Multiprotocols::MultiProtocolDefinition & Multiprotocols::getProtocol(int protocol) const {
-  for (const Multiprotocols::MultiProtocolDefinition & proto: protocols)
-    if (proto.protocol == protocol)
-      return proto;
-
-  // Protocol not found, return the default (last) proto
-  Q_ASSERT(protocols.rbegin()->protocol == 0xfe);
-  return *protocols.rbegin();
-}
-
-// static
-QString Multiprotocols::protocolToString(int protocol)
-{
-  for (const Multiprotocols::MultiProtocolDefinition & proto: protocols)  //  convert from vector to array
-    if (proto.protocol == protocol)   // break when proto.protocol = 0xFF
-      return proto.protocolStr;
-
-  return CPN_STR_UNKNOWN_ITEM;
-}
-
-// static
-QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
-{
-  if (subType < multiProtocols.getProtocol(protocol).numSubTypes) {
-    const unsigned int sub_len = multiProtocols.getProtocol(protocol).subTypeStrings[0];
-    if (sub_len > 0)
-      return multiProtocols.getProtocol(protocol).subTypeStrings[subType * sub_len]);
-  }
-
-  return CPN_STR_UNKNOWN_ITEM;
-}
-*/
 
 static mm_protocol_definition * getProtocolDefinition(int protocol)
 {
@@ -124,8 +45,8 @@ int Multiprotocols::getMaxChannelCount(int protocol, unsigned subType)
 {
   if (subType == PROTO_DSM)
     return 12;
-  else
-    return 16;
+
+  return 16;
 }
 
 // static
@@ -135,8 +56,8 @@ QString Multiprotocols::protocolToString(int protocol)
 
   if (pd)
     return pd->ProtoString;
-  else
-    return CPN_STR_UNKNOWN_ITEM;
+
+  return CPN_STR_UNKNOWN_ITEM;
 }
 
 // static
@@ -155,20 +76,6 @@ QString Multiprotocols::subTypeToString(int protocol, unsigned subType)
 
   return CPN_STR_UNKNOWN_ITEM;
 }
-
-/*
-  OPTION_NONE		0	Hidden field
-  OPTION_OPTION	1	"Option:"		value=-128..0(default)..127
-  OPTION_RFTUNE	2	"RF freq tune:"	value=-128..0(default)..127
-  OPTION_VIDFREQ	3	"Video freq:"	value=-128..0(default)..127
-  OPTION_FIXEDID	4	"ID type:"		value="Auto":0(default), "Fixed":1
-  OPTION_TELEM	5	"Telem:"		value="Off":0(default), "On":1, "Off+Aux":2, "On+Aux":3
-  OPTION_SRVFREQ	6	"Servo freq(Hz):"	value="50":0(default).."400":70 => display=50+5*option with option=0..70
-  OPTION_MAXTHR	7	"Max throw:"	value="Disabled":0, "Enabled":1
-  OPTION_RFCHAN	8	"Select RF chan:"	value=-128..0(default)..127
-  OPTION_RFPOWER	9	"RF power:"		"1.6mW":0(default),"2.0mW":1,"2.5mW":2,"3.2mW":3,"4.0mW":4,"5.0mW":5,"6.3mW":6,"7.9mW":7,"10mW\0":8,"13mW\0":9,"16mW\0":10,"20mW\0":11,"25mW\0":12,"32mW\0":13,"40mW\0":14,"50mW\0":15
-  OPTION_WBUS		10	"Output:"		"WBUS":0(default),"PPM":1
-*/
 
 // static
 QString Multiprotocols::optionTypeToString(int protocol, unsigned subType)
@@ -203,10 +110,11 @@ QString Multiprotocols::optionTypeToString(int protocol, unsigned subType)
         return CPN_STR_UNKNOWN_ITEM;
     }
   }
-  else
-    return CPN_STR_UNKNOWN_ITEM;
+
+  return CPN_STR_UNKNOWN_ITEM;
 }
 
+//  static
 int Multiprotocols::optionTypeMin(int protocol, unsigned subType)
 {
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
@@ -225,10 +133,11 @@ int Multiprotocols::optionTypeMin(int protocol, unsigned subType)
         return -128;
     }
   }
-  else
-    return 0;
+
+  return 0;
 }
 
+//  static
 int Multiprotocols::optionTypeMax(int protocol, unsigned subType)
 {
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
@@ -251,10 +160,11 @@ int Multiprotocols::optionTypeMax(int protocol, unsigned subType)
         return 127;
     }
   }
-  else
-    return 0;
+
+  return 0;
 }
 
+//  static
 FieldRange Multiprotocols::optionTypeRange(int protocol, unsigned subType)
 {
   FieldRange result;
@@ -271,30 +181,28 @@ QString Multiprotocols::optionValueToString(int protocol, unsigned subType, int 
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
 
   if (pd) {
-    QStringList lst;
+    QStringList strl;
     switch (pd->optionType) {
       case MM_OPTION_FIXEDID:
-        lst << tr("Auto") << tr("Fixed");
+        strl << tr("Auto") << tr("Fixed");
         break:
       case MM_OPTION_TELEM:
-        lst << tr("Off") << tr("On") << tr("Off+Aux") << tr("On+Aux");
+        strl << tr("Off") << tr("On") << tr("Off+Aux") << tr("On+Aux");
         break:
       case MM_OPTION_MAXTHR:
-        lst << tr("Disabled") << tr("Enabled");
+        strl << tr("Disabled") << tr("Enabled");
         break:
       case MM_OPTION_RFPOWER:
-        lst << tr("1.6mW") << tr("2.0mW") << tr("2.5mW") << tr("3.2mW") << tr("4.0mW") << tr("5.0mW") << tr("6.3mW") << tr("7.9mW")
+        strl << tr("1.6mW") << tr("2.0mW") << tr("2.5mW") << tr("3.2mW") << tr("4.0mW") << tr("5.0mW") << tr("6.3mW") << tr("7.9mW")
             << tr("10mW") << tr("13mW") tr("16mW") << tr("20mW") << tr("25mW") << tr("32mW") << tr("40mW") << tr("50mW");
         break:
       case MM_OPTION_WBUS:
-        lst << tr("WBUS") << tr("PPM");
+        strl << tr("WBUS") << tr("PPM");
         break:
     }
 
-    if (optionValue < lst.count())
-      return lst[optionValue];
-    else
-      return CPN_STR_UNKNOWN_ITEM;
+    if (optionValue >= 0 && optionValue < strl.count())
+      return strl[optionValue];
   }
 
   return CPN_STR_UNKNOWN_ITEM;
@@ -326,8 +234,8 @@ int Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType)
         return VALUE_UI_WIDGET_NONE;
     }
   }
-  else
-    return VALUE_UI_WIDGET_NONE;
+
+  return VALUE_UI_WIDGET_NONE;
 }
 
 //  static
@@ -336,10 +244,10 @@ AbstractStaticItemModel * Multiprotocols::protocolItemModel()
   AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
   mdl->setName(AIM_MULTI_PROTOCOL);
 
-  for (auto &proto : multi_protocols) {
-    if (proto.protocol == 0xFF)
+  for (auto &pd : multi_protocols) {
+    if (pd.protocol == 0xFF)
       break;
-    mdl->appendToItemList(proto.ProtoString, proto.protocol);
+    mdl->appendToItemList(pd.ProtoString, pd.protocol);
   }
 
   mdl->sort(0);
@@ -353,11 +261,11 @@ AbstractStaticItemModel * Multiprotocols::subTypeItemModel()
   AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
   mdl->setName(AIM_MULTI_SUBTYPE);
 
-  for (auto &proto : multi_protocols) {
-    if (proto.protocol == 0xFF)
+  for (auto &pd : multi_protocols) {
+    if (pd.protocol == 0xFF)
       break;
-    for (unsigned int j = 0; j <= proto.nbrSubProto; j++) {
-      mdl->appendToItemList(subTypeToString(proto.protocol, j), j, , ,proto.protocol);    //  load all protocols and subtypes then filter when used
+    for (unsigned int j = 0; j <= pd.nbrSubProto; j++) {
+      mdl->appendToItemList(subTypeToString(pd.protocol, j), j, , ,pd.protocol);    //  load all protocols and subtypes then filter when used
     }
   }
 
