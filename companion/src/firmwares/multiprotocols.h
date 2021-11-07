@@ -27,7 +27,7 @@
 // identiying names of static abstract item models
 constexpr char AIM_MULTI_PROTOCOL[]        {"multi.protocol"};
 constexpr char AIM_MULTI_SUBTYPE[]         {"multi.subtype"};
-constexpr char AIM_MULTI_OPTIONVALUE[]     {"multi.optionvalue"};
+constexpr char AIM_MULTI_OPTIONTYPEVALUE[] {"multi.optiontypevalue"};
 
 class AbstractStaticItemModel;
 
@@ -57,6 +57,7 @@ class Multiprotocols
     static int optionTypeMax(int protocol, unsigned subType);
     static FieldRange optionTypeRange(int protocol, unsigned subType);
 
-    static int optionTypeValueUiWidget(int protocol, unsigned subType);
-    static QString optionValueToString(int protocol, unsigned subType, int optionValue);
+    static int optionTypeValueUiWidget(int optionType);
+    static QString optionValueToString(int optionType, int optionValue);
+    static AbstractStaticItemModel *optionValueItemModel();
 };

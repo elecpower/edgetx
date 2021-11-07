@@ -44,7 +44,7 @@ QString Multiprotocols::getDefinitionVersion()
 // static
 int Multiprotocols::getMaxChannelCount(int protocol, unsigned subType)
 {
-  if (subType == PROTO_DSM)
+  if (protocol == PROTO_DSM)
     return 12;
 
   return 16;
@@ -214,63 +214,75 @@ FieldRange Multiprotocols::optionTypeRange(int protocol, unsigned subType)
 }
 
 //  static
-int Multiprotocols::optionTypeValueUiWidget(int protocol, unsigned subType)
+int Multiprotocols::optionTypeValueUiWidget(int optionType)
 {
-  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
-
-  if (pd) {
-    switch (pd->optionType) {
-      case MM_OPTION_NONE:
-        return VALUE_UI_WIDGET_NONE;
-      case MM_OPTION_OPTION:
-      case MM_OPTION_RFTUNE:
-      case MM_OPTION_VIDFREQ:
-      case MM_OPTION_RFCHAN:
-        return VALUE_UI_WIDGET_SPINBOX;
-      case MM_OPTION_FIXEDID:
-      case MM_OPTION_TELEM:
-      case MM_OPTION_SRVFREQ:
-      case MM_OPTION_MAXTHR:
-      case MM_OPTION_RFPOWER:
-      case MM_OPTION_WBUS:
-        return VALUE_UI_WIDGET_COMBOBOX;
-      default:
-        return VALUE_UI_WIDGET_NONE;
-    }
+  switch (optionType) {
+    case MM_OPTION_NONE:
+      return VALUE_UI_WIDGET_NONE;
+    case MM_OPTION_OPTION:
+    case MM_OPTION_RFTUNE:
+    case MM_OPTION_VIDFREQ:
+    case MM_OPTION_RFCHAN:
+      return VALUE_UI_WIDGET_SPINBOX;
+    case MM_OPTION_FIXEDID:
+    case MM_OPTION_TELEM:
+    case MM_OPTION_SRVFREQ:
+    case MM_OPTION_MAXTHR:
+    case MM_OPTION_RFPOWER:
+    case MM_OPTION_WBUS:
+      return VALUE_UI_WIDGET_COMBOBOX;
+    default:
+      return VALUE_UI_WIDGET_NONE;
   }
-
-  return VALUE_UI_WIDGET_NONE;
 }
 
 //  static
-QString Multiprotocols::optionValueToString(int protocol, unsigned subType, int optionValue)
+QString Multiprotocols::optionValueToString(int optionType, int optionValue)
 {
-  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
-
-  if (pd) {
-    QStringList strl;
-    switch (pd->optionType) {
-      case MM_OPTION_FIXEDID:
-        strl << tr("Auto") << tr("Fixed");
-        break;
-      case MM_OPTION_TELEM:
-        strl << tr("Off") << tr("On") << tr("Off+Aux") << tr("On+Aux");
-        break;
-      case MM_OPTION_MAXTHR:
-        strl << tr("Disabled") << tr("Enabled");
-        break;
-      case MM_OPTION_RFPOWER:
-        strl << tr("1.6mW") << tr("2.0mW") << tr("2.5mW") << tr("3.2mW") << tr("4.0mW") << tr("5.0mW") << tr("6.3mW") << tr("7.9mW")
-            << tr("10mW") << tr("13mW") << tr("16mW") << tr("20mW") << tr("25mW") << tr("32mW") << tr("40mW") << tr("50mW");
-        break;
-      case MM_OPTION_WBUS:
-        strl << tr("WBUS") << tr("PPM");
-        break;
-    }
-
-    if (optionValue >= 0 && optionValue < strl.count())
-      return strl[optionValue];
+  QStringList strl;
+  switch (optionType) {
+    case MM_OPTION_FIXEDID:
+      strl << tr("Auto") << tr("Fixed");
+      break;
+    case MM_OPTION_TELEM:
+      strl << tr("Off") << tr("On") << tr("Off+Aux") << tr("On+Aux");
+      break;
+    case MM_OPTION_MAXTHR:
+      strl << tr("Disabled") << tr("Enabled");
+      break;
+    case MM_OPTION_RFPOWER:
+      strl << tr("1.6mW") << tr("2.0mW") << tr("2.5mW") << tr("3.2mW") << tr("4.0mW") << tr("5.0mW") << tr("6.3mW") << tr("7.9mW")
+          << tr("10mW") << tr("13mW") << tr("16mW") << tr("20mW") << tr("25mW") << tr("32mW") << tr("40mW") << tr("50mW");
+      break;
+    case MM_OPTION_WBUS:
+      strl << tr("WBUS") << tr("PPM");
+      break;
   }
 
+  if (optionValue >= 0 && optionValue < strl.count())
+    return strl[optionValue];
+
   return CPN_STR_UNKNOWN_ITEM;
+}
+
+//  static
+AbstractStaticItemModel * Multiprotocols::optionValueItemModel()
+{
+  AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
+  mdl->setName(AIM_MULTI_OPTIONTYPEVALUE);
+
+  //  load all option types then filter when used
+  for (int i = 0; i < MM_OPTION_COUNT; i++) {
+    for (int j = 0; ; j++) {
+      const QString str = optionValueToString(i, j);
+      if (str != CPN_STR_UNKNOWN_ITEM)
+        mdl->appendToItemList(optionValueToString(i, j), j, true, 0, i);
+      else
+        break;
+    }
+  }
+
+  mdl->sort(0);
+  mdl->loadItemList();
+  return mdl;
 }

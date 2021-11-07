@@ -1,6 +1,8 @@
 //  This file has been generated using multiprotocol_diy.py
 //  This file must be #include in multiprotocols_diy.h
 
+#pragma once
+
 //  typedefs
 #include <stdint.h>
 
@@ -18,6 +20,7 @@ enum
 	MM_OPTION_RFCHAN,
 	MM_OPTION_RFPOWER,
 	MM_OPTION_WBUS,
+	MM_OPTION_COUNT
 };
 
 //  force all subTypes for FRSKY RX protocol. Need to filter when used.
