@@ -23,7 +23,8 @@
 #include "multiprotocols_diy.h"
 #include "compounditemmodels.h"
 
-static const mm_protocol_definition * getProtocolDefinition(int protocol)
+// static
+const mm_protocol_definition * getProtocolDefinition(int protocol)
 {
   for (int i = 0; ; i++) {
     if (multi_protocols[i].protocol == 0xFF)
