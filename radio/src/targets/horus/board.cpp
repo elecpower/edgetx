@@ -107,6 +107,7 @@ void boardInit()
                          BACKLIGHT_RCC_AHB1Periph |
                          KEYS_BACKLIGHT_RCC_AHB1Periph |
                          SD_RCC_AHB1Periph |
+                         FLASH_RCC_AHB1Periph |
                          AUDIO_RCC_AHB1Periph |
                          KEYS_RCC_AHB1Periph |
                          ADC_RCC_AHB1Periph |
@@ -136,6 +137,7 @@ void boardInit()
                          INTERRUPT_xMS_RCC_APB1Periph |
                          ADC_RCC_APB1Periph |
                          TIMER_2MHz_RCC_APB1Periph |
+                         FLASH_RCC_APB1Periph |
                          AUDIO_RCC_APB1Periph |
 #if defined(RADIO_FAMILY_T16)
                          FLYSKY_HALL_RCC_APB1Periph |
@@ -192,6 +194,8 @@ void boardInit()
 
   TRACE("\nHorus board started :)");
   TRACE("RCC->CSR = %08x", RCC->CSR);
+
+  flashInit();
 
   audioInit();
 
