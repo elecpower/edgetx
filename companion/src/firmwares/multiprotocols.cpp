@@ -22,7 +22,6 @@
 #include "multiprotocols.h"
 #include "compounditemmodels.h"
 
-// static
 const mm_protocol_definition * getProtocolDefinition(int protocol)
 {
   for (int i = 0; ; i++) {
@@ -36,9 +35,17 @@ const mm_protocol_definition * getProtocolDefinition(int protocol)
 }
 
 // static
-QString Multiprotocols::getDefinitionVersion()
+const mm_protocol_definition * Multiprotocols::getDefinition(int protocol)
 {
-  return QString("%1.%2.%3.%4").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_REVISION).arg(VERSION_PATCH_LEVEL);
+  for (int i = 0; ; i++) {
+    if (multi_protocols[i].protocol == 0xFF)
+      break;
+    else if (multi_protocols[i].protocol == (unsigned int)protocol)
+      return &multi_protocols[i];
+  }
+
+  qDebug() << "Multiprotocol" << protocol << "not found. Using default.";
+  return &multi_protocols[PROTO_CONFIG];
 }
 
 // static
@@ -77,6 +84,16 @@ AbstractStaticItemModel * Multiprotocols::protocolItemModel()
   mdl->loadItemList();
   AbstractStaticItemModel::dumpItemModelContents(mdl);
   return mdl;
+}
+
+// static
+int Multiprotocols::getNumSubTypes(int protocol)
+{
+  const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+  if (pd)
+    return pd->nbrSubProto;
+  else
+    return 0;
 }
 
 // static

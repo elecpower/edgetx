@@ -493,4 +493,3 @@ const mm_protocol_definition multi_protocols[] = {
 	#endif
 		{0xFF,             nullptr,       nullptr,               0, 0,              0, 0, 0,         nullptr,         nullptr             }
 };
-

@@ -397,9 +397,9 @@ void ModulePanel::setupFailsafes()
 
 void ModulePanel::update()
 {
-  const auto protocol = (PulsesProtocol)module.protocol;
   const auto board = firmware->getBoard();
-  const auto & pdef = multiProtocols.getProtocol(module.multi.rfProtocol);
+  const auto protocol = (PulsesProtocol)module.protocol;
+  const auto *pdef = Multiprotocols::getDefinition(module.multi.rfProtocol);
   unsigned int mask = 0;
   unsigned int max_rx_num = 63;
 
@@ -465,9 +465,9 @@ void ModulePanel::update()
           mask |= MASK_CHANNELS_COUNT;
         else
           module.channelsCount = 16;
-        if (pdef.optionsstr != nullptr)
+        if (pdef->optionType != 0)
           mask |= MASK_MULTIOPTION;
-        if (pdef.hasFailsafe || (module.multi.rfProtocol == MODULE_SUBTYPE_MULTI_FRSKY && (module.subType == 0 || module.subType == 2 || module.subType > 3 )))
+        if (pdef->failSafe || (module.multi.rfProtocol == MODULE_SUBTYPE_MULTI_FRSKY && (module.subType == 0 || module.subType == 2 || module.subType > 3 )))
           mask |= MASK_FAILSAFES;
         break;
       case PULSES_AFHDS3:
@@ -567,7 +567,7 @@ void ModulePanel::update()
     unsigned i = 0;
     switch(protocol){
     case PULSES_MULTIMODULE:
-      numEntries = (module.multi.rfProtocol > MODULE_SUBTYPE_MULTI_LAST ? 8 : pdef.numSubTypes());
+      numEntries = (module.multi.rfProtocol > MODULE_SUBTYPE_MULTI_LAST ? 8 : pdef->nbrSubProto);
       break;
     case PULSES_PXX_R9M:
       if (firmware->getCapability(HasModuleR9MFlex))
@@ -610,10 +610,11 @@ void ModulePanel::update()
   }
 
   if (mask & MASK_MULTIOPTION) {
-    ui->optionValue->setMinimum(pdef.getOptionMin());
-    ui->optionValue->setMaximum(pdef.getOptionMax());
+    ui->optionValue->setMinimum(Multiprotocols::optionTypeMin(pdef->protocol, pdef->nbrSubProto));
+    ui->optionValue->setMaximum(Multiprotocols::optionTypeMax(pdef->protocol, pdef->nbrSubProto));
     ui->optionValue->setValue(module.multi.optionValue);
-    ui->label_option->setText(qApp->translate("Multiprotocols", qPrintable(pdef.optionsstr)));
+    ui->label_option->setText(qApp->translate("Multiprotocols",
+                                              qPrintable(Multiprotocols::optionTypeToString(pdef->protocol, pdef->nbrSubProto))));
   }
 
   if (mask & MASK_ACCESS) {
@@ -776,7 +777,7 @@ void ModulePanel::onMultiProtocolChanged(int index)
   if (!lock && module.multi.rfProtocol != (unsigned)rfProtocol) {
     lock=true;
     module.multi.rfProtocol = (unsigned int)rfProtocol;
-    unsigned int maxSubTypes = multiProtocols.getProtocol(index).numSubTypes();
+    unsigned int maxSubTypes = Multiprotocols::getNumSubTypes(rfProtocol);
     if (rfProtocol > MODULE_SUBTYPE_MULTI_LAST)
       maxSubTypes = 8;
     module.subType = std::min(module.subType, maxSubTypes - 1);

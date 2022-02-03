@@ -45,13 +45,13 @@ class Multiprotocols
       VALUE_UI_WIDGET_COMBOBOX
     };
 
-    static mm_protocol_definition getDefinition(int protocol);
-    static QString getDefinitionVersion();
+    static const mm_protocol_definition* getDefinition(int protocol);
     static int getMaxChannelCount(int protocol, unsigned subType);
 
     static QString protocolToString(int protocol);
     static AbstractStaticItemModel *protocolItemModel();
 
+    static int getNumSubTypes(int protocol);
     static QString subTypeToString(int protocol, unsigned subType);
     static AbstractStaticItemModel *subTypeItemModel();
 
