@@ -21,8 +21,10 @@
 
 #pragma once
 
-#include <QtCore>
+#include "multiprotocols_diy.h"
 #include "datahelpers.h"
+
+#include <QtCore>
 
 // identiying names of static abstract item models
 constexpr char AIM_MULTI_PROTOCOL[]        = {"multi.protocol"};

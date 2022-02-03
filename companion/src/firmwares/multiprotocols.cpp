@@ -20,7 +20,6 @@
  */
 
 #include "multiprotocols.h"
-#include "multiprotocols_diy.h"
 #include "compounditemmodels.h"
 
 // static

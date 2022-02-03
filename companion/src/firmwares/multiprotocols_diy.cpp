@@ -19,9 +19,6 @@
  * GNU General Public License for more details.
  */
 
-//  This file has been generated using multiprotocoldiy.py
-//  Content sourced from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/Multiprotocol/Multi_Protos.ino
-
 /*
  This project is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -497,68 +494,3 @@ const mm_protocol_definition multi_protocols[] = {
 		{0xFF,             nullptr,       nullptr,               0, 0,              0, 0, 0,         nullptr,         nullptr             }
 };
 
-#ifdef MULTI_TELEMETRY
-uint16_t PROTOLIST_callback()
-{
-	if(option != prev_option)
-	{//Only send once
-		/* Type 0x11 Protocol list export via telemetry. Used by the protocol PROTO_PROTOLIST=0, the list entry is given by the Option field.
-		   length: variable
-		   data[0]     = protocol number, 0xFF is an invalid list entry (Option value too large), Option == 0xFF -> number of protocols in the list
-		   data[1..n]  = protocol name null terminated
-		   data[n+1]   = flags
-						 flags>>4 Option text number to be displayed (check multi status for description)
-						 flags&0x01 failsafe supported
-						 flags&0x02 Channel Map Disabled supported
-		   data[n+2]   = number of sub protocols
-		   data[n+3]   = sub protocols text length, only sent if nbr_sub != 0
-		   data[n+4..] = sub protocol names, only sent if nbr_sub != 0
-		*/
-		prev_option = option;
-
-		if(option >= (sizeof(multi_protocols)/sizeof(mm_protocol_definition)) - 1)
-		{//option is above the end of the list
-			//Header
-			multi_send_header(MULTI_TELEMETRY_PROTO, 1);
-			if(option == 0xFF)
-				Serial_write((sizeof(multi_protocols)/sizeof(mm_protocol_definition)) - 1);	//Nbr proto
-			else
-				Serial_write(0xFF);															//Error
-		}
-		else
-		{//valid option value
-			uint8_t proto_len = strlen(multi_protocols[option].ProtoString) + 1;
-			uint8_t nbr_sub = multi_protocols[option].nbrSubProto;
-			uint8_t sub_len = 0;
-			if(nbr_sub)
-				sub_len = multi_protocols[option].SubProtoString[0];
-
-			//Header
-			multi_send_header(MULTI_TELEMETRY_PROTO, 1 + proto_len + 1 + 1 + (nbr_sub?1:0) + (nbr_sub * sub_len));
-			//Protocol number
-			Serial_write(multi_protocols[option].protocol);
-			//Protocol name
-			for(uint8_t i=0;i<proto_len;i++)
-				Serial_write(multi_protocols[option].ProtoString[i]);
-			//Flags
-			uint8_t flags=0;
-			#ifdef FAILSAFE_ENABLE
-				if(multi_protocols[option].failSafe)
-					flags |= 0x01;		//Failsafe supported
-			#endif
-			if(multi_protocols[option].chMap)
-				flags |= 0x02;			//Disable_ch_mapping supported
-			Serial_write( flags | (multi_protocols[option].optionType<<4));	// flags && option type
-			//Number of sub protocols
-			Serial_write(nbr_sub);
-
-			if(nbr_sub !=0 )
-			{//Sub protocols length and texts
-				for(uint8_t i=0;i<=nbr_sub*sub_len;i++)
-					Serial_write(multi_protocols[option].SubProtoString[i]);
-			}
-		}
-	}
-	return 1000;
-}
-#endif
