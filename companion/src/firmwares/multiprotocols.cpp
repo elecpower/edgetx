@@ -22,12 +22,32 @@
 #include "multiprotocols.h"
 #include "compounditemmodels.h"
 
+const int getProtocolCount()
+{
+  bool guardfound = false;
+  int i = 0;
+
+  for ( ; i <= 0xFF; i++) {
+    if (multi_protocols[i].protocol == 0xFF && multi_protocols[i].ProtoString == nullptr && multi_protocols[i].SubProtoString == nullptr) {
+      guardfound = true;
+      break;
+    }
+  }
+
+  if (guardfound)
+    return i;
+  else {
+    qDebug() << "Error: guard entry 0xFF not found in multi_protocols array";
+    return -1;
+  }
+}
+
 const mm_protocol_definition * getProtocolDefinition(int protocol)
 {
-  for (int i = 0; ; i++) {
-    if (multi_protocols[i].protocol == 0xFF)
-      break;
-    else if (multi_protocols[i].protocol == (unsigned int)protocol)
+  const int cnt = getProtocolCount();
+
+  for (int i = 0; i < cnt; i++) {
+    if (multi_protocols[i].protocol == (unsigned int)protocol - 1)
       return &multi_protocols[i];
   }
 
@@ -37,21 +57,21 @@ const mm_protocol_definition * getProtocolDefinition(int protocol)
 // static
 const mm_protocol_definition * Multiprotocols::getDefinition(int protocol)
 {
-  for (int i = 0; ; i++) {
-    if (multi_protocols[i].protocol == 0xFF)
-      break;
-    else if (multi_protocols[i].protocol == (unsigned int)protocol)
+  const int cnt = getProtocolCount();
+
+  for (int i = 0; i < cnt; i++) {
+    if (multi_protocols[i].protocol == (unsigned int)protocol - 1)
       return &multi_protocols[i];
   }
 
-  qDebug() << "Multiprotocol" << protocol << "not found. Using default.";
+  qDebug() << "Multiprotocol" << protocol << "not found so using default";
   return &multi_protocols[PROTO_CONFIG];
 }
 
 // static
 int Multiprotocols::getMaxChannelCount(int protocol, unsigned subType)
 {
-  if (protocol == PROTO_DSM)
+  if ((protocol - 1) == PROTO_DSM)
     return 12;
 
   return 16;
@@ -74,10 +94,10 @@ AbstractStaticItemModel * Multiprotocols::protocolItemModel()
   AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
   mdl->setName(AIM_MULTI_PROTOCOL);
 
-  for (int i = 0; ; i++) {
-    if (multi_protocols[i].protocol == 0xFF)
-      break;
-    mdl->appendToItemList(multi_protocols[i].ProtoString, multi_protocols[i].protocol);
+  const int cnt = getProtocolCount();
+
+  for (int i = 0; i < cnt; i++) {
+    mdl->appendToItemList(multi_protocols[i].ProtoString, i);
   }
 
   mdl->sort(0);
@@ -90,6 +110,7 @@ AbstractStaticItemModel * Multiprotocols::protocolItemModel()
 int Multiprotocols::getNumSubTypes(int protocol)
 {
   const mm_protocol_definition * pd = getProtocolDefinition(protocol);
+
   if (pd)
     return pd->nbrSubProto;
   else
@@ -119,12 +140,12 @@ AbstractStaticItemModel * Multiprotocols::subTypeItemModel()
   AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
   mdl->setName(AIM_MULTI_SUBTYPE);
 
-  for (int i = 0; ; i++) {
-    if (multi_protocols[i].protocol == 0xFF)
-      break;
+  const int cnt = getProtocolCount();
+
+  for (int i = 0; i < cnt; i++) {
     for (unsigned int j = 0; j <= multi_protocols[i].nbrSubProto; j++) {
       //  load all protocols and subtypes then filter when used
-      mdl->appendToItemList(subTypeToString(multi_protocols[i].protocol, j), j, true, 0, multi_protocols[i].protocol);
+      mdl->appendToItemList(subTypeToString(multi_protocols[i].protocol, j), j, true, 0, i);
     }
   }
 
