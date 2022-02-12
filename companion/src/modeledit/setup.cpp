@@ -182,6 +182,39 @@ void TimerPanel::onModeChanged(int index)
 
 /******************************************************************************/
 
+ModulePanel::FrSky::FrSky(QWidget * parent)
+{
+
+}
+
+ModulePanel::FrSky::~FrSky()
+{
+
+}
+
+ModulePanel::MultiProtocol::MultiProtocol(QWidget * parent)
+{
+
+}
+
+ModulePanel::MultiProtocol::~MultiProtocol()
+{
+
+}
+
+ModulePanel::Trainer::Trainer(QWidget * parent)
+{
+  if (!parent) return;
+
+
+}
+
+ModulePanel::Trainer::~Trainer()
+{
+
+}
+
+
 #define FAILSAFE_CHANNEL_HOLD    2000
 #define FAILSAFE_CHANNEL_NOPULSE 2001
 

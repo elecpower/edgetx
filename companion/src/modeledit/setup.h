@@ -75,6 +75,27 @@ class ModulePanel : public ModelPanel
     virtual ~ModulePanel();
     virtual void update();
 
+  class FrSky
+  {
+    public:
+      FrSky(QWidget * parent);
+      virtual ~FrSky();
+    };
+
+  class MultiProtocol
+  {
+    public:
+      MultiProtocol(QWidget * parent);
+      virtual ~MultiProtocol();
+  };
+
+  class Trainer
+  {
+    public:
+      Trainer(QWidget * parent);
+      virtual ~Trainer();
+  };
+
   public slots:
     void onExtendedLimitsToggled();
     void onFailsafeModified(unsigned index);
