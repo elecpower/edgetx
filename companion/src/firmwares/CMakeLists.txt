@@ -25,6 +25,7 @@ set(firmwares_SRCS
   sensordata.cpp
   telem_data.cpp
   timerdata.cpp
+  trainermoduledata.cpp
   afhds3.cpp
   ersky9x/ersky9xeeprom.cpp
   ersky9x/ersky9xinterface.cpp

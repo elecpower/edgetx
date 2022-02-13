@@ -736,6 +736,34 @@ struct convert<FrSkyScreenData> {
   }
 };
 
+template <>
+struct convert<TrainerModuleData> {
+  static Node encode(const TrainerModuleData& rhs)
+  {
+    Node node;
+    node["mode"] = trainerModeLut << rhs.Mode;
+    node["channelsStart"] = rhs.channelsStart;
+    node["channelsCount"] = (rhs.channelsCount - 8);
+    node["frameLength"] = rhs.frameLength;
+    node["delay"] = ((rhs.delay - 300) / 50);
+    node["pulsePol"] = (int)rhs.pulsePol;
+    return node;
+  }
+
+  static bool decode(const Node& node, TrainerModuleData& rhs)
+  {
+    node["mode"] >> trainerModeLut >> rhs.mode;
+    node["channelsStart"] >> rhs.channelsStart;
+    node["channelsCount"] >> rhs.channelsCount;
+    rhs.channelsCount += 8;
+    node["frameLength"] >> rhs.frameLength;
+    node["delay"] >> rhs.delay;
+    rhs.delay = 300 + 50 * rhs.delay;
+    node["pulsePol"] >> rhs.pulsePol;
+    return true;
+  }
+};
+
 Node convert<ModelData>::encode(const ModelData& rhs)
 {
   Node node;
@@ -917,12 +945,7 @@ Node convert<ModelData>::encode(const ModelData& rhs)
     }
   }
 
-  node["trainerData"]["mode"] = trainerModeLut << rhs.trainerMode;
-  node["trainerData"]["channelsStart"] = rhs.moduleData[2].channelsStart;
-  node["trainerData"]["channelsCount"] = (rhs.moduleData[2].channelsCount - 8);
-  node["trainerData"]["frameLength"] = rhs.moduleData[2].ppm.frameLength;
-  node["trainerData"]["delay"] = ((rhs.moduleData[2].ppm.delay - 300) / 50);
-  node["trainerData"]["pulsePol"] = (int)rhs.moduleData[2].ppm.pulsePol;
+  node["trainerData"] = rhs.trainerData;
 
   for (int i=0; i<CPN_MAX_SCRIPTS; i++) {
     if (strlen(rhs.scriptData[i].filename) > 0) {
@@ -1109,18 +1132,7 @@ bool convert<ModelData>::decode(const Node& node, ModelData& rhs)
     }
   }
 
-  if (node["trainerData"]) {
-    const auto& trainer = node["trainerData"];
-    if (!trainer.IsMap()) return false;
-    trainer["mode"] >> trainerModeLut >> rhs.trainerMode;
-    trainer["channelsStart"] >> rhs.moduleData[2].channelsStart;
-    trainer["channelsCount"] >> rhs.moduleData[2].channelsCount;
-    rhs.moduleData[2].channelsCount += 8;
-    trainer["frameLength"] >> rhs.moduleData[2].ppm.frameLength;
-    trainer["delay"] >> rhs.moduleData[2].ppm.delay;
-    rhs.moduleData[2].ppm.delay = 300 + 50 * rhs.moduleData[2].ppm.delay;
-    trainer["pulsePol"] >> rhs.moduleData[2].ppm.pulsePol;
-  }
+  node["trainerData"] >> rhs.trainerData;
 
   node["scriptData"] >> rhs.scriptData;
   node["telemetrySensors"] >> rhs.sensorData;

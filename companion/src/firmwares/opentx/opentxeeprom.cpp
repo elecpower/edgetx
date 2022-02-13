@@ -2737,13 +2737,12 @@ OpenTxModelData::OpenTxModelData(ModelData & modelData, Board::Type board, unsig
 
   if (version >= 219) {
     // Trainer PPM settings
-    internalField.Append(new UnsignedField<3>(this,  modelData.trainerMode));
-    internalField.Append(new SpareBitsField<5>(this));
-    internalField.Append(new UnsignedField<8>(this, modelData.moduleData[2].channelsStart));
-    internalField.Append(new ConversionField<SignedField<8> >(this, modelData.moduleData[2].channelsCount, -8));
-    internalField.Append(new SignedField<8>(this, modelData.moduleData[2].ppm.frameLength));
-    internalField.Append(new ConversionField<SignedField<6> >(this, modelData.moduleData[2].ppm.delay, exportPpmDelay, importPpmDelay));
-    internalField.Append(new BoolField<1>(this, modelData.moduleData[2].ppm.pulsePol));
+    internalField.Append(new UnsignedField<8>(this,  modelData.trainerModuleData.mode));
+    internalField.Append(new UnsignedField<8>(this, modelData.trainerModuleData.channelsStart));
+    internalField.Append(new ConversionField<SignedField<8>>(this, modelData.trainerModuleData.channelsCount, -8));
+    internalField.Append(new SignedField<8>(this, modelData.trainerModuleData.frameLength));
+    internalField.Append(new ConversionField<SignedField<6>>(this, modelData.trainerModuleData.delay, exportPpmDelay, importPpmDelay));
+    internalField.Append(new BoolField<1>(this, modelData.trainerModuleData.pulsePol));
     internalField.Append(new SpareBitsField<1>(this));
   }
 
@@ -2877,13 +2876,13 @@ void OpenTxModelData::beforeExport()
   //  TODO remove when enum not radio specific requires eeprom change and conversion
   //  Note: this must mirror reverse afterImport
   if (!IS_FLYSKY_NV14(board))
-      modelData.trainerMode -= 1;
+      modelData.trainerModuleData.mode -= 1;
 
-  if (modelData.trainerMode > TRAINER_MODE_SLAVE_JACK) {
+  if (modelData.trainerModuleData.mode > TRAINER_MODE_SLAVE_JACK) {
     if (!IS_TARANIS(board)) {
-      modelData.trainerMode -= 2;
+      modelData.trainerModuleData.mode -= 2;
       if (!IS_RADIOMASTER_TX16S(board))
-        modelData.trainerMode -= 1;
+        modelData.trainerModuleData.mode -= 1;
     }
   }
 }
@@ -2924,13 +2923,13 @@ void OpenTxModelData::afterImport()
   //  TODO remove when enum not radio specific requires eeprom change and conversion
   //  Note: this must mirror reverse beforeExport
   if (!IS_FLYSKY_NV14(board))
-      modelData.trainerMode += 1;
+      modelData.trainerModuleData.mode += 1;
 
-  if (modelData.trainerMode > TRAINER_MODE_SLAVE_JACK) {
+  if (modelData.trainerModuleData.mode > TRAINER_MODE_SLAVE_JACK) {
     if (!IS_TARANIS(board)) {
-      modelData.trainerMode += 2;
+      modelData.trainerModuleData.mode += 2;
       if (!IS_RADIOMASTER_TX16S(board))
-        modelData.trainerMode += 1;
+        modelData.trainerModuleData.mode += 1;
     }
   }
 }
@@ -3328,4 +3327,3 @@ void OpenTxGeneralData::afterImport()
     }
   }
 }
-

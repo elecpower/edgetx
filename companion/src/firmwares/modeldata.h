@@ -35,6 +35,7 @@
 #include "telem_data.h"
 #include "timerdata.h"
 #include "customisation_data.h"
+#include "trainermoduledata.h"
 #include "generalsettings.h"
 
 #include <QtCore>
@@ -43,7 +44,6 @@ class GeneralSettings;
 class RadioDataConversionState;
 class AbstractStaticItemModel;
 
-constexpr char AIM_MODELDATA_TRAINERMODE[]  {"modeldata.trainermode"};
 constexpr char AIM_MODELDATA_FUNCSWITCHCONFIG[]  {"modeldata.funcswitchconfig"};
 constexpr char AIM_MODELDATA_FUNCSWITCHSTART[]  {"modeldata.funcswitchstart"};
 
@@ -70,20 +70,6 @@ class ScriptData {
     char    name[10+1];
     int     inputs[CPN_MAX_SCRIPT_INPUTS];
     void clear() { memset(reinterpret_cast<void *>(this), 0, sizeof(ScriptData)); }
-};
-
-enum TrainerMode {
-  TRAINER_MODE_OFF,
-  TRAINER_MODE_FIRST = TRAINER_MODE_OFF,
-  TRAINER_MODE_MASTER_JACK,
-  TRAINER_MODE_SLAVE_JACK,
-  TRAINER_MODE_MASTER_SBUS_EXTERNAL_MODULE,
-  TRAINER_MODE_MASTER_CPPM_EXTERNAL_MODULE,
-  TRAINER_MODE_MASTER_BATTERY_COMPARTMENT,
-  TRAINER_MODE_MASTER_BLUETOOTH,
-  TRAINER_MODE_SLAVE_BLUETOOTH,
-  TRAINER_MODE_MULTI,
-  TRAINER_MODE_LAST = TRAINER_MODE_MULTI
 };
 
 #define INPUT_NAME_LEN 4
@@ -159,9 +145,9 @@ class ModelData {
 
     char bitmap[CPN_MAX_BITMAP_LEN + 1];
 
-    unsigned int trainerMode;  // TrainerMode
+    TrainerModuleData trainerData;
 
-    ModuleData moduleData[CPN_MAX_MODULES + 1/*trainer*/];
+    ModuleData moduleData[CPN_MAX_MODULES];
 
     ScriptData scriptData[CPN_MAX_SCRIPTS];
 
@@ -283,10 +269,6 @@ class ModelData {
     void limitsMove(const int index, const int offset);
     void limitsSet(const int index, const QByteArray & data);
 
-    QString trainerModeToString() const;
-    static QString trainerModeToString(const int value);
-    static bool isTrainerModeAvailable(const GeneralSettings & generalSettings, const Firmware * firmware, const int value);
-    static AbstractStaticItemModel * trainerModeItemModel(const GeneralSettings & generalSettings, const Firmware * firmware);
     QString funcSwitchConfigToString(const int index) const;
     static QString funcSwitchConfigToString(const int index, const int value);
     static AbstractStaticItemModel * funcSwitchConfigItemModel();
