@@ -181,104 +181,135 @@ void TimerPanel::onModeChanged(int index)
 }
 
 /******************************************************************************/
+/*
+    BaseModule
+*/
 
-ModulePanel::FrSky::FrSky(ModuleData & moduleData, QWidget * parent)
+BaseModule::BaseModule(QWidget * parent) :
+  QWidget(parent),
+  ui(new Ui::GenericModule),
+  m_gridRow(0),
+  m_gridCol(0)
 {
+  ui->setupUi(this);
+
+
 
 }
 
-ModulePanel::FrSky::~FrSky()
+BaseModule::~BaseModule()
 {
-
+  delete ui;
 }
 
-ModulePanel::MultiProtocol::MultiProtocol(ModuleData & moduleData, QWidget * parent)
+void BaseModule::setMode(int &mode, FilteredItemModel * filteredItemModel)
 {
-  QComboBox * cboSubType = parent->findChild("cboSubType");
-  if (cboSubType)
-    cboSubType->hide();
-}
-
-ModulePanel::MultiProtocol::~MultiProtocol()
-{
-
-}
-
-ModulePanel::Trainer::Trainer(TrainerModuleData & trainerData, QWidget * parent, FilteredItemModelFactory * panelFilteredItemModels)
-{
-  if (!parent)
-    return;
-
   AutoComboBox * cboMode = parent->findChild("cboMode");
-  if (cboMode && panelFilteredItemModels) {
-    cboMode.setModel(panelFilteredItemModels->getItemModel(FIM_TRAINERMODE));
-    cboMode.setField(trainerData.mode);
+  if (cboMode && filteredItemModel) {
+    cboMode.setModel(filteredItemModel);
+    cboMode.setField(mode);
   }
+}
 
+void BaseModule::hideSubType()
+{
   AutoComboBox * cboSubType = parent->findChild("cboSubType");
   if (cboSubType)
     cboSubType->hide();
+}
 
-  QGridLayout * gridLayout = parent->findChild("gridLayout");
-  if (!gridLayout)
-    return;
-
-  int row = 1;  //  0 is mode and subtype
-  int col = 0;
-
-  switch (trainerData.mode) {
-    case TRAINER_MODE_SLAVE_JACK:
-      QLabel * lblChannelRange = new QLabel(tr("Channel Range"));
-
-      AutoSpinBox * spnChannelStart = new AutoSpinBox();
-      FieldRange fieldRange = trainerData.getChannelStartRange();
-      spnChannelStart->setRange(fieldRange.min, fieldRange.max);
-      spnChannelStart->setPrefix(fieldRange.prefix);
-      spnChannelStart->setField(trainerData.channelsStart);
-
-      AutoSpinBox * spnChannelsCount = new AutoSpinBox();
-      FieldRange fieldRange = trainerData.getChannelsCountRange();
-      spnChannelsCount->setRange(fieldRange.min, fieldRange.max);
-      spnChannelsCount->setField(trainerData.channelsCount);
-
-      gridLayout->addWidget(lblChannelRange, row, col++);
-      gridLayout->addWidget(spnChannelStart, row, col++);
-      gridLayout->addWidget(spnChannelsCount, row, col++);
-
-      row++;
-      col = 0;
-      QLabel * lblPPMFrame = new QLabel(tr("PPM frame"));
-
-      AutoDoubleSpinBox * dsbFrameLength = new AutoDoubleSpinBox();
-      fieldRange = trainerData.getFrameLengthRange();
-      dsbFrameLength->setDecimals(fieldRange.decimals);
-      dsbFrameLength->setRange(fieldRange.min, fieldRange.max);
-      dsbFrameLength->setStep(fieldRange.step);
-      dsbFrameLength->setField(trainerData.frameLength);
-
-      AutoSpinBox * spnDelay = new AutoSpinBox();
-      fieldRange = trainerData.getDelayRange();
-      spnDelay->setRange(fieldRange.min, fieldRange.max);
-      spnDelay->setStep(fieldRange.step);
-      spnDelay->setField(trainerData.delay);
-
-      AutoComboBox * cboPulsePol = new AutoComboBox();
-      cboPulsePol->addItem(tr("Negative"));
-      cboPulsePol->addItem(tr("Positive"));
-      cboPulsePol->setField(trainerData.pulsePol);
-
-      gridLayout->addWidget(lblPPMFrame, row, col++);
-      gridLayout->addWidget(dsbFrameLength, row, col++);
-      gridLayout->addWidget(spnDelay, row, col++);
-      gridLayout->addWidget(cboPulsePol, row, col++);
-    default:
-  }
+void BaseModule::hideFailsafe()
+{
 
 }
 
-ModulePanel::Trainer::~Trainer()
+void BaseModule::addChannelRange(int &start, FieldRange startRange, int &count, FieldRange countRange)
+{
+  QLabel * lblChannelRange = new QLabel(tr("Channel Range"));
+
+  AutoSpinBox * spnChannelStart = new AutoSpinBox();
+  spnChannelStart->setRange(startRange.min, startRange.max);
+  spnChannelStart->setPrefix(startRange.prefix);
+  spnChannelStart->setField(start);
+
+  AutoSpinBox * spnChannelsCount = new AutoSpinBox();
+  spnChannelsCount->setRange(countRange.min, countRange.max);
+  spnChannelsCount->setField(count);
+
+  m_gridRow++;
+  m_gridCol = 0;
+  ui->gridLayout->addWidget(lblChannelRange, m_gridRow, m_gridCol++);
+  ui->gridLayout->addWidget(spnChannelStart, m_gridRow, m_gridCol++);
+  ui->gridLayout->addWidget(spnChannelsCount, m_gridRow, m_gridCol++);
+}
+
+void BaseModule::addPPMFrame(int &length, FieldRange lengthRange, int &delay, FieldRange delayRange, bool &polarity)
+{
+  QLabel * lblPPMFrame = new QLabel(tr("PPM frame"));
+
+  AutoDoubleSpinBox * dsbFrameLength = new AutoDoubleSpinBox();
+  dsbFrameLength->setDecimals(lengthRange.decimals);
+  dsbFrameLength->setRange(lengthRange.min, lengthRange.max);
+  dsbFrameLength->setStep(lengthRange.step);
+  dsbFrameLength->setField(length);
+
+  AutoSpinBox * spnDelay = new AutoSpinBox();
+  spnDelay->setRange(delayRange.min, delayRange.max);
+  spnDelay->setStep(delayRange.step);
+  spnDelay->setField(delay);
+
+  AutoComboBox * cboPulsePol = new AutoComboBox();
+  cboPulsePol->addItem(tr("Negative"));
+  cboPulsePol->addItem(tr("Positive"));
+  cboPulsePol->setField(polarity);
+
+  m_gridRow++;
+  m_gridCol = 0;
+  ui->gridLayout->addWidget(lblPPMFrame, m_gridRow, m_gridCol++);
+  ui->gridLayout->addWidget(dsbFrameLength, m_gridRow, m_gridCol++);
+  ui->gridLayout->addWidget(spnDelay, m_gridRow, m_gridCol++);
+  ui->gridLayout->addWidget(cboPulsePol, m_gridRow, m_gridCol++);
+}
+
+/*
+    FrSkyModule
+*/
+
+FrSkyModule::FrSkyModule(ModuleData & moduleData, QWidget * parent) :
+  BaseModule(parent)
 {
 
+}
+
+/*
+    MultiModule
+*/
+
+MultiModule::MultiModule(ModuleData & moduleData, QWidget * parent) :
+  BaseModule(parent)
+{
+
+}
+
+/*
+    TrainerModule
+*/
+
+TrainerModule::TrainerModule(TrainerModuleData & trainerData, QWidget * parent, FilteredItemModelFactory * panelFilteredItemModels) :
+  BaseModule(parent)
+{
+  setMode(trainerData.mode, panelFilteredItemModels->getItemModel(FIM_TRAINERMODE));
+  hideSubType();
+  hideFailsafe();
+
+  if (trainerData.mode == TRAINER_MODE_SLAVE_JACK) {
+      addChannelRange(trainerData.channelsStart, trainerData.getChannelStartRange(),
+                      trainerData.channelsCount, trainerData.getChannelsCountRange());
+
+      addPPM(trainerData.frameLength, trainerData.getFrameLengthRange(),
+             trainerData.delay, trainerData.getDelayRange(),
+             trainerData.pulsePol);
+  }
 }
 
 #define FAILSAFE_CHANNEL_HOLD    2000

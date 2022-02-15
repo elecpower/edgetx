@@ -30,6 +30,7 @@ constexpr char MIMETYPE_TIMER[] = "application/x-companion-timer";
 namespace Ui {
   class Setup;
   class Timer;
+  class GenericModule;
   class Module;
   class FunctionSwitches;
 }
@@ -65,6 +66,49 @@ class TimerPanel : public ModelPanel
     int modelsUpdateCnt;
 };
 
+class BaseModule : public QWidget
+{
+  Q_OBJECT
+
+  public:
+    BaseModule(QWidget * parent);
+    virtual ~BaseModule();
+
+    ui::GenericModule *ui;
+
+  protected:
+    void setMode(int &mode, FilteredItemModel * filteredItemModel);
+    void hideSubType();
+    void hideFailsafe();
+    void addChannelRange(int &start, FieldRange startRange, int &count, FieldRange countRange);
+    void addPPM(int &length, FieldRange lengthRange, int &delay, FieldRange delayRange, bool &polarity);
+
+  private:
+    int m_gridRow;
+    int m_gridCol;
+};
+
+class FrSkyModule : public BaseModule
+{
+  public:
+    FrSkyModule(QWidget * parent);
+    virtual ~FrSkyModule() = default;
+  };
+
+class MultiModule : public BaseModule
+{
+  public:
+    MultiModule(QWidget * parent);
+    virtual ~MultiModule() = default;
+};
+
+class TrainerModule : public BaseModule
+{
+  public:
+    TrainerModule(QWidget * parent);
+    virtual ~TrainerModule() = default;
+};
+
 class ModulePanel : public ModelPanel
 {
   Q_OBJECT
@@ -74,27 +118,6 @@ class ModulePanel : public ModelPanel
                 FilteredItemModelFactory * panelFilteredItemModels = nullptr);
     virtual ~ModulePanel();
     virtual void update();
-
-  class FrSky
-  {
-    public:
-      FrSky(QWidget * parent);
-      virtual ~FrSky();
-    };
-
-  class MultiProtocol
-  {
-    public:
-      MultiProtocol(QWidget * parent);
-      virtual ~MultiProtocol();
-  };
-
-  class Trainer
-  {
-    public:
-      Trainer(QWidget * parent);
-      virtual ~Trainer();
-  };
 
   public slots:
     void onExtendedLimitsToggled();
