@@ -24,6 +24,9 @@
 #include "eeprominterface.h"
 #include "compounditemmodels.h"
 #include "filtereditemmodels.h"
+#include "autocombobox.h"
+#include "autospinbox.h"
+#include "autodoublespinbox.h"
 
 constexpr char MIMETYPE_TIMER[] = "application/x-companion-timer";
 
@@ -66,46 +69,48 @@ class TimerPanel : public ModelPanel
     int modelsUpdateCnt;
 };
 
-class BaseModule : public QWidget
+class AbstractModule : public QWidget
 {
   Q_OBJECT
 
   public:
-    BaseModule(QWidget * parent);
-    virtual ~BaseModule();
-
-    ui::GenericModule *ui;
+    AbstractModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels);
+    virtual ~AbstractModule();
 
   protected:
-    void setMode(int &mode, FilteredItemModel * filteredItemModel);
+    void setMode(unsigned int &mode, const char * itemModelName);
     void hideSubType();
     void hideFailsafe();
-    void addChannelRange(int &start, FieldRange startRange, int &count, FieldRange countRange);
-    void addPPM(int &length, FieldRange lengthRange, int &delay, FieldRange delayRange, bool &polarity);
+    void addChannelRange(unsigned int &start, FieldRange startRange, int &count, FieldRange countRange);
+    void addPPM(int &length, FieldRange lengthRange, int &delay, FieldRange delayRange, unsigned int &polarity);
 
   private:
+    FilteredItemModelFactory * filteredItemModels;
+    AutoComboBox * m_cboMode;
+    AutoComboBox * m_cboSubType;
+    QGridLayout * m_gridLayout;
     int m_gridRow;
     int m_gridCol;
 };
 
-class FrSkyModule : public BaseModule
+class FrSkyModule : public AbstractModule
 {
   public:
-    FrSkyModule(QWidget * parent);
+    FrSkyModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
     virtual ~FrSkyModule() = default;
   };
 
-class MultiModule : public BaseModule
+class MultiModule : public AbstractModule
 {
   public:
-    MultiModule(QWidget * parent);
+    MultiModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
     virtual ~MultiModule() = default;
 };
 
-class TrainerModule : public BaseModule
+class TrainerModule : public AbstractModule
 {
   public:
-    TrainerModule(QWidget * parent);
+    TrainerModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, TrainerModuleData & trainerData);
     virtual ~TrainerModule() = default;
 };
 

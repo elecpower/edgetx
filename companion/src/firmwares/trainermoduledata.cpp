@@ -23,7 +23,7 @@
 #include "eeprominterface.h"
 #include "generalsettings.h"
 
-FieldRange TrainerModuleData::getChannelStartRange() const;
+FieldRange TrainerModuleData::getChannelStartRange() const
 {
   FieldRange result;
 
@@ -34,7 +34,7 @@ FieldRange TrainerModuleData::getChannelStartRange() const;
   return result;
 }
 
-FieldRange TrainerModuleData::getChannelsCountRange() const;
+FieldRange TrainerModuleData::getChannelsCountRange() const
 {
   FieldRange result;
 
@@ -44,7 +44,7 @@ FieldRange TrainerModuleData::getChannelsCountRange() const;
   return result;
 }
 
-FieldRange TrainerModuleData::getFrameLengthRange() const;
+FieldRange TrainerModuleData::getFrameLengthRange() const
 {
   FieldRange result;
 
@@ -55,7 +55,7 @@ FieldRange TrainerModuleData::getFrameLengthRange() const;
   return result;
 }
 
-FieldRange TrainerModuleData::getDelayRange() const;
+FieldRange TrainerModuleData::getDelayRange() const
 {
   FieldRange result;
 
@@ -76,23 +76,23 @@ QString TrainerModuleData::modeToString() const
 QString TrainerModuleData::modeToString(int value)
 {
   switch (value) {
-    case TRAINER_MODE_OFF:
+    case TRAINERMODE_OFF:
       return tr("OFF");
-    case TRAINER_MODE_MASTER_JACK:
+    case TRAINERMODE_MASTER_JACK:
       return tr("Master/Jack");
-    case TRAINER_MODE_SLAVE_JACK:
+    case TRAINERMODE_SLAVE_JACK:
       return tr("Slave/Jack");
-    case TRAINER_MODE_MASTER_SBUS_EXTERNAL_MODULE:
+    case TRAINERMODE_MASTER_SBUS_EXTERNAL_MODULE:
       return tr("Master/SBUS Module");
-    case TRAINER_MODE_MASTER_CPPM_EXTERNAL_MODULE:
+    case TRAINERMODE_MASTER_CPPM_EXTERNAL_MODULE:
       return tr("Master/CPPM Module");
-    case TRAINER_MODE_MASTER_BATTERY_COMPARTMENT:
+    case TRAINERMODE_MASTER_BATTERY_COMPARTMENT:
       return tr("Master/Battery");
-    case TRAINER_MODE_MASTER_BLUETOOTH:
+    case TRAINERMODE_MASTER_BLUETOOTH:
       return tr("Master/Bluetooth");
-    case TRAINER_MODE_SLAVE_BLUETOOTH:
+    case TRAINERMODE_SLAVE_BLUETOOTH:
       return tr("Slave/Bluetooth");
-    case TRAINER_MODE_MULTI:
+    case TRAINERMODE_MULTI:
       return tr("Master/Multi");
     default:
       return CPN_STR_UNKNOWN_ITEM;
@@ -102,25 +102,25 @@ QString TrainerModuleData::modeToString(int value)
 //  static
 bool TrainerModuleData::isModeAvailable(const GeneralSettings & generalSettings, const Firmware * firmware, const int value)
 {
-  if (value < TRAINER_MODE_FIRST || value > TRAINER_MODE_LAST)
+  if (value < TRAINERMODE_FIRST || value > TRAINERMODE_LAST)
     return false;
 
   bool ret = true;
   const Board::Type board = firmware->getBoard();
 
-  if (!IS_FLYSKY_NV14(board) && value == TRAINER_MODE_OFF)
+  if (!IS_FLYSKY_NV14(board) && value == TRAINERMODE_OFF)
     ret = false;
   else if (!IS_TARANIS(board) || IS_ACCESS_RADIO(board, Firmware::getCurrentVariant()->getId())) {
-    if (value >= TRAINER_MODE_MASTER_SBUS_EXTERNAL_MODULE && value <= TRAINER_MODE_MASTER_BATTERY_COMPARTMENT)
+    if (value >= TRAINERMODE_MASTER_SBUS_EXTERNAL_MODULE && value <= TRAINERMODE_MASTER_BATTERY_COMPARTMENT)
       ret = false;
   }
-  else if (generalSettings.auxSerialMode != UART_MODE_SBUS_TRAINER && value == TRAINER_MODE_MASTER_BATTERY_COMPARTMENT)
+  else if (generalSettings.auxSerialMode != UART_MODE_SBUS_TRAINER && value == TRAINERMODE_MASTER_BATTERY_COMPARTMENT)
       ret = false;
 
-  if (generalSettings.bluetoothMode != GeneralSettings::BLUETOOTH_MODE_TRAINER && value >= TRAINER_MODE_MASTER_BLUETOOTH && value <= TRAINER_MODE_SLAVE_BLUETOOTH)
+  if (generalSettings.bluetoothMode != GeneralSettings::BLUETOOTH_MODE_TRAINER && value >= TRAINERMODE_MASTER_BLUETOOTH && value <= TRAINERMODE_SLAVE_BLUETOOTH)
       ret = false;
 
-  if (!IS_RADIOMASTER_TX16S(board) && value == TRAINER_MODE_MULTI)
+  if (!IS_RADIOMASTER_TX16S(board) && value == TRAINERMODE_MULTI)
       ret = false;
 
   return ret;
@@ -132,8 +132,8 @@ AbstractStaticItemModel * TrainerModuleData::modeItemModel(const GeneralSettings
   AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
   mdl->setName(AIM_MODELDATA_TRAINERMODE);
 
-  for (int i = TRAINER_MODE_FIRST; i <= TRAINER_MODE_LAST; i++) {
-    mdl->appendToItemList(trainerModeToString(i), i, isTrainerModeAvailable(generalSettings, firmware, i));
+  for (int i = TRAINERMODE_FIRST; i <= TRAINERMODE_LAST; i++) {
+    mdl->appendToItemList(modeToString(i), i, isModeAvailable(generalSettings, firmware, i));
   }
 
   mdl->loadItemList();

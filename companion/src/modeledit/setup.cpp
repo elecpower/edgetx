@@ -182,48 +182,59 @@ void TimerPanel::onModeChanged(int index)
 
 /******************************************************************************/
 /*
-    BaseModule
+    AbstractModule
 */
 
-BaseModule::BaseModule(QWidget * parent) :
+AbstractModule::AbstractModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels) :
   QWidget(parent),
-  ui(new Ui::GenericModule),
+  filteredItemModels(filteredItemModels),
+  m_cboMode(nullptr),
+  m_cboSubType(nullptr),
+  m_gridLayout(nullptr),
   m_gridRow(0),
   m_gridCol(0)
 {
-  ui->setupUi(this);
+  m_cboMode = findChild<AutoComboBox *>("cboMode");
+  if (!m_cboMode) {
+    qDebug() << "Unable to find cboMode in parent widget";
+    return;
+  }
 
+  m_cboSubType = findChild<AutoComboBox *>("cboSubType");
+  if (!m_cboSubType) {
+    qDebug() << "Unable to find cboSubType in parent widget";
+    return;
+  }
 
-
-}
-
-BaseModule::~BaseModule()
-{
-  delete ui;
-}
-
-void BaseModule::setMode(int &mode, FilteredItemModel * filteredItemModel)
-{
-  AutoComboBox * cboMode = parent->findChild("cboMode");
-  if (cboMode && filteredItemModel) {
-    cboMode.setModel(filteredItemModel);
-    cboMode.setField(mode);
+  m_gridLayout = findChild<QGridLayout *>("gridLayout");
+  if (!m_gridLayout) {
+    qDebug() << "Unable to find gridLayout in parent widget";
+    return;
   }
 }
 
-void BaseModule::hideSubType()
-{
-  AutoComboBox * cboSubType = parent->findChild("cboSubType");
-  if (cboSubType)
-    cboSubType->hide();
-}
-
-void BaseModule::hideFailsafe()
+AbstractModule::~AbstractModule()
 {
 
 }
 
-void BaseModule::addChannelRange(int &start, FieldRange startRange, int &count, FieldRange countRange)
+void AbstractModule::setMode(unsigned int &mode, const char * itemModelName)
+{
+  m_cboMode->setModel(filteredItemModels->getItemModel(itemModelName));
+  m_cboMode->setField(mode);
+}
+
+void AbstractModule::hideSubType()
+{
+  m_cboSubType->hide();
+}
+
+void AbstractModule::hideFailsafe()
+{
+
+}
+
+void AbstractModule::addChannelRange(unsigned int &start, FieldRange startRange, int &count, FieldRange countRange)
 {
   QLabel * lblChannelRange = new QLabel(tr("Channel Range"));
 
@@ -238,24 +249,24 @@ void BaseModule::addChannelRange(int &start, FieldRange startRange, int &count, 
 
   m_gridRow++;
   m_gridCol = 0;
-  ui->gridLayout->addWidget(lblChannelRange, m_gridRow, m_gridCol++);
-  ui->gridLayout->addWidget(spnChannelStart, m_gridRow, m_gridCol++);
-  ui->gridLayout->addWidget(spnChannelsCount, m_gridRow, m_gridCol++);
+  m_gridLayout->addWidget(lblChannelRange, m_gridRow, m_gridCol++);
+  m_gridLayout->addWidget(spnChannelStart, m_gridRow, m_gridCol++);
+  m_gridLayout->addWidget(spnChannelsCount, m_gridRow, m_gridCol++);
 }
 
-void BaseModule::addPPMFrame(int &length, FieldRange lengthRange, int &delay, FieldRange delayRange, bool &polarity)
+void AbstractModule::addPPM(int &length, FieldRange lengthRange, int &delay, FieldRange delayRange, unsigned int &polarity)
 {
   QLabel * lblPPMFrame = new QLabel(tr("PPM frame"));
 
   AutoDoubleSpinBox * dsbFrameLength = new AutoDoubleSpinBox();
   dsbFrameLength->setDecimals(lengthRange.decimals);
   dsbFrameLength->setRange(lengthRange.min, lengthRange.max);
-  dsbFrameLength->setStep(lengthRange.step);
+  dsbFrameLength->setSingleStep(lengthRange.step);
   dsbFrameLength->setField(length);
 
   AutoSpinBox * spnDelay = new AutoSpinBox();
   spnDelay->setRange(delayRange.min, delayRange.max);
-  spnDelay->setStep(delayRange.step);
+  spnDelay->setSingleStep(delayRange.step);
   spnDelay->setField(delay);
 
   AutoComboBox * cboPulsePol = new AutoComboBox();
@@ -265,18 +276,18 @@ void BaseModule::addPPMFrame(int &length, FieldRange lengthRange, int &delay, Fi
 
   m_gridRow++;
   m_gridCol = 0;
-  ui->gridLayout->addWidget(lblPPMFrame, m_gridRow, m_gridCol++);
-  ui->gridLayout->addWidget(dsbFrameLength, m_gridRow, m_gridCol++);
-  ui->gridLayout->addWidget(spnDelay, m_gridRow, m_gridCol++);
-  ui->gridLayout->addWidget(cboPulsePol, m_gridRow, m_gridCol++);
+  m_gridLayout->addWidget(lblPPMFrame, m_gridRow, m_gridCol++);
+  m_gridLayout->addWidget(dsbFrameLength, m_gridRow, m_gridCol++);
+  m_gridLayout->addWidget(spnDelay, m_gridRow, m_gridCol++);
+  m_gridLayout->addWidget(cboPulsePol, m_gridRow, m_gridCol++);
 }
 
 /*
     FrSkyModule
 */
 
-FrSkyModule::FrSkyModule(ModuleData & moduleData, QWidget * parent) :
-  BaseModule(parent)
+FrSkyModule::FrSkyModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
+  AbstractModule(parent, filteredItemModels)
 {
 
 }
@@ -285,8 +296,8 @@ FrSkyModule::FrSkyModule(ModuleData & moduleData, QWidget * parent) :
     MultiModule
 */
 
-MultiModule::MultiModule(ModuleData & moduleData, QWidget * parent) :
-  BaseModule(parent)
+MultiModule::MultiModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
+  AbstractModule(parent, filteredItemModels)
 {
 
 }
@@ -295,14 +306,14 @@ MultiModule::MultiModule(ModuleData & moduleData, QWidget * parent) :
     TrainerModule
 */
 
-TrainerModule::TrainerModule(TrainerModuleData & trainerData, QWidget * parent, FilteredItemModelFactory * panelFilteredItemModels) :
-  BaseModule(parent)
+TrainerModule::TrainerModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, TrainerModuleData & trainerData) :
+  AbstractModule(parent, filteredItemModels)
 {
-  setMode(trainerData.mode, panelFilteredItemModels->getItemModel(FIM_TRAINERMODE));
+  setMode(trainerData.mode, FIM_TRAINERMODE);
   hideSubType();
   hideFailsafe();
 
-  if (trainerData.mode == TRAINER_MODE_SLAVE_JACK) {
+  if (trainerData.mode == TrainerModuleData::TRAINERMODE_SLAVE_JACK) {
       addChannelRange(trainerData.channelsStart, trainerData.getChannelStartRange(),
                       trainerData.channelsCount, trainerData.getChannelsCountRange());
 

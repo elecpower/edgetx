@@ -46,15 +46,15 @@ static const YamlLookupTable timerModeLut = {
 };
 
 static const YamlLookupTable trainerModeLut = {
-  {  TRAINER_MODE_OFF, "OFF"  },
-  {  TRAINER_MODE_MASTER_JACK, "MASTER_TRAINER_JACK"  },
-  {  TRAINER_MODE_SLAVE_JACK, "SLAVE"  },
-  {  TRAINER_MODE_MASTER_SBUS_EXTERNAL_MODULE, "MASTER_SBUS_EXT"  },
-  {  TRAINER_MODE_MASTER_CPPM_EXTERNAL_MODULE, "MASTER_CPPM_EXT"  },
-  {  TRAINER_MODE_MASTER_BATTERY_COMPARTMENT, "MASTER_BATT_COMP"  },
-  {  TRAINER_MODE_MASTER_BLUETOOTH, "MASTER_BT"  },
-  {  TRAINER_MODE_SLAVE_BLUETOOTH, "SLAVE_BT"  },
-  {  TRAINER_MODE_MULTI, "MASTER_MULTI"  },
+  {  TrainerModuleData::TRAINERMODE_OFF, "OFF"  },
+  {  TrainerModuleData::TRAINERMODE_MASTER_JACK, "MASTER_TRAINER_JACK"  },
+  {  TrainerModuleData::TRAINERMODE_SLAVE_JACK, "SLAVE"  },
+  {  TrainerModuleData::TRAINERMODE_MASTER_SBUS_EXTERNAL_MODULE, "MASTER_SBUS_EXT"  },
+  {  TrainerModuleData::TRAINERMODE_MASTER_CPPM_EXTERNAL_MODULE, "MASTER_CPPM_EXT"  },
+  {  TrainerModuleData::TRAINERMODE_MASTER_BATTERY_COMPARTMENT, "MASTER_BATT_COMP"  },
+  {  TrainerModuleData::TRAINERMODE_MASTER_BLUETOOTH, "MASTER_BT"  },
+  {  TrainerModuleData::TRAINERMODE_SLAVE_BLUETOOTH, "SLAVE_BT"  },
+  {  TrainerModuleData::TRAINERMODE_MULTI, "MASTER_MULTI"  },
 };
 
 static const YamlLookupTable swashTypeLut = {
@@ -741,7 +741,7 @@ struct convert<TrainerModuleData> {
   static Node encode(const TrainerModuleData& rhs)
   {
     Node node;
-    node["mode"] = trainerModeLut << rhs.Mode;
+    node["mode"] = trainerModeLut << rhs.mode;
     node["channelsStart"] = rhs.channelsStart;
     node["channelsCount"] = (rhs.channelsCount - 8);
     node["frameLength"] = rhs.frameLength;

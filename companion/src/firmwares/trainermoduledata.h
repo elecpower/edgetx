@@ -22,35 +22,39 @@
 
 #include "datahelpers.h"
 
-#include <QString>
+#include <QtCore>
 
 class GeneralSettings;
+class Firmware;
 class AbstractStaticItemModel;
 
 constexpr char AIM_MODELDATA_TRAINERMODE[]  {"trainermoduledata.mode"};
 
 class TrainerModuleData {
+
+  Q_DECLARE_TR_FUNCTIONS(TrainerModuleData)
+
   public:
     enum TrainerMode {
-      TRAINER_MODE_OFF,
-      TRAINER_MODE_FIRST = TRAINER_MODE_OFF,
-      TRAINER_MODE_MASTER_JACK,
-      TRAINER_MODE_SLAVE_JACK,
-      TRAINER_MODE_MASTER_SBUS_EXTERNAL_MODULE,
-      TRAINER_MODE_MASTER_CPPM_EXTERNAL_MODULE,
-      TRAINER_MODE_MASTER_BATTERY_COMPARTMENT,
-      TRAINER_MODE_MASTER_BLUETOOTH,
-      TRAINER_MODE_SLAVE_BLUETOOTH,
-      TRAINER_MODE_MULTI,
-      TRAINER_MODE_LAST = TRAINER_MODE_MULTI
+      TRAINERMODE_OFF,
+      TRAINERMODE_FIRST = TRAINERMODE_OFF,
+      TRAINERMODE_MASTER_JACK,
+      TRAINERMODE_SLAVE_JACK,
+      TRAINERMODE_MASTER_SBUS_EXTERNAL_MODULE,
+      TRAINERMODE_MASTER_CPPM_EXTERNAL_MODULE,
+      TRAINERMODE_MASTER_BATTERY_COMPARTMENT,
+      TRAINERMODE_MASTER_BLUETOOTH,
+      TRAINERMODE_SLAVE_BLUETOOTH,
+      TRAINERMODE_MULTI,
+      TRAINERMODE_LAST = TRAINERMODE_MULTI
     };
 
-    int mode;
+    unsigned int mode;
     unsigned int channelsStart;
     int channelsCount;
     int frameLength;
     int delay;
-    int pulsePol;
+    unsigned int pulsePol;
 
     void clear() { memset(reinterpret_cast<void *>(this), 0, sizeof(TrainerModuleData)); }
 
