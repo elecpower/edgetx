@@ -283,33 +283,48 @@ void AbstractModule::addPPM(int &length, FieldRange lengthRange, int &delay, Fie
   m_gridLayout->addWidget(cboPulsePol, m_gridRow, m_gridCol++);
 }
 
+/******************************************************************************/
 /*
-    FrSkyModule
+    ModuleOff
 */
 
-FrSkyModule::FrSkyModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+ModuleOff::ModuleOff(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
                          FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
   AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
 {
 
 }
 
+/******************************************************************************/
 /*
-    MultiModule
+    ModuleFrSky
 */
 
-MultiModule::MultiModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+ModuleFrSky::ModuleFrSky(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
                          FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
   AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
 {
 
 }
 
+/******************************************************************************/
 /*
-    TrainerModule
+    ModuleMulti
 */
 
-TrainerModule::TrainerModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+ModuleMulti::ModuleMulti(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+                         FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
+  AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
+{
+
+}
+
+/******************************************************************************/
+/*
+    ModuleTrainer
+*/
+
+ModuleTrainer::ModuleTrainer(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
                              FilteredItemModelFactory * filteredItemModels, TrainerModuleData & trainerData) :
   AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
 {
@@ -327,6 +342,7 @@ TrainerModule::TrainerModule(QWidget * parent, ModelData & model, GeneralSetting
   }
 }
 
+/******************************************************************************/
 #define FAILSAFE_CHANNEL_HOLD    2000
 #define FAILSAFE_CHANNEL_NOPULSE 2001
 

@@ -94,28 +94,36 @@ class AbstractModule : public ModelPanel
     int m_gridCol;
 };
 
-class FrSkyModule : public AbstractModule
+class ModuleOff : public AbstractModule
 {
   public:
-    FrSkyModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+    ModuleOff(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
                 FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
-    virtual ~FrSkyModule() = default;
+    virtual ~ModuleOff() = default;
   };
 
-class MultiModule : public AbstractModule
+class ModuleFrSky : public AbstractModule
 {
   public:
-    MultiModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+    ModuleFrSky(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
                 FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
-    virtual ~MultiModule() = default;
+    virtual ~ModuleFrSky() = default;
+  };
+
+class ModuleMulti : public AbstractModule
+{
+  public:
+    ModuleMulti(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+                FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
+    virtual ~ModuleMulti() = default;
 };
 
-class TrainerModule : public AbstractModule
+class ModuleTrainer : public AbstractModule
 {
   public:
-    TrainerModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+    ModuleTrainer(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
                   FilteredItemModelFactory * filteredItemModels, TrainerModuleData & trainerData);
-    virtual ~TrainerModule() = default;
+    virtual ~ModuleTrainer() = default;
 };
 
 class ModulePanel : public ModelPanel
