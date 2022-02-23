@@ -33,7 +33,6 @@ constexpr char MIMETYPE_TIMER[] = "application/x-companion-timer";
 namespace Ui {
   class Setup;
   class Timer;
-  class GenericModule;
   class Module;
   class FunctionSwitches;
 }
@@ -78,12 +77,15 @@ class AbstractModule : public ModelPanel
                    FilteredItemModelFactory * filteredItemModels);
     virtual ~AbstractModule();
 
+    virtual void update();
+
   protected:
     void setMode(unsigned int &mode, const char * itemModelName);
     void hideSubType();
     void hideFailsafe();
     void addChannelRange(unsigned int &start, FieldRange startRange, int &count, FieldRange countRange);
     void addPPM(int &length, FieldRange lengthRange, int &delay, FieldRange delayRange, unsigned int &polarity);
+    void reset();
 
   private:
     FilteredItemModelFactory * filteredItemModels;
@@ -98,7 +100,7 @@ class ModuleOff : public AbstractModule
 {
   public:
     ModuleOff(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
-                FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
+                FilteredItemModelFactory * filteredItemModels);
     virtual ~ModuleOff() = default;
   };
 
@@ -106,7 +108,7 @@ class ModuleFrSky : public AbstractModule
 {
   public:
     ModuleFrSky(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
-                FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
+                FilteredItemModelFactory * filteredItemModels);
     virtual ~ModuleFrSky() = default;
   };
 
@@ -114,7 +116,7 @@ class ModuleMulti : public AbstractModule
 {
   public:
     ModuleMulti(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
-                FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
+                FilteredItemModelFactory * filteredItemModels);
     virtual ~ModuleMulti() = default;
 };
 
@@ -122,7 +124,7 @@ class ModuleTrainer : public AbstractModule
 {
   public:
     ModuleTrainer(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
-                  FilteredItemModelFactory * filteredItemModels, TrainerModuleData & trainerData);
+                  FilteredItemModelFactory * filteredItemModels);
     virtual ~ModuleTrainer() = default;
 };
 
@@ -136,6 +138,8 @@ class ModulePanel : public ModelPanel
     virtual ~ModulePanel();
     virtual void update();
 
+  //  TODO
+  /*
   public slots:
     void onExtendedLimitsToggled();
     void onFailsafeModified(unsigned index);
@@ -173,6 +177,7 @@ class ModulePanel : public ModelPanel
     void updateFailsafe(unsigned channel);
     void on_optionValue_editingFinished();
     void onClearAccessRxClicked();
+    */
 
   private:
     enum FailsafeValueDisplayTypes { FAILSAFE_DISPLAY_PERCENT = 1, FAILSAFE_DISPLAY_USEC = 2 };

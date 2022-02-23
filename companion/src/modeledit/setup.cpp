@@ -195,28 +195,44 @@ AbstractModule::AbstractModule(QWidget * parent, ModelData & model, GeneralSetti
   m_gridRow(0),
   m_gridCol(0)
 {
-  m_cboMode = findChild<AutoComboBox *>("cboMode");
+  m_cboMode = parent->findChild<AutoComboBox *>("cboMode");
   if (!m_cboMode) {
-    qDebug() << "Unable to find cboMode in parent widget";
+    qDebug() << "Error: Unable to find cboMode in parent widget";
     return;
   }
 
-  m_cboSubType = findChild<AutoComboBox *>("cboSubType");
+  m_cboSubType = parent->findChild<AutoComboBox *>("cboSubType");
   if (!m_cboSubType) {
-    qDebug() << "Unable to find cboSubType in parent widget";
+    qDebug() << "Error: Unable to find cboSubType in parent widget";
     return;
   }
 
-  m_gridLayout = findChild<QGridLayout *>("gridLayout");
+  m_gridLayout = parent->findChild<QGridLayout *>("gridLayout");
   if (!m_gridLayout) {
-    qDebug() << "Unable to find gridLayout in parent widget";
+    qDebug() << "Error: Unable to find gridLayout in parent widget";
     return;
   }
+
+  reset();
+
 }
 
 AbstractModule::~AbstractModule()
 {
 
+}
+
+void AbstractModule::update()
+{
+
+}
+
+void AbstractModule::reset()
+{
+  //  mode > OFF though trainer ???? Maybe no need and leave to each module type
+  //  remove all widgets from grid
+  hideSubType();
+  hideFailsafe();
 }
 
 void AbstractModule::setMode(unsigned int &mode, const char * itemModelName)
@@ -289,7 +305,7 @@ void AbstractModule::addPPM(int &length, FieldRange lengthRange, int &delay, Fie
 */
 
 ModuleOff::ModuleOff(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
-                         FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
+                         FilteredItemModelFactory * filteredItemModels) :
   AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
 {
 
@@ -301,7 +317,7 @@ ModuleOff::ModuleOff(QWidget * parent, ModelData & model, GeneralSettings & gene
 */
 
 ModuleFrSky::ModuleFrSky(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
-                         FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
+                         FilteredItemModelFactory * filteredItemModels) :
   AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
 {
 
@@ -313,7 +329,7 @@ ModuleFrSky::ModuleFrSky(QWidget * parent, ModelData & model, GeneralSettings & 
 */
 
 ModuleMulti::ModuleMulti(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
-                         FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
+                         FilteredItemModelFactory * filteredItemModels) :
   AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
 {
 
@@ -325,24 +341,58 @@ ModuleMulti::ModuleMulti(QWidget * parent, ModelData & model, GeneralSettings & 
 */
 
 ModuleTrainer::ModuleTrainer(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
-                             FilteredItemModelFactory * filteredItemModels, TrainerModuleData & trainerData) :
+                             FilteredItemModelFactory * filteredItemModels) :
   AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
 {
-  setMode(trainerData.mode, FIM_TRAINERMODE);
-  hideSubType();
-  hideFailsafe();
+  TrainerModuleData & td = model.trainerData;
 
-  if (trainerData.mode == TrainerModuleData::TRAINERMODE_SLAVE_JACK) {
-      addChannelRange(trainerData.channelsStart, trainerData.getChannelStartRange(),
-                      trainerData.channelsCount, trainerData.getChannelsCountRange());
+  setMode(td.mode, FIM_TRAINERMODE);
 
-      addPPM(trainerData.frameLength, trainerData.getFrameLengthRange(),
-             trainerData.delay, trainerData.getDelayRange(),
-             trainerData.pulsePol);
+  if (td.mode == TrainerModuleData::TRAINERMODE_SLAVE_JACK) {
+    addChannelRange(td.channelsStart, td.getChannelStartRange(), td.channelsCount, td.getChannelsCountRange());
+    addPPM(td.frameLength, td.getFrameLengthRange(), td.delay, td.getDelayRange(), td.pulsePol);
   }
 }
 
 /******************************************************************************/
+ModulePanel::ModulePanel(QWidget * parent, ModelData & model, ModuleData & module, GeneralSettings & generalSettings, Firmware * firmware, int moduleIdx,
+                         FilteredItemModelFactory * panelFilteredItemModels):
+  ModelPanel(parent, model, generalSettings, firmware),
+  module(module),
+  moduleIdx(moduleIdx),
+  ui(new Ui::Module)
+{
+  lock = true;
+
+  ui->setupUi(this);
+
+  ui->lblModule->setText(ModuleData::indexToString(moduleIdx, firmware));
+
+  if (moduleIdx < 0) {
+    ModuleTrainer(this, model, generalSettings, firmware, panelFilteredItemModels);
+  }
+  else {
+
+  }
+
+  disableMouseScrolling();
+
+  lock = false;
+}
+
+ModulePanel::~ModulePanel()
+{
+  delete ui;
+}
+
+void ModulePanel::update()
+{
+
+}
+
+
+
+#if 0
 #define FAILSAFE_CHANNEL_HOLD    2000
 #define FAILSAFE_CHANNEL_NOPULSE 2001
 
@@ -1159,7 +1209,7 @@ void ModulePanel::onClearAccessRxClicked()
     emit modified();
   }
 }
-
+#endif // 0
 /******************************************************************************/
 FunctionSwitchesPanel::FunctionSwitchesPanel(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware):
   ModelPanel(parent, model, generalSettings, firmware),
@@ -1388,7 +1438,7 @@ SetupPanel::SetupPanel(QWidget * parent, ModelData & model, GeneralSettings & ge
   panelItemModels->registerItemModel(TimerData::countdownStartItemModel());
   panelItemModels->registerItemModel(TimerData::persistentItemModel());
   panelItemModels->registerItemModel(TimerData::modeItemModel());
-  panelFilteredModels->registerItemModel(new FilteredItemModel(ModelData::trainerModeItemModel(generalSettings, firmware)), FIM_TRAINERMODE);
+  panelFilteredModels->registerItemModel(new FilteredItemModel(TrainerModuleData::modeItemModel(generalSettings, firmware)), FIM_TRAINERMODE);
 
   Board::Type board = firmware->getBoard();
 
@@ -1614,15 +1664,17 @@ SetupPanel::SetupPanel(QWidget * parent, ModelData & model, GeneralSettings & ge
   for (int i = firmware->getCapability(NumFirstUsableModule); i < firmware->getCapability(NumModules); i++) {
     modules[i] = new ModulePanel(this, model, model.moduleData[i], generalSettings, firmware, i, panelFilteredModels);
     ui->modulesLayout->addWidget(modules[i]);
-    connect(modules[i], &ModulePanel::modified, this, &SetupPanel::modified);
-    connect(modules[i], &ModulePanel::updateItemModels, this, &SetupPanel::onModuleUpdateItemModels);
-    connect(this, &SetupPanel::extendedLimitsToggled, modules[i], &ModulePanel::onExtendedLimitsToggled);
+    //  TODO
+    //connect(modules[i], &ModulePanel::modified, this, &SetupPanel::modified);
+    //connect(modules[i], &ModulePanel::updateItemModels, this, &SetupPanel::onModuleUpdateItemModels);
+    //connect(this, &SetupPanel::extendedLimitsToggled, modules[i], &ModulePanel::onExtendedLimitsToggled);
   }
 
   for (int i = firmware->getCapability(NumFirstUsableModule); i < firmware->getCapability(NumModules); i++) {
     for (int j = firmware->getCapability(NumFirstUsableModule); j < firmware->getCapability(NumModules); j++) {
       if (i != j) {
-        connect(modules[i], SIGNAL(failsafeModified(unsigned)), modules[j], SLOT(onFailsafeModified(unsigned)));
+        //  TODO
+        //connect(modules[i], SIGNAL(failsafeModified(unsigned)), modules[j], SLOT(onFailsafeModified(unsigned)));
       }
     }
   }
@@ -1630,7 +1682,8 @@ SetupPanel::SetupPanel(QWidget * parent, ModelData & model, GeneralSettings & ge
   if (firmware->getCapability(ModelTrainerEnable)) {
     modules[CPN_MAX_MODULES] = new ModulePanel(this, model, model.moduleData[CPN_MAX_MODULES], generalSettings, firmware, -1, panelFilteredModels);
     ui->modulesLayout->addWidget(modules[CPN_MAX_MODULES]);
-    connect(modules[CPN_MAX_MODULES], &ModulePanel::modified, this, &SetupPanel::modified);
+    //  TODO
+    //connect(modules[CPN_MAX_MODULES], &ModulePanel::modified, this, &SetupPanel::modified);
   }
 
   disableMouseScrolling();

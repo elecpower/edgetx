@@ -188,15 +188,16 @@ QString ModelPrinter::printModule(int idx)
 {
   QStringList str;
   QString result;
-  ModuleData module = model.moduleData[(idx<0 ? CPN_MAX_MODULES : idx)];
+  ModuleData module = model.moduleData[(idx < 0 ? CPN_MAX_MODULES : idx)];
   if (idx < 0) {
-    str << printLabelValue(tr("Mode"), model.trainerModeToString());
+    const TrainerModuleData & td = model.trainerData;
+    str << printLabelValue(tr("Mode"), td.modeToString());
     if (IS_HORUS_OR_TARANIS(firmware->getBoard())) {
-      if (model.trainerMode == TRAINER_MODE_SLAVE_JACK) {
-        str << printLabelValue(tr("Channels"), QString("%1-%2").arg(module.channelsStart + 1).arg(module.channelsStart + module.channelsCount));
-        str << printLabelValue(tr("Frame length"), QString("%1ms").arg(printPPMFrameLength(module.ppm.frameLength)));
-        str << printLabelValue(tr("PPM delay"), QString("%1us").arg(module.ppm.delay));
-        str << printLabelValue(tr("Polarity"), module.polarityToString());
+      if (td.mode == TrainerModuleData::TRAINERMODE_SLAVE_JACK) {
+        str << printLabelValue(tr("Channels"), QString("%1-%2").arg(td.channelsStart + 1).arg(td.channelsStart + td.channelsCount));
+        str << printLabelValue(tr("Frame length"), QString("%1ms").arg(printPPMFrameLength(td.frameLength)));
+        str << printLabelValue(tr("PPM delay"), QString("%1us").arg(td.delay));
+        str << printLabelValue(tr("Polarity"), td.pulsePolToString());
       }
     }
     result = str.join(" ");

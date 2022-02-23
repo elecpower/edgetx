@@ -67,4 +67,5 @@ class TrainerModuleData {
     static QString modeToString(const int value);
     static bool isModeAvailable(const GeneralSettings & generalSettings, const Firmware * firmware, const int value);
     static AbstractStaticItemModel * modeItemModel(const GeneralSettings & generalSettings, const Firmware * firmware);
+    QString pulsePolToString() const { return pulsePol ? tr("Positive") : tr("Negative"); }
 };
