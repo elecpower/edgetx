@@ -185,8 +185,9 @@ void TimerPanel::onModeChanged(int index)
     AbstractModule
 */
 
-AbstractModule::AbstractModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels) :
-  QWidget(parent),
+AbstractModule::AbstractModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+                               FilteredItemModelFactory * filteredItemModels) :
+  ModelPanel(parent, model, generalSettings, firmware),
   filteredItemModels(filteredItemModels),
   m_cboMode(nullptr),
   m_cboSubType(nullptr),
@@ -241,11 +242,11 @@ void AbstractModule::addChannelRange(unsigned int &start, FieldRange startRange,
   AutoSpinBox * spnChannelStart = new AutoSpinBox();
   spnChannelStart->setRange(startRange.min, startRange.max);
   spnChannelStart->setPrefix(startRange.prefix);
-  spnChannelStart->setField(start);
+  spnChannelStart->setField(start, this);
 
   AutoSpinBox * spnChannelsCount = new AutoSpinBox();
   spnChannelsCount->setRange(countRange.min, countRange.max);
-  spnChannelsCount->setField(count);
+  spnChannelsCount->setField(count, this);
 
   m_gridRow++;
   m_gridCol = 0;
@@ -262,17 +263,17 @@ void AbstractModule::addPPM(int &length, FieldRange lengthRange, int &delay, Fie
   dsbFrameLength->setDecimals(lengthRange.decimals);
   dsbFrameLength->setRange(lengthRange.min, lengthRange.max);
   dsbFrameLength->setSingleStep(lengthRange.step);
-  dsbFrameLength->setField(length);
+  dsbFrameLength->setField(length, this);
 
   AutoSpinBox * spnDelay = new AutoSpinBox();
   spnDelay->setRange(delayRange.min, delayRange.max);
   spnDelay->setSingleStep(delayRange.step);
-  spnDelay->setField(delay);
+  spnDelay->setField(delay, this);
 
   AutoComboBox * cboPulsePol = new AutoComboBox();
   cboPulsePol->addItem(tr("Negative"));
   cboPulsePol->addItem(tr("Positive"));
-  cboPulsePol->setField(polarity);
+  cboPulsePol->setField(polarity, this);
 
   m_gridRow++;
   m_gridCol = 0;
@@ -286,8 +287,9 @@ void AbstractModule::addPPM(int &length, FieldRange lengthRange, int &delay, Fie
     FrSkyModule
 */
 
-FrSkyModule::FrSkyModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
-  AbstractModule(parent, filteredItemModels)
+FrSkyModule::FrSkyModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+                         FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
+  AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
 {
 
 }
@@ -296,8 +298,9 @@ FrSkyModule::FrSkyModule(QWidget * parent, FilteredItemModelFactory * filteredIt
     MultiModule
 */
 
-MultiModule::MultiModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
-  AbstractModule(parent, filteredItemModels)
+MultiModule::MultiModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+                         FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData) :
+  AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
 {
 
 }
@@ -306,8 +309,9 @@ MultiModule::MultiModule(QWidget * parent, FilteredItemModelFactory * filteredIt
     TrainerModule
 */
 
-TrainerModule::TrainerModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, TrainerModuleData & trainerData) :
-  AbstractModule(parent, filteredItemModels)
+TrainerModule::TrainerModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+                             FilteredItemModelFactory * filteredItemModels, TrainerModuleData & trainerData) :
+  AbstractModule(parent, model, generalSettings, firmware, filteredItemModels)
 {
   setMode(trainerData.mode, FIM_TRAINERMODE);
   hideSubType();

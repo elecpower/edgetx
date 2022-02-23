@@ -69,12 +69,13 @@ class TimerPanel : public ModelPanel
     int modelsUpdateCnt;
 };
 
-class AbstractModule : public QWidget
+class AbstractModule : public ModelPanel
 {
   Q_OBJECT
 
   public:
-    AbstractModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels);
+    AbstractModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+                   FilteredItemModelFactory * filteredItemModels);
     virtual ~AbstractModule();
 
   protected:
@@ -96,21 +97,24 @@ class AbstractModule : public QWidget
 class FrSkyModule : public AbstractModule
 {
   public:
-    FrSkyModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
+    FrSkyModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+                FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
     virtual ~FrSkyModule() = default;
   };
 
 class MultiModule : public AbstractModule
 {
   public:
-    MultiModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
+    MultiModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+                FilteredItemModelFactory * filteredItemModels, ModuleData & moduleData);
     virtual ~MultiModule() = default;
 };
 
 class TrainerModule : public AbstractModule
 {
   public:
-    TrainerModule(QWidget * parent, FilteredItemModelFactory * filteredItemModels, TrainerModuleData & trainerData);
+    TrainerModule(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware,
+                  FilteredItemModelFactory * filteredItemModels, TrainerModuleData & trainerData);
     virtual ~TrainerModule() = default;
 };
 
