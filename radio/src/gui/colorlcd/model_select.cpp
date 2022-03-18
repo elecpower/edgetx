@@ -521,7 +521,7 @@ class ModelCategoryPageBody : public FormWindow
                    sizeof(duplicatedFilename));
             if (findNextFileIndex(duplicatedFilename, LEN_MODEL_FILENAME,
                                   MODELS_PATH)) {
-              sdCopyFile(model->modelFilename, MODELS_PATH, duplicatedFilename,
+              VirtualFS::instance().copyFile(model->modelFilename, MODELS_PATH, duplicatedFilename,
                          MODELS_PATH);
               modelslist.addModel(category, duplicatedFilename);
               update(index);
