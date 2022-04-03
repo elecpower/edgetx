@@ -53,12 +53,12 @@ class TemplatePage : public Page
   
   void updateInfo()
   {
-    FIL fp;
-    FRESULT res = f_open (&fp, buffer, FA_READ);
-    unsigned int bytesRead = 0;
-    if (res == FR_OK) {
-      f_read (&fp, infoText, LEN_INFO_TEXT, &bytesRead);
-      f_close(&fp);
+    VfsFile fp;
+    VfsError res = VirtualFS::instance().openFile(fp, buffer, VfsOpenFlags::READ);
+    size_t bytesRead = 0;
+    if (res == VfsError::OK) {
+      fp.read(infoText, LEN_INFO_TEXT, bytesRead);
+      fp.close();
     }
     infoText[bytesRead] = '\0';
     invalidate();
@@ -127,29 +127,30 @@ class SelectTemplate : public TemplatePage
     FormGridLayout grid;
     grid.spacer(PAGE_PADDING);
     std::list<std::string> files;
-    FILINFO fno;
-    DIR dir;
-    FRESULT res = f_opendir(&dir, path);
+    VirtualFS& vfs = VirtualFS::instance();
+    VfsFileInfo fno;
+    VfsDir dir;
+    VfsError res = vfs.openDirectory(dir, path);
 
-    if (res == FR_OK) {
+    if (res == VfsError::OK) {
       // read all entries
-      bool firstTime = true;
       for (;;) {
-        res = sdReadDir(&dir, &fno, firstTime);
-        firstTime = false;
-        if (res != FR_OK || fno.fname[0] == 0)
+        res = dir.read(fno);
+        std::string fName = fno.getName();
+        if (res != VfsError::OK || fName.length() == 0)
           break; // Break on error or end of dir
-        if (strlen((const char*)fno.fname) > SD_SCREEN_FILE_LENGTH)
+        if (fName.length() > STORAGE_SCREEN_FILE_LENGTH)
           continue;
-        if (fno.fname[0] == '.')
+        if (fName.at(0) == '.')
           continue;
-        if (!(fno.fattrib & AM_DIR)) {
-          const char *ext = getFileExtension(fno.fname);
+        if (fno.getType() == VfsType::FILE) {
+          const char* cname = fName.c_str();
+          const char *ext = vfs.getFileExtension(cname);
           if(ext && !strcasecmp(ext, YAML_EXT)) {
-            int len = ext - fno.fname;
+            int len = ext - cname;
             if (len < FF_MAX_LFN) {
               char name[FF_MAX_LFN] = { 0 };
-              strncpy(name, fno.fname, len);
+              strncpy(name, cname, len);
               files.push_back(name);
             }
           }
@@ -167,10 +168,12 @@ class SelectTemplate : public TemplatePage
             // Dismiss template pages
             deleteLater();
             templateFolderPage->deleteLater();
+
 #if defined(LUA)
             // If there is a wizard Lua script, fire it up
             snprintf(buffer, LEN_BUFFER, "%s%c%s%s", path, '/', name.c_str(), SCRIPT_EXT);
-            if (f_stat(buffer, 0) == FR_OK) {
+            VfsFileInfo fno;
+            if (VirtualFS::instance().fstat(buffer, fno) == VfsError::OK) {
               luaExec(buffer);
               // Need to update() the ModelCategoryPageBody before attaching StandaloneLuaWindow to not mess up focus
               update();
@@ -191,7 +194,7 @@ class SelectTemplate : public TemplatePage
       }
     }
     
-    f_closedir(&dir);
+    dir.close();
     count = files.size();
     if (count == 0) {
       rect_t rect = body.getRect();
@@ -252,24 +255,24 @@ class SelectTemplateFolder : public TemplatePage
     grid.spacer(tfb->height() + 5);
 
     std::list<std::string> directories;
-    FILINFO fno;
-    DIR dir;
-    FRESULT res = f_opendir(&dir, TEMPLATES_PATH);
+    VirtualFS& vfs = VirtualFS::instance();
+    VfsFileInfo fno;
+    VfsDir dir;
+    VfsError res = vfs.openDirectory(dir, TEMPLATES_PATH);
 
-    if (res == FR_OK) {
+    if (res == VfsError::OK) {
       // read all entries
-      bool firstTime = true;
       for (;;) {
-        res = sdReadDir(&dir, &fno, firstTime);
-        firstTime = false;
-        if (res != FR_OK || fno.fname[0] == 0)
+        res = dir.read(fno);
+        std::string name = fno.getName();
+        if (res != VfsError::OK || name.length() == 0)
           break; // Break on error or end of dir
-        if (strlen((const char*)fno.fname) > SD_SCREEN_FILE_LENGTH)
+        if (name.length() > STORAGE_SCREEN_FILE_LENGTH)
           continue;
-        if (fno.fname[0] == '.')
+        if (name.at(0) == '.')
           continue;
-        if (fno.fattrib & AM_DIR)
-          directories.push_back((char*)fno.fname);
+        if (fno.getType() == VfsType::DIR)
+          directories.push_back(name);
       }
 
       directories.sort(compare_nocase);
@@ -299,7 +302,7 @@ class SelectTemplateFolder : public TemplatePage
 #endif
     }
     
-    f_closedir(&dir);
+    dir.close();
     count = directories.size();
     if (count == 0) {
       rect_t rect = grid.getLabelSlot();
@@ -538,15 +541,16 @@ class ModelCategoryPageBody : public FormWindow
               snprintf(modelName, size, "%s%s", model->modelName, YAML_EXT);
               char templatePath[FF_MAX_LFN];
               snprintf(templatePath, FF_MAX_LFN, "%s%c%s", PERS_TEMPL_PATH, '/', modelName);
-              sdCheckAndCreateDirectory(TEMPLATES_PATH);
-              sdCheckAndCreateDirectory(PERS_TEMPL_PATH);
-              if (isFileAvailable(templatePath)) {
+			  VirtualFS& vfs = VirtualFS::instance();
+              vfs.checkAndCreateDirectory(TEMPLATES_PATH);
+              vfs.checkAndCreateDirectory(PERS_TEMPL_PATH);
+              if (vfs.isFileAvailable(templatePath)) {
                 new ConfirmDialog(parent, STR_FILE_EXISTS, STR_ASK_OVERWRITE,
                   [=] {
-                    sdCopyFile(model->modelFilename, MODELS_PATH, modelName, PERS_TEMPL_PATH);
+                    VirtualFS::instance().copyFile(model->modelFilename, MODELS_PATH, modelName, PERS_TEMPL_PATH);
                   });
               } else {
-                sdCopyFile(model->modelFilename, MODELS_PATH, modelName, PERS_TEMPL_PATH);
+                vfs.copyFile(model->modelFilename, MODELS_PATH, modelName, PERS_TEMPL_PATH);
               }
           });
           if (model != modelslist.getCurrentModel()) {
