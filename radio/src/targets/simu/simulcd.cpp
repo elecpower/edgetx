@@ -71,7 +71,7 @@ static void simuRefreshLcd(lv_disp_drv_t * disp_drv, uint16_t *buffer, const rec
   auto src = buffer;
 #endif
 
-  auto dst = simuLcdBuf + y1 * LCD_PHYS_W + x1;
+  auto dst = simuLcdBuf + y1 * LCD_W + x1;
   for (auto line = 0; line < copy_area.h; line++) {
 
     auto line_end = dst + copy_area.w;
@@ -83,7 +83,7 @@ static void simuRefreshLcd(lv_disp_drv_t * disp_drv, uint16_t *buffer, const rec
 #endif
     }
 
-    dst += LCD_PHYS_W - copy_area.w;
+    dst += LCD_W - copy_area.w;
   }
 
   if (lv_disp_flush_is_last(disp_drv)) {
