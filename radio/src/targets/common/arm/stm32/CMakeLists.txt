@@ -81,7 +81,6 @@ endif()
 
 set(FIRMWARE_SRC
   ${FIRMWARE_SRC}
-  vfs_syscalls.cpp
   syscalls.c
   )
 
