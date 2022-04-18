@@ -133,7 +133,10 @@ void buildLuaUi(std::vector<LuaScript> luaScripts, FormWindow *window, FormGridL
           char toolPath[FF_MAX_LFN + 1];
           strncpy(toolPath, luaScript.path.c_str(), sizeof(toolPath)-1);
           *((char *)VirtualFS::getBasename(toolPath)-1) = '\0';
-          VirtualFS::instance().changeDirectory(toolPath);
+          size_t offset = 0;
+          if(toolPath[0] == ':')
+            offset = 1;
+          VirtualFS::instance().changeDirectory(toolPath + offset);
 
           luaExec(luaScript.path.c_str());
           auto lua_win = StandaloneLuaWindow::instance();
@@ -203,8 +206,9 @@ void RadioToolsPage::rebuild(FormWindow * window)
           *ext = '\0';
           label = VirtualFS::getBasename(path);
         }
-
-        luaScripts.emplace_back(LuaScript{ path, label });
+        std::string p = ":";
+        p += path;
+        luaScripts.emplace_back(LuaScript{ p, label });
       }
     }
 
