@@ -801,7 +801,7 @@ void luaInitThemesAndWidgets()
     UNPROTECT_LUA();
     TRACE("lsWidgets %p", lsWidgets);
     //luaLoadFiles(THEMES_PATH, luaLoadThemeCallback);
-    luaLoadFiles(WIDGETS_PATH, luaLoadWidgetCallback);
+    luaLoadFiles( WIDGETS_PATH, luaLoadWidgetCallback);
     luaDoGc(lsWidgets, true);
   }
 }
