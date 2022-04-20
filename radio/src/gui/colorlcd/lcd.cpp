@@ -111,6 +111,8 @@ void lcdInitDisplayDriver()
 #elif defined (LCD_VERTICAL_INVERT)
   disp_drv.rotated = LV_DISP_ROT_180;
   disp_drv.sw_rotate = 1;
+  disp_drv.full_refresh = 0;
+  disp_drv.direct_mode = 0;
 #endif
 
   // Register the driver and save the created display object
