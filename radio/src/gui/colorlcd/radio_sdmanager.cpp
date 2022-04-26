@@ -100,7 +100,11 @@ RadioSdManagerPage::RadioSdManagerPage() :
 {
   setOnSetVisibleHandler([]() {
     TRACE("changeDirectory(ROOT_PATH)");
+#if defined(SPIFLASH) && defined(SDCARD)
     VirtualFS::instance().changeDirectory("/");
+#else
+    VirtualFS::instance().changeDirectory("/DEFAULT/");
+#endif
   });
 }
 
