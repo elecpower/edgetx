@@ -27,6 +27,10 @@ set(modeledit_SRCS
   colorcustomscreens.cpp
   telemetry_customscreens.cpp
   curves.cpp
+  setup_timers.cpp
+  setup_modules.cpp
+  setup_functionswitches.cpp
+  setup_trainer.cpp
 )
 
 set(modeledit_HDRS
@@ -41,15 +45,20 @@ set(modeledit_HDRS
   colorcustomscreens.h
   telemetry_customscreens.h
   curves.h
+  setup_timers.h
+  setup_modules.h
+  setup_functionswitches.h
+  setup_trainer.h
 )
 
 set(modeledit_UIS
-  setup_timer.ui
-  setup_module.ui
-  setup_function_switches.ui
   flightmode.ui
   telemetry_customscreen.ui
   telemetry_sensor.ui
+  setup_timer.ui
+  setup_module.ui
+  setup_functionswitches.ui
+  setup_trainer.ui
 )
 
 foreach(name ${modeledit_NAMES})
