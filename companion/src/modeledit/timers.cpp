@@ -175,6 +175,12 @@ TimersPanel::TimersPanel(QWidget * parent, ModelData & model, GeneralSettings & 
                        QWidget * prevFocus, FilteredItemModelFactory * panelFilteredModels, CompoundItemModelFactory * panelItemModels):
   ModelPanel(parent, model, generalSettings, firmware)
 {
+  panelItemModels = new CompoundItemModelFactory(&generalSettings, &model);
+  panelItemModels->registerItemModel(TimerData::countdownBeepItemModel());
+  panelItemModels->registerItemModel(TimerData::countdownStartItemModel());
+  panelItemModels->registerItemModel(TimerData::persistentItemModel());
+  panelItemModels->registerItemModel(TimerData::modeItemModel());
+
   timersCount = firmware->getCapability(Timers);
 
   for (int i = 0; i < CPN_MAX_TIMERS, i < timersCount; i++) {

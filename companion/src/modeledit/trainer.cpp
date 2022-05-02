@@ -21,11 +21,15 @@
 #include "setup_trainer.h"
 #include "ui_setup_trainer.h"
 
+constexpr char FIM_TRAINERMODE[] {"Trainer Mode"};
+
 TrainerPanel::TrainerPanel(QWidget * parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware):
   ModelPanel(parent, model, generalSettings, firmware),
   ui(new Ui::FunctionSwitches)
 {
   ui->setupUi(this);
+
+  panelFilteredModels->registerItemModel(new FilteredItemModel(ModelData::trainerModeItemModel(generalSettings, firmware)), FIM_TRAINERMODE);
 
 
   update();

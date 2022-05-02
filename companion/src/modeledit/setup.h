@@ -22,8 +22,6 @@
 
 #include "modeledit.h"
 #include "eeprominterface.h"
-#include "compounditemmodels.h"
-#include "filtereditemmodels.h"
 
 class SetupPanel : public ModelPanel
 {
@@ -33,54 +31,14 @@ class SetupPanel : public ModelPanel
     SetupPanel(QWidget *parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware, CompoundItemModelFactory * sharedItemModels);
     virtual ~SetupPanel();
 
-    virtual void update();
+    virtual void update() override;
 
   signals:
-    void extendedLimitsToggled();
     void updated();
 
-  private slots:
-    void on_name_editingFinished();
-    void on_throttleTrimSwitch_currentIndexChanged(int index);
-    void on_throttleTrim_toggled(bool checked);
-    void on_extendedLimits_toggled(bool checked);
-    void on_extendedTrims_toggled(bool checked);
-    void on_throttleWarning_toggled(bool checked);
-    void on_enableCustomThrottleWarning_toggled(bool checked);
-    void on_customThrottleWarningPosition_valueChanged(int value);
-    void on_throttleReverse_toggled(bool checked);
-    void on_displayText_toggled(bool checked);
-    void on_gfEnabled_toggled(bool checked);
-    void on_image_currentIndexChanged(int index);
-    void on_trimIncrement_currentIndexChanged(int index);
-    void onBeepCenterToggled(bool checked);
-    void startupSwitchEdited(int value);
-    void startupSwitchToggled(bool checked);
-    void potWarningToggled(bool checked);
-    void on_potWarningMode_currentIndexChanged(int index);
-    void on_editText_clicked();
-    void onItemModelAboutToBeUpdated();
-    void onItemModelUpdateComplete();
-    void onModuleUpdateItemModels();
-    void onFunctionSwitchesUpdateItemModels();
-    void on_jitterFilter_currentIndexChanged(int index);
-
   private:
-    Ui::Setup *ui;
-    QVector<QSlider *> startupSwitchesSliders;
-    QVector<QCheckBox *> startupSwitchesCheckboxes;
-    QVector<QCheckBox *> potWarningCheckboxes;
-    QVector<QCheckBox *> centerBeepCheckboxes;
-    ModulePanel * modules[CPN_MAX_MODULES + 1];
-    FunctionSwitchesPanel * funcswitches;
+    QVector<GenericPanel *> panels;
 
-    void updateStartupSwitches();
-    void updatePotWarnings();
-    void updateBeepCenter();
-    void populateThrottleTrimSwitchCB();
-    CompoundItemModelFactory * sharedItemModels;
-    void updateItemModels();
-    void connectItemModelEvents(const FilteredItemModel * itemModel);
-    CompoundItemModelFactory * panelItemModels;
-    FilteredItemModelFactory * panelFilteredModels;
 };
+
+
