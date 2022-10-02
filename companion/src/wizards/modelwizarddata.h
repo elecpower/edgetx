@@ -18,8 +18,7 @@
  * GNU General Public License for more details.
  */
 
-#ifndef _WIZARDDATA_H_
-#define _WIZARDDATA_H_
+#pragma once
 
 #include "eeprominterface.h"
 
@@ -111,5 +110,3 @@ class WizMix
     void maxMixSwitch(char *name, MixData &mix, int destCh, int sw, int weight);
 
 };
-
-#endif // _WIZARDDATA_H_

@@ -47,6 +47,7 @@
 #include "constants.h"
 #include "updates/updates.h"
 #include "updates/updateinterface.h"
+#include "wizards/sdcardwizarddialog.h"
 
 #include <QtGui>
 #include <QFileInfo>
@@ -828,6 +829,7 @@ void MainWindow::retranslateUi(bool showMsg)
   trAct(readFlashAct,       tr("Read Firmware from Radio"),   tr("Read firmware from Radio"));
   trAct(writeFlashAct,      tr("Write Firmware to Radio"),    tr("Write firmware to Radio"));
   trAct(sdsyncAct,          tr("Synchronize SD"),             tr("SD card synchronization"));
+  trAct(sdcardWizardAct,    tr("SD Card Wizard..."),          tr("SD card wizard"));
 
   //trAct(openDocURLAct,      tr("Manuals and other Documents"),         tr("Open the EdgeTX document page in a web browser"));
   trAct(writeSettingsAct,   tr("Write Models and Settings To Radio"),  tr("Write Models and Settings to Radio"));
@@ -882,6 +884,7 @@ void MainWindow::createActions()
   downloadsAct =       addAct("download.png",       SLOT(downloads()),        tr("Ctrl+Alt+D"));
   compareAct =         addAct("compare.png",        SLOT(compare()),          tr("Ctrl+Alt+R"));
   sdsyncAct =          addAct("sdsync.png",         SLOT(sdsync()));
+  sdcardWizardAct =    addAct("wizard.png",         SLOT(sdCardWizard()));
 
   editSplashAct =      addAct("paintbrush.png",        SLOT(customizeSplash()));
   burnListAct =        addAct("list.png",              SLOT(burnList()));
@@ -940,6 +943,7 @@ void MainWindow::createMenus()
   fileMenu->addAction(downloadsAct);
   fileMenu->addAction(compareAct);
   fileMenu->addAction(sdsyncAct);
+  fileMenu->addAction(sdcardWizardAct);
   fileMenu->addSeparator();
   fileMenu->addAction(exitAct);
 
@@ -1049,6 +1053,7 @@ void MainWindow::createToolBars()
   fileToolBar->addSeparator();
   fileToolBar->addAction(compareAct);
   fileToolBar->addAction(sdsyncAct);
+  fileToolBar->addAction(sdcardWizardAct);
 
   // workaround for default split button appearance of action with menu  :-/
   QToolButton * btn;
@@ -1410,4 +1415,11 @@ void MainWindow::chooseProfile()
     if (!checkProfileRadioExists(g.sessionId()))
       g.warningId(g.warningId() | AppMessages::MSG_NO_RADIO_TYPE);
   }
+}
+
+void MainWindow::sdCardWizard()
+{
+  SDCardWizardDialog * wizard = new SDCardWizardDialog(this, updateFactories);
+  wizard->exec();
+  delete wizard;
 }

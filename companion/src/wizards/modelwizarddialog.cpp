@@ -18,11 +18,11 @@
  * GNU General Public License for more details.
  */
 
-#include "wizarddialog.h"
-#include "wizarddata.h"
+#include "modelwizarddialog.h"
+#include "modelwizarddata.h"
 #include "helpers.h"
 
-WizardDialog::WizardDialog(const GeneralSettings & settings, unsigned int modelId, const ModelData & modelData, QWidget *parent):
+ModelWizardDialog::ModelWizardDialog(const GeneralSettings & settings, unsigned int modelId, const ModelData & modelData, QWidget *parent):
   QWizard(parent),
   mix(settings, modelId, modelData),
   settings(settings)
@@ -66,7 +66,7 @@ WizardDialog::WizardDialog(const GeneralSettings & settings, unsigned int modelI
   connect(this, SIGNAL(helpRequested()), this, SLOT(showHelp()));
 }
 
-void WizardDialog::showHelp()
+void ModelWizardDialog::showHelp()
 {
   QString message;
 
@@ -157,7 +157,7 @@ void WizardDialog::showHelp()
   QMessageBox::information(this, tr("Model Wizard Help"), message);
 }
 
-StandardPage::StandardPage(WizardPage currentPage, WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+StandardPage::StandardPage(WizardPage currentPage, ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   QWizardPage(),
   wizDlg(dlg),
   pageCurrent(currentPage),
@@ -273,7 +273,7 @@ int StandardPage::nextId() const
   return pageFollower;
 }
 
-ModelSelectionPage::ModelSelectionPage(WizardDialog *dlg, QString image, QString title, QString text)
+ModelSelectionPage::ModelSelectionPage(ModelWizardDialog *dlg, QString image, QString title, QString text)
   : StandardPage(Page_Models, dlg, image, title, text)
 {
   nameLineEdit = new QLineEdit;
@@ -327,7 +327,7 @@ int ModelSelectionPage::nextId() const
     return Page_Throttle;
 }
 
-WingtypeSelectionPage::WingtypeSelectionPage(WizardDialog *dlg, QString image, QString title, QString text)
+WingtypeSelectionPage::WingtypeSelectionPage(ModelWizardDialog *dlg, QString image, QString title, QString text)
   : StandardPage(Page_Wingtypes, dlg, image, title, text)
 {
   standardWingRB = new QRadioButton(tr("Standard Wing"));
@@ -347,7 +347,7 @@ int WingtypeSelectionPage::nextId() const
     return Page_Ailerons;
 }
 
-TailSelectionPage::TailSelectionPage(WizardDialog *dlg, QString image, QString title, QString text)
+TailSelectionPage::TailSelectionPage(ModelWizardDialog *dlg, QString image, QString title, QString text)
   : StandardPage(Page_Tails, dlg, image, title, text)
 {
   standardTailRB = new QRadioButton(tr("Elevator and Rudder"));
@@ -372,7 +372,7 @@ int TailSelectionPage::nextId() const
     return Page_Tail;
 }
 
-FlybarSelectionPage::FlybarSelectionPage(WizardDialog *dlg, QString image, QString title, QString text)
+FlybarSelectionPage::FlybarSelectionPage(ModelWizardDialog *dlg, QString image, QString title, QString text)
   : StandardPage(Page_Flybar, dlg, image, title, text)
 {
   flybarRB = new QRadioButton(tr("Has Flybar"));
@@ -393,7 +393,7 @@ int FlybarSelectionPage::nextId() const
     return Page_Fblheli;
 }
 
-ThrottlePage::ThrottlePage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage)
+ThrottlePage::ThrottlePage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage)
   : StandardPage(Page_Throttle, dlg, image, title, text, nextPage)
 {
   motorRB = new QRadioButton(tr("Yes"));
@@ -430,7 +430,7 @@ void ThrottlePage::onMotorStateChanged(bool toggled)
   throttleCB->setEnabled(toggled);
 }
 
-AileronsPage::AileronsPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage)
+AileronsPage::AileronsPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage)
   : StandardPage(Page_Ailerons, dlg, image, title, text, nextPage)
 {
   noAileronsRB = new QRadioButton(tr("No"));
@@ -495,7 +495,7 @@ void AileronsPage::twoAileronChannels()
   aileron2CB->setEnabled(true);
 }
 
-FlapsPage::FlapsPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+FlapsPage::FlapsPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Flaps, dlg, image, title, text, nextPage)
 {
   noFlapsRB = new QRadioButton(tr("No"));
@@ -559,7 +559,7 @@ void FlapsPage::twoFlapChannels()
   flap2CB->setEnabled(true);
 }
 
-AirbrakesPage::AirbrakesPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+AirbrakesPage::AirbrakesPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Airbrakes, dlg, image, title, text, nextPage)
 {
   noAirbrakesRB = new QRadioButton(tr("No"));
@@ -624,7 +624,7 @@ void AirbrakesPage::twoAirbrakeChannels()
   airbrake2CB->setEnabled(true);
 }
 
-ElevonsPage::ElevonsPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+ElevonsPage::ElevonsPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Elevons, dlg, image, title, text, nextPage)
 {
   elevon1CB = new QComboBox();
@@ -651,7 +651,7 @@ bool ElevonsPage::validatePage()
       bookChannel(elevon2CB, AILERONS_INPUT, -50, ELEVATOR_INPUT, 50));
 }
 
-RudderPage::RudderPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+RudderPage::RudderPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Rudder, dlg, image, title, text, nextPage)
 {
   noRudderRB = new QRadioButton(tr("No"));
@@ -694,7 +694,7 @@ void RudderPage::hasRudder()
   rudderCB->setEnabled(true);
 }
 
-VTailPage::VTailPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage)
+VTailPage::VTailPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage)
   : StandardPage(Page_Tail, dlg, image, title, text, nextPage)
 {
   tail1CB = new QComboBox();
@@ -721,7 +721,7 @@ bool VTailPage::validatePage()
     bookChannel(tail2CB, ELEVATOR_INPUT, 50, RUDDER_INPUT, -50 ));
 }
 
-TailPage::TailPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+TailPage::TailPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Tail, dlg, image, title, text, nextPage)
 {
   elevatorCB = new QComboBox();
@@ -768,7 +768,7 @@ void TailPage::cleanupPage()
   StandardPage::cleanupPage();
 }
 
-SimpleTailPage::SimpleTailPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage)
+SimpleTailPage::SimpleTailPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage)
   : StandardPage(Page_Simpletail, dlg, image, title, text, nextPage)
 {
   elevatorCB = new QComboBox();
@@ -790,7 +790,7 @@ bool SimpleTailPage::validatePage()
   return( bookChannel(elevatorCB, ELEVATOR_INPUT, 100 ));
 }
 
-CyclicPage::CyclicPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+CyclicPage::CyclicPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Cyclic, dlg, image, title, text, nextPage)
 {
   cyclic90RB = new QRadioButton(tr("90"));
@@ -817,7 +817,7 @@ bool CyclicPage::validatePage()
   return true;
 }
 
-GyroPage::GyroPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+GyroPage::GyroPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Gyro, dlg, image, title, text, nextPage)
 {
   noGyroRB = new QRadioButton(tr("No"));
@@ -841,7 +841,7 @@ bool GyroPage::validatePage() {
   return true;
 }
 
-FblPage::FblPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+FblPage::FblPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Fblheli, dlg, image, title, text, nextPage)
 {
   throttleCB = new QComboBox();
@@ -878,7 +878,7 @@ bool FblPage::validatePage()
     bookChannel(      rollCB,     AILERONS_INPUT,  100 ));
 }
 
-HeliPage::HeliPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+HeliPage::HeliPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Helictrl, dlg, image, title, text, nextPage)
 {
   throttleCB = new QComboBox();
@@ -915,7 +915,7 @@ bool HeliPage::validatePage()
     bookChannel(      rollCB,     AILERONS_INPUT,  100 ));
 }
 
-MultirotorPage::MultirotorPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+MultirotorPage::MultirotorPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Multirotor, dlg, image, title, text, nextPage)
 {
   throttleCB = new QComboBox();
@@ -952,7 +952,7 @@ bool MultirotorPage::validatePage()
     bookChannel(rollCB,           AILERONS_INPUT,  100 ));
 }
 
-OptionsPage::OptionsPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage):
+OptionsPage::OptionsPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage):
   StandardPage(Page_Options, dlg, image, title, text, nextPage)
 {
   throttleCutRB = new QCheckBox(tr("Throttle Cut"));
@@ -976,7 +976,7 @@ bool OptionsPage::validatePage(){
   return true;
 }
 
-ConclusionPage::ConclusionPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage)
+ConclusionPage::ConclusionPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage)
   : StandardPage(Page_Conclusion, dlg, image, title, text, nextPage)
 {
   textLabel = new QLabel();

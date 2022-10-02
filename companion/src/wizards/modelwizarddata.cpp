@@ -20,7 +20,7 @@
 
 #include <string.h>
 #include "eeprominterface.h"
-#include "wizarddata.h"
+#include "modelwizarddata.h"
 
 Channel::Channel()
 {

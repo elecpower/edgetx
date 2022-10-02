@@ -398,6 +398,7 @@ void UpdateInterface::resetEnvironment()
 void UpdateInterface::setReleaseChannel(int channel)
 {
   params->releaseChannel = channel;
+  repoReleasesMetaData();
   releases->setReleaseChannel(channel);
 }
 
@@ -619,6 +620,22 @@ bool UpdateInterface::checkCreateDirectory(const QString & dir, const UpdateFlag
       reportProgress(tr("Failed to create %1 directory %2!").arg(updateFlagsToString(flag)).arg(dir), QtCriticalMsg);
       return false;
     }
+  }
+
+  return true;
+}
+
+ bool UpdateInterface::getReleaseJsonAsset(const QString assetName, QJsonDocument * json)
+{
+  if (!repoReleaseAssetsMetaData())
+    return false;
+
+  if (!downloadTextFileToBuffer(assetName)) {
+    return false;
+  }
+
+  if (!convertDownloadToJson(json)) {
+    return false;
   }
 
   return true;
@@ -1627,6 +1644,20 @@ const bool UpdateFactories::isUpdateAvailable(QStringList & names)
     if (factory->instance()->isUpdateable() && factory->instance()->isUpdateAvailable()) {
       names.append(factory->name());
       ret = true;
+    }
+  }
+
+  return ret;
+}
+
+bool UpdateFactories::getReleaseJsonAsset(const QString & name, const QString assetName, QJsonDocument * json)
+{
+  bool ret = false;
+
+  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
+    if (name == factory->name()) {
+      ret = factory->instance()->getReleaseJsonAsset(assetName, json);
+      break;
     }
   }
 

@@ -190,6 +190,7 @@ add_subdirectory(modeledit)
 add_subdirectory(generaledit)
 add_subdirectory(simulation)
 add_subdirectory(storage)
+add_subdirectory(wizards)
 add_subdirectory(thirdparty/qcustomplot)
 add_subdirectory(thirdparty/maxlibqt/src/widgets)
 add_subdirectory(thirdparty/miniz)
@@ -228,8 +229,6 @@ set(companion_SRCS
   mainwindow.cpp
   companion.cpp
   radionotfound.cpp
-  wizarddata.cpp
-  wizarddialog.cpp
   styleeditdialog.cpp
   dialogs/filesyncdialog.cpp         # TODO move to own lib with other dialogs
   profilechooser.cpp
@@ -254,7 +253,6 @@ set(companion_MOC_HDRS
   mdichild.h
   mainwindow.h
   radionotfound.h
-  wizarddialog.h
   modelprinter.h
   multimodelprinter.h
   modelslist.h
@@ -292,7 +290,7 @@ qt5_wrap_ui(companion_SRCS ${companion_UIS})
 qt5_wrap_cpp(companion_SRCS ${companion_MOC_HDRS})
 
 add_executable(${COMPANION_NAME} MACOSX_BUNDLE ${WIN_EXECUTABLE_TYPE} ${companion_SRCS} ${icon_RC})
-target_link_libraries(${COMPANION_NAME} PRIVATE generaledit modeledit qcustomplot miniz shared updates ${CPN_COMMON_LIB})
+target_link_libraries(${COMPANION_NAME} PRIVATE generaledit modeledit qcustomplot miniz shared updates wizards ${CPN_COMMON_LIB})
 
 PrintTargetReport("${COMPANION_NAME}")
 

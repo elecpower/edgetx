@@ -54,8 +54,8 @@ bool UpdateSDCard::flagAssets()
   /*
   {
     "targets": [
-      ["Flysky NV14", "nv14-", "nv14"],
-      ["FrSky Horus X10", "x10-", "horus"],
+      ["Flysky NV14", "nv14-", "c320x480"],
+      ["FrSky Horus X10", "x10-", "c480x272"],
   */
 
   const QString mappingfile = "sdcard.json";

@@ -188,6 +188,7 @@ class UpdateInterface : public QWidget
     bool copyStructure();
     bool copyFiles();
     bool saveReleaseSettings();
+    bool getReleaseJsonAsset(const QString assetName, QJsonDocument * json);
 
     bool downloadAssetToBuffer(const int assetId);
     bool downloadTextFileToBuffer(const QString & path);
@@ -286,6 +287,7 @@ class UpdateFactories : public QWidget
     const bool isLatestRelease(const QString & name);
     const QString latestRelease(const QString & name);
     const QStringList releases(const QString & name);
+    bool getReleaseJsonAsset(const QString & name, const QString assetName, QJsonDocument * json);
 
     bool update(const QString & name, ProgressWidget * progress = nullptr);
     bool updateAll(ProgressWidget * progress = nullptr);

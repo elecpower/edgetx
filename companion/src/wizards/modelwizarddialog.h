@@ -18,19 +18,19 @@
  * GNU General Public License for more details.
  */
 
-#ifndef _WIZARDDIALOG_H_
-#define _WIZARDDIALOG_H_
+#pragma once
+
+#include "modelwizarddata.h"
 
 #include <QtWidgets>
-#include "wizarddata.h"
 
-class WizardDialog : public QWizard
+class ModelWizardDialog : public QWizard
 {
   Q_OBJECT
 
   public:
     WizMix mix;
-    WizardDialog(const GeneralSettings & settings, const unsigned int modelId, const ModelData & modelData, QWidget *parent = 0);
+    ModelWizardDialog(const GeneralSettings & settings, const unsigned int modelId, const ModelData & modelData, QWidget *parent = 0);
     const GeneralSettings & settings;
 
   private slots:
@@ -42,8 +42,8 @@ class StandardPage: public QWizardPage
   Q_OBJECT
 
   public:
-    StandardPage(WizardPage curPage, WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
-    WizardDialog *wizDlg;
+    StandardPage(WizardPage curPage, ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+    ModelWizardDialog *wizDlg;
 
   protected:
     void releaseBookings();
@@ -67,7 +67,7 @@ class ModelSelectionPage: public StandardPage
 {
   Q_OBJECT
 public:
-  ModelSelectionPage(WizardDialog *dlg, QString image, QString title, QString text);
+  ModelSelectionPage(ModelWizardDialog *dlg, QString image, QString title, QString text);
 private:
   QLineEdit *nameLineEdit;
   QRadioButton *planeRB;
@@ -82,7 +82,7 @@ class WingtypeSelectionPage: public StandardPage
 {
   Q_OBJECT
 public:
-  WingtypeSelectionPage(WizardDialog *dlg, QString image, QString title, QString text);
+  WingtypeSelectionPage(ModelWizardDialog *dlg, QString image, QString title, QString text);
 private:
   QRadioButton *deltaWingRB;
   QRadioButton *standardWingRB;
@@ -93,7 +93,7 @@ class TailSelectionPage: public StandardPage
 {
   Q_OBJECT
 public:
-  TailSelectionPage(WizardDialog *dlg, QString image, QString title, QString text);
+  TailSelectionPage(ModelWizardDialog *dlg, QString image, QString title, QString text);
 private:
   QRadioButton *vTailRB;
   QRadioButton *standardTailRB;
@@ -105,7 +105,7 @@ class FlybarSelectionPage: public StandardPage
 {
   Q_OBJECT
 public:
-  FlybarSelectionPage(WizardDialog *dlg, QString image, QString title, QString text);
+  FlybarSelectionPage(ModelWizardDialog *dlg, QString image, QString title, QString text);
 private:
   QRadioButton *flybarRB;
   QRadioButton *noFlybarRB;
@@ -117,7 +117,7 @@ class ThrottlePage: public StandardPage
   Q_OBJECT
 
   public:
-    ThrottlePage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+    ThrottlePage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
     void initializePage();
     bool validatePage();
 
@@ -134,7 +134,7 @@ class AileronsPage: public StandardPage
 {
   Q_OBJECT
 public:
-  AileronsPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  AileronsPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 
@@ -155,7 +155,7 @@ class FlapsPage: public StandardPage
 {
   Q_OBJECT
 public:
-  FlapsPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  FlapsPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 
@@ -176,7 +176,7 @@ class AirbrakesPage: public StandardPage
 {
   Q_OBJECT
 public:
-  AirbrakesPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  AirbrakesPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 
@@ -198,7 +198,7 @@ class ElevonsPage: public StandardPage
   Q_OBJECT
 
   public:
-    ElevonsPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+    ElevonsPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
     void initializePage();
     bool validatePage();
 
@@ -212,7 +212,7 @@ class RudderPage: public StandardPage
   Q_OBJECT
 
   public:
-    RudderPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+    RudderPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
     void initializePage();
     bool validatePage();
 
@@ -230,7 +230,7 @@ class TailPage: public StandardPage
 {
   Q_OBJECT
 public:
-  TailPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  TailPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   void cleanupPage();
   bool validatePage();
@@ -245,7 +245,7 @@ class VTailPage: public StandardPage
 {
   Q_OBJECT
 public:
-  VTailPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  VTailPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 private:
@@ -257,7 +257,7 @@ class SimpleTailPage: public StandardPage
 {
   Q_OBJECT
 public:
-  SimpleTailPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  SimpleTailPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 private:
@@ -268,7 +268,7 @@ class CyclicPage: public StandardPage
 {
   Q_OBJECT
 public:
-  CyclicPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  CyclicPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 private:
@@ -282,7 +282,7 @@ class GyroPage: public StandardPage
 {
   Q_OBJECT
 public:
-  GyroPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  GyroPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 private:
@@ -295,7 +295,7 @@ class FblPage: public StandardPage
 {
   Q_OBJECT
 public:
-  FblPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  FblPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 private:
@@ -309,7 +309,7 @@ class HeliPage: public StandardPage
 {
   Q_OBJECT
 public:
-  HeliPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  HeliPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 private:
@@ -323,7 +323,7 @@ class MultirotorPage: public StandardPage
 {
   Q_OBJECT
 public:
-  MultirotorPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  MultirotorPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 private:
@@ -337,7 +337,7 @@ class OptionsPage: public StandardPage
 {
   Q_OBJECT
 public:
-  OptionsPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  OptionsPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 private:
@@ -350,7 +350,7 @@ class ConclusionPage: public StandardPage
 {
   Q_OBJECT
 public:
-  ConclusionPage(WizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
+  ConclusionPage(ModelWizardDialog *dlg, QString image, QString title, QString text, int nextPage=-1);
   void initializePage();
   bool validatePage();
 private:
@@ -370,7 +370,3 @@ private:
   QString vehicleName( Vehicle );
   QString printChannel( Input, int, Input, int );
 };
-#endif // _WIZARDDIALOG_H_
-
-
-

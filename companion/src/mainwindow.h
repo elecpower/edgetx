@@ -114,6 +114,7 @@ class MainWindow : public QMainWindow
     void manualCheckForUpdates();
     void downloads();
     void doUpdates(bool check, bool interactive = true);
+    void sdCardWizard();
 
     void openFile(const QString & fileName, bool updateLastUsedDir = false);
 
@@ -204,4 +205,5 @@ class MainWindow : public QMainWindow
     QAction *actTileWindows;
     QAction *actCascadeWindows;
     QAction *actCloseAllWindows;
+    QAction *sdcardWizardAct;
 };
