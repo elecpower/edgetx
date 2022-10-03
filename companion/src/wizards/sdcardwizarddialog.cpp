@@ -429,11 +429,12 @@ SDCardSoundsPage::SDCardSoundsPage(QWidget * parent, UpdateFactories * updateFac
   lstSounds = new QListView();
   lstSounds->setModel(langPacks);
   lstSounds->setSelectionMode(QAbstractItemView::ExtendedSelection);
-  registerField("sounds", lstSounds);
 
   grid->addWidget(new QLabel(tr("Sound packs")), row, 0, Qt::AlignTop);
   grid->addWidget(lstSounds, row++, 1);
 
+  selSoundPacks = new QLineEdit();
+  registerField("soundpacks", selSoundPacks);
 }
 
 void SDCardSoundsPage::releaseChanged(const int index)
@@ -468,13 +469,13 @@ void SDCardSoundsPage::releaseChanged(const int index)
           QStandardItem * item = new QStandardItem();
 
           if (!obj.value("language").isUndefined())
-            item->setData(obj.value("language").toString(), Qt::UserRole);
+            item->setData(obj.value("language").toString(), IMDR_Language);
           if (!obj.value("name").isUndefined())
-            item->setData(obj.value("name").toString(), Qt::UserRole + 1);
+            item->setData(obj.value("name").toString(), IMDR_Name);
           if (!obj.value("description").isUndefined())
             item->setData(obj.value("description").toString(), Qt::DisplayRole);
           if (!obj.value("directory").isUndefined())
-            item->setData(obj.value("directory").toString(), Qt::UserRole + 2);
+            item->setData(obj.value("directory").toString(), IMDR_Directory);
 
           langPacks->appendRow(item);
         }
@@ -483,6 +484,26 @@ void SDCardSoundsPage::releaseChanged(const int index)
   }
 
   delete json;
+}
+
+bool SDCardSoundsPage::validatePage()
+{
+  QItemSelectionModel *selItems = lstSounds->selectionModel();
+
+  if (!selItems->hasSelection()) return false;
+
+  QModelIndexList selIndexes = selItems->selectedIndexes();
+
+  QString str;
+
+  for (int i = 0; i < selIndexes.size(); i++) {
+    if (i > 0) str.append("|");
+    str.append(langPacks->data(selIndexes.at(i)).toString());
+  }
+
+  selSoundPacks->setText(str);
+
+  return true;
 }
 
 int SDCardSoundsPage::nextId() const
@@ -520,9 +541,10 @@ SDCardConfirmPage::SDCardConfirmPage(QWidget * parent) :
   setTitle(tr("Confirmation"));
   setSubTitle(tr(" "));
 
-  QVBoxLayout *layout = new QVBoxLayout;
-  lblSummary = new QLabel();
-  layout->addWidget(lblSummary);
+  row = 0;
+  grid = new QGridLayout();
+  layout = new QVBoxLayout();
+  layout->addLayout(grid);
   setLayout(layout);
 
   setCommitPage(true);
@@ -530,15 +552,41 @@ SDCardConfirmPage::SDCardConfirmPage(QWidget * parent) :
 
 void SDCardConfirmPage::initializePage()
 {
-  QString *str = new QString();
-  str->append(QString("<b>%1:</b>  %2<br>").arg(tr("Radio")).arg(field("radio").toString()));
-  str->append(QString("<b>%1:</b>  %2<br>").arg(tr("Language")).arg(field("language").toString()));
-  str->append(QString("<b>%1:</b>  %2<br>").arg(tr("SD card")).arg(field("sdDrive").toString()));
-  str->append(QString("<b>%1:</b>  %2<br>").arg(tr("Erase")).arg(field("sdErase").toBool() ? tr("Yes") : tr("No")));
-  str->append(QString("<b>%1:</b>  %2<br>").arg(tr("Image")).arg(field("sdimage").toString()));
-  str->append(QString("<b>%1:</b>  %2<br>").arg(tr("Sounds")).arg(field("sounds").toString()));
-  str->append(QString("<b>%1:</b>  %2<br>").arg(tr("Themes")).arg(field("themes").toBool() ? tr("Yes") : tr("No")));
-  lblSummary->setText(*str);
+  qDebug() << "TRACE";
+  grid->addWidget(new QLabel(tr("SD card")), row, 0);
+  grid->addWidget(new QLabel(field("sdDrive").toString()), row++, 1);
+  grid->addWidget(new QLabel(tr("Erase SD card")), row, 0);
+  grid->addWidget(new QLabel(field("sdErase").toBool() ? tr("Yes") : tr("No")), row++, 1);
+  grid->addWidget(new QLabel(tr("Radio")), row, 0);
+  grid->addWidget(new QLabel(field("radio").toString()), row++, 1);
+  grid->addWidget(new QLabel(tr("Language")), row, 0);
+  grid->addWidget(new QLabel(field("language").toString()), row++, 1);
+  grid->addWidget(new QLabel(tr("Base image")), row, 0);
+  grid->addWidget(new QLabel(field("sdimage").toString()), row++, 1);
+  grid->addWidget(new QLabel(tr("Sound packs")), row, 0);
+  QStringList strl = field("soundpacks").toString().split("|");
+  for (int i = 0; i < strl.count(); i++) {
+    grid->addWidget(new QLabel(strl.at(i)), row++, 1);
+  }
+  grid->addWidget(new QLabel(tr("Custom themes")), row, 0);
+  grid->addWidget(new QLabel(field("themes").toBool() ? tr("Yes") : tr("No")), row++, 1);
+
+  //layout = new QVBoxLayout();
+  //layout->addLayout(grid);
+
+  //setLayout(layout);
+}
+
+void SDCardConfirmPage::cleanupPage()
+{
+  qDebug() << "TRACE";
+  row = 0;
+  qDeleteAll(grid->findChildren<QWidget *>(QString(), Qt::FindDirectChildrenOnly));
+  layout->removeItem(grid);
+  delete grid;
+  grid = new QGridLayout();
+  layout->addLayout(grid);
+  //delete layout;
 }
 
 int SDCardConfirmPage::nextId() const

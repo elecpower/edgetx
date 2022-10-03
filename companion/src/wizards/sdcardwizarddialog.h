@@ -183,13 +183,22 @@ class SDCardSoundsPage : public SDCardRepoPage
     SDCardSoundsPage(QWidget * parent, UpdateFactories * updateFactories);
     virtual ~SDCardSoundsPage() {}
 
+    enum ItemModelDataRoles {
+      IMDR_Language = Qt::UserRole,
+      IMDR_Name,
+      IMDR_Directory,
+    };
+    Q_ENUM(ItemModelDataRoles)
+
   protected slots:
     virtual void releaseChanged(const int index) override;
 
   private:
     QStandardItemModel *langPacks;
+    QLineEdit *selSoundPacks;
     QListView *lstSounds;
 
+    bool validatePage();
     int nextId() const;
 };
 
@@ -219,9 +228,12 @@ class SDCardConfirmPage : public QWizardPage
     virtual ~SDCardConfirmPage() {}
 
   private:
-    QLabel *lblSummary;
+    QGridLayout *grid;
+    QVBoxLayout *layout;
+    int row;
 
     void initializePage();
+    void cleanupPage();
     int nextId() const;
 };
 
