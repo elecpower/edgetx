@@ -538,16 +538,10 @@ int SDCardThemesPage::nextId() const
 }
 
 SDCardConfirmPage::SDCardConfirmPage(QWidget * parent) :
-  QWizardPage(parent)
+  SDCardCommonPage(parent)
 {
   setTitle(tr("Confirmation"));
   setSubTitle(tr(" "));
-
-  row = 0;
-  grid = new QGridLayout();
-  layout = new QVBoxLayout();
-  layout->addLayout(grid);
-  setLayout(layout);
 
   setCommitPage(true);
 }

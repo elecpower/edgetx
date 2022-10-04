@@ -219,7 +219,7 @@ class SDCardThemesPage : public SDCardRepoPage
     int nextId() const;
 };
 
-class SDCardConfirmPage : public QWizardPage
+class SDCardConfirmPage : public SDCardCommonPage
 {
   Q_OBJECT
 
@@ -228,9 +228,6 @@ class SDCardConfirmPage : public QWizardPage
     virtual ~SDCardConfirmPage() {}
 
   private:
-    QGridLayout *grid;
-    QVBoxLayout *layout;
-    int row;
 
     void initializePage();
     void cleanupPage();
