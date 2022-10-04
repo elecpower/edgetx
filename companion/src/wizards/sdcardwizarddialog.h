@@ -194,8 +194,8 @@ class SDCardSoundsPage : public SDCardRepoPage
     virtual void releaseChanged(const int index) override;
 
   private:
-    QStandardItemModel *langPacks;
-    QLineEdit *selSoundPacks;
+    QStandardItemModel *soundPacksItemModel;
+    QLabel *selSoundPacks;
     QListView *lstSounds;
 
     bool validatePage();

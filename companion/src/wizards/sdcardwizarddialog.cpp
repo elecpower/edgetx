@@ -72,13 +72,13 @@ void SDCardWizardDialog::showHelp()
     case Page_Options:
       message = tr("Select options");
       break;
-    case Page_Radio:
-      message = tr("Select the radio and language");
-      break;
     case Page_Select:
       message = tr("Select a SD card from the list and whether to erase the card contents.<br>"
                    "Only cards under 65GB will be listed.<br>"
                    "The chosen card must be formatted as FAT32.");
+      break;
+    case Page_Radio:
+      message = tr("Select the radio and language");
       break;
     case Page_Image:
       message = tr("Select the release channel");
@@ -421,19 +421,19 @@ int SDCardImagePage::nextId() const
 
 SDCardSoundsPage::SDCardSoundsPage(QWidget * parent, UpdateFactories * updateFactories) :
   SDCardRepoPage(parent, updateFactories, tr("Sounds")),
-  langPacks(new QStandardItemModel())
+  soundPacksItemModel(new QStandardItemModel())
 {
   setTitle(tr("Sounds"));
   setSubTitle(tr("Select one or more sound packs from the list below"));
 
   lstSounds = new QListView();
-  lstSounds->setModel(langPacks);
+  lstSounds->setModel(soundPacksItemModel);
   lstSounds->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   grid->addWidget(new QLabel(tr("Sound packs")), row, 0, Qt::AlignTop);
   grid->addWidget(lstSounds, row++, 1);
 
-  selSoundPacks = new QLineEdit();
+  selSoundPacks = new QLabel();
   registerField("soundpacks", selSoundPacks);
 }
 
@@ -449,7 +449,7 @@ void SDCardSoundsPage::releaseChanged(const int index)
       "directory": "en_gb-libby"
   },
   */
-  langPacks->clear();
+  soundPacksItemModel->clear();
 
   if (json->isArray()) {
     const QJsonArray &arr = json->array();
@@ -477,7 +477,7 @@ void SDCardSoundsPage::releaseChanged(const int index)
           if (!obj.value("directory").isUndefined())
             item->setData(obj.value("directory").toString(), IMDR_Directory);
 
-          langPacks->appendRow(item);
+          soundPacksItemModel->appendRow(item);
         }
       }
     }
@@ -490,15 +490,17 @@ bool SDCardSoundsPage::validatePage()
 {
   QItemSelectionModel *selItems = lstSounds->selectionModel();
 
-  if (!selItems->hasSelection()) return false;
+  if (!selItems->hasSelection())
+    return false;
 
   QModelIndexList selIndexes = selItems->selectedIndexes();
 
   QString str;
 
   for (int i = 0; i < selIndexes.size(); i++) {
-    if (i > 0) str.append("|");
-    str.append(langPacks->data(selIndexes.at(i)).toString());
+    if (i > 0)
+      str.append("||");
+    str.append(soundPacksItemModel->data(selIndexes.at(i)).toString());
   }
 
   selSoundPacks->setText(str);
@@ -552,7 +554,6 @@ SDCardConfirmPage::SDCardConfirmPage(QWidget * parent) :
 
 void SDCardConfirmPage::initializePage()
 {
-  qDebug() << "TRACE";
   grid->addWidget(new QLabel(tr("SD card")), row, 0);
   grid->addWidget(new QLabel(field("sdDrive").toString()), row++, 1);
   grid->addWidget(new QLabel(tr("Erase SD card")), row, 0);
@@ -564,29 +565,25 @@ void SDCardConfirmPage::initializePage()
   grid->addWidget(new QLabel(tr("Base image")), row, 0);
   grid->addWidget(new QLabel(field("sdimage").toString()), row++, 1);
   grid->addWidget(new QLabel(tr("Sound packs")), row, 0);
-  QStringList strl = field("soundpacks").toString().split("|");
+  QStringList strl = field("soundpacks").toString().split("||");
   for (int i = 0; i < strl.count(); i++) {
     grid->addWidget(new QLabel(strl.at(i)), row++, 1);
   }
   grid->addWidget(new QLabel(tr("Custom themes")), row, 0);
   grid->addWidget(new QLabel(field("themes").toBool() ? tr("Yes") : tr("No")), row++, 1);
-
-  //layout = new QVBoxLayout();
-  //layout->addLayout(grid);
-
-  //setLayout(layout);
 }
 
 void SDCardConfirmPage::cleanupPage()
 {
-  qDebug() << "TRACE";
   row = 0;
-  qDeleteAll(grid->findChildren<QWidget *>(QString(), Qt::FindDirectChildrenOnly));
-  layout->removeItem(grid);
-  delete grid;
-  grid = new QGridLayout();
-  layout->addLayout(grid);
-  //delete layout;
+
+  while (!grid->isEmpty()) {
+    QLayoutItem* item = grid->itemAt(0);
+    grid->removeItem(item);
+    QWidget* widget = item->widget();
+    if (widget)
+      delete widget;
+  }
 }
 
 int SDCardConfirmPage::nextId() const
