@@ -554,8 +554,6 @@ void SDCardConfirmPage::initializePage()
   grid->addWidget(new QLabel(field("sdErase").toBool() ? tr("Yes") : tr("No")), row++, 1);
   grid->addWidget(new QLabel(tr("Radio")), row, 0);
   grid->addWidget(new QLabel(field("radio").toString()), row++, 1);
-  grid->addWidget(new QLabel(tr("Language")), row, 0);
-  grid->addWidget(new QLabel(field("language").toString()), row++, 1);
   grid->addWidget(new QLabel(tr("Base image")), row, 0);
   grid->addWidget(new QLabel(field("sdimage").toString()), row++, 1);
   grid->addWidget(new QLabel(tr("Sound packs")), row, 0);
