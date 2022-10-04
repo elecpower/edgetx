@@ -151,7 +151,6 @@ class SDCardRadioPage : public SDCardCommonPage
 
   private:
     QComboBox *cboRadio;
-    QComboBox *cboLang;
 
     int nextId() const;
 };
@@ -194,7 +193,9 @@ class SDCardSoundsPage : public SDCardRepoPage
     virtual void releaseChanged(const int index) override;
 
   private:
+    QComboBox *cboLang;
     QStandardItemModel *soundPacksItemModel;
+    QSortFilterProxyModel *soundPacksFilteredModel;
     QLabel *selSoundPacks;
     QListView *lstSounds;
 

@@ -295,7 +295,7 @@ int SDCardSelectPage::nextId() const
 SDCardRadioPage::SDCardRadioPage(QWidget * parent) :
   SDCardCommonPage(parent)
 {
-  setTitle(tr("Radio and Language"));
+  setTitle(tr("Radio"));
   setSubTitle(" ");
 
   const QStringList profileId = g.currentProfile().fwType().split('-');
@@ -308,8 +308,8 @@ SDCardRadioPage::SDCardRadioPage(QWidget * parent) :
 
   const QString currLang = profileId.last();
 
-  QLabel *lblRadio = new QLabel(tr("Radio:"));
   cboRadio = new QComboBox();
+
   foreach(Firmware * firmware, Firmware::getRegisteredFirmwares()) {
     const QStringList fwId = firmware->getId().split('-');
     QString fwFlavour;
@@ -337,21 +337,8 @@ SDCardRadioPage::SDCardRadioPage(QWidget * parent) :
     lblFlavour->setText(cboRadio->currentData().toString());
   });
 
-  QLabel *lblLang = new QLabel(tr("Language:"));
-  cboLang = new QComboBox();
-  for (const char *lang : getCurrentFirmware()->getFirmwareBase()->languageList()) {
-    cboLang->addItem(lang);
-    if (currLang == lang) {
-      cboLang->setCurrentIndex(cboLang->count() - 1);
-    }
-  }
-
-  registerField("language", cboLang);
-
-  grid->addWidget(lblRadio, 0, 0);
-  grid->addWidget(cboRadio, 0, 1);
-  grid->addWidget(lblLang, 1, 0);
-  grid->addWidget(cboLang, 1, 1);
+  grid->addWidget(new QLabel(tr("Radio")), row, 0);
+  grid->addWidget(cboRadio, row++, 1);
 
 }
 
@@ -420,16 +407,38 @@ int SDCardImagePage::nextId() const
 }
 
 SDCardSoundsPage::SDCardSoundsPage(QWidget * parent, UpdateFactories * updateFactories) :
-  SDCardRepoPage(parent, updateFactories, tr("Sounds")),
-  soundPacksItemModel(new QStandardItemModel())
+  SDCardRepoPage(parent, updateFactories, tr("Sounds"))
 {
   setTitle(tr("Sounds"));
   setSubTitle(tr("Select one or more sound packs from the list below"));
 
+  cboLang = new QComboBox();
+
+  const QString currLang = g.currentProfile().fwType().split('-').last();
+
+  for (const char *lang : getCurrentFirmware()->getFirmwareBase()->languageList()) {
+    cboLang->addItem(lang);
+    if (currLang == lang) {
+      cboLang->setCurrentIndex(cboLang->count() - 1);
+    }
+  }
+
+  soundPacksItemModel = new QStandardItemModel(this);
+  soundPacksFilteredModel = new QSortFilterProxyModel(this);
+  soundPacksFilteredModel->setSourceModel(soundPacksItemModel);
+  soundPacksFilteredModel->setFilterRole(IMDR_Language);
+  soundPacksFilteredModel->setFilterRegularExpression(QRegularExpression(cboLang->currentText(), QRegularExpression::CaseInsensitiveOption));
+
   lstSounds = new QListView();
-  lstSounds->setModel(soundPacksItemModel);
+  lstSounds->setModel(soundPacksFilteredModel);
   lstSounds->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
+  connect(cboLang, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](const int index) {
+    soundPacksFilteredModel->setFilterRegularExpression(QRegularExpression(cboLang->currentText(), QRegularExpression::CaseInsensitiveOption));
+  });
+
+  grid->addWidget(new QLabel(tr("Language")), row, 0);
+  grid->addWidget(cboLang, row++, 1);
   grid->addWidget(new QLabel(tr("Sound packs")), row, 0, Qt::AlignTop);
   grid->addWidget(lstSounds, row++, 1);
 
@@ -457,28 +466,18 @@ void SDCardSoundsPage::releaseChanged(const int index)
     foreach (const QJsonValue &v, arr) {
       if (v.isObject()) {
         const QJsonObject obj = v.toObject();
-        QString langVariant;
-        QString lang;
+        QStandardItem * item = new QStandardItem();
 
-        if (!obj.value("language").isUndefined()) {
-          langVariant = obj.value("language").toString();
-          lang = langVariant.split("-").at(0);
-        }
+        if (!obj.value("language").isUndefined())
+          item->setData(obj.value("language").toString(), IMDR_Language);
+        if (!obj.value("name").isUndefined())
+          item->setData(obj.value("name").toString(), IMDR_Name);
+        if (!obj.value("description").isUndefined())
+          item->setData(obj.value("description").toString(), Qt::DisplayRole);
+        if (!obj.value("directory").isUndefined())
+          item->setData(obj.value("directory").toString(), IMDR_Directory);
 
-        if (lang == field("language").toString()) {
-          QStandardItem * item = new QStandardItem();
-
-          if (!obj.value("language").isUndefined())
-            item->setData(obj.value("language").toString(), IMDR_Language);
-          if (!obj.value("name").isUndefined())
-            item->setData(obj.value("name").toString(), IMDR_Name);
-          if (!obj.value("description").isUndefined())
-            item->setData(obj.value("description").toString(), Qt::DisplayRole);
-          if (!obj.value("directory").isUndefined())
-            item->setData(obj.value("directory").toString(), IMDR_Directory);
-
-          soundPacksItemModel->appendRow(item);
-        }
+        soundPacksItemModel->appendRow(item);
       }
     }
   }
