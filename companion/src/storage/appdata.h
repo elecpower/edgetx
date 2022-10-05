@@ -499,7 +499,7 @@ class ComponentData: public CompStoreObj
     PROPERTY    (bool,           checkForUpdate,  false)
     PROPERTY    (ReleaseChannel, releaseChannel,  RELEASE_CHANNEL_STABLE)
     PROPERTYSTRD(                release,         "unknown")
-    PROPERTY    (int,            id,              0)
+    PROPERTY    (int,            releaseId,       0)
     PROPERTY    (bool,           prerelease,      false)
     PROPERTYSTRD(                version,         "0")
     PROPERTYSTRD(                date,            "")

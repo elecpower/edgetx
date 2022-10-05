@@ -118,8 +118,7 @@ UpdateInterface::UpdateInterface(QWidget * parent) :
   buffer(new QByteArray()),
   file(nullptr),
   m_id(CID_Unknown),
-  m_name(""),
-  m_resultsPerPage(-1)
+  m_name("")
 {
   QNetworkProxyFactory::setUseSystemConfiguration(true);
 
@@ -148,30 +147,30 @@ bool UpdateInterface::update(ProgressWidget * progress)
   this->progress = progress;
 
   if (progress) {
-    progress->setInfo(tr("Processing updates for: %1").arg(name));
+    progress->setInfo(tr("Processing updates for: %1").arg(m_name));
     progress->setValue(0);
     progress->setMaximum(100);
   }
 
-  reportProgress(tr("Processing updates for: %1").arg(name), QtInfoMsg);
+  reportProgress(tr("Processing updates for: %1").arg(m_name), QtInfoMsg);
 
   if (!preparation()) {
-    reportProgress(tr("%1 preparation failed").arg(name), QtCriticalMsg);
+    reportProgress(tr("%1 preparation failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
   if (!download()) {
-    reportProgress(tr("%1 download failed").arg(name), QtCriticalMsg);
+    reportProgress(tr("%1 download failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
   if (!decompress()) {
-    reportProgress(tr("%1 decompress failed").arg(name), QtCriticalMsg);
+    reportProgress(tr("%1 decompress failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
   if (!copyToDestination()) {
-    reportProgress(tr("%1 copy to destination failed").arg(name), QtCriticalMsg);
+    reportProgress(tr("%1 copy to destination failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
@@ -182,19 +181,19 @@ bool UpdateInterface::update(ProgressWidget * progress)
   }
 
   if (!asyncInstall()) {
-    reportProgress(tr("%1 start async failed").arg(name), QtCriticalMsg);
+    reportProgress(tr("%1 start async failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
   if (!housekeeping()) {
-    reportProgress(tr("%1 housekeeping failed").arg(name), QtCriticalMsg);
+    reportProgress(tr("%1 housekeeping failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
-  reportProgress(tr("%1 update successful").arg(name), QtInfoMsg);
+  reportProgress(tr("%1 update successful").arg(m_name), QtInfoMsg);
 
   if (!progress)
-    QMessageBox::information(progress, CPN_STR_APP_NAME, tr("%1 update successful").arg(name));
+    QMessageBox::information(progress, CPN_STR_APP_NAME, tr("%1 update successful").arg(m_name));
 
   return true;
 }
@@ -289,17 +288,14 @@ void UpdateInterface::criticalMsg(const QString & msg)
 
 void UpdateInterface::init(ComponentIdentity id, QString name, QString repo, QString nightly, int resultsPerPage)
 {
-  m_id = id;
-  m_name = name;
-  m_resultsPerPage = resultsPerPage;
-
-  releases->repo(repo);
-  releases->setNightlyName(nightly);
-  releases->setSettingsIndex(id());
-
-  assets->repo(repo);
+  setId(id);
+  setName(name);
 
   initAppSettings();
+
+  releases->init(repo, nightly, resultsPerPage, id);
+  assets->init(repo, resultsPerPage);
+
   currentRelease();
 }
 
@@ -310,7 +306,7 @@ void UpdateInterface::initAppSettings()
     return;
   }
 
-  if (!g.component[m_id].existsOnDisk() {
+  if (!g.component[m_id].existsOnDisk()) {
     g.component[m_id].init();
     g.component[m_id].name(m_name);
   }
@@ -326,7 +322,7 @@ void UpdateInterface::loadAssetSettings()
 
   params->assets.clear();
 
-  for (int i = 0; i < MAX_COMPONENT_ASSETS && g.component[m_settingsIdx].asset[i].existsOnDisk(); i++) {
+  for (int i = 0; i < MAX_COMPONENT_ASSETS && g.component[m_id].asset[i].existsOnDisk(); i++) {
     UpdateParameters::AssetParams &ap = params->addAsset();
     ComponentAssetData &cad = g.component[m_id].asset[i];
 
@@ -350,7 +346,7 @@ void UpdateInterface::saveAssetSettings()
     const UpdateParameters::AssetParams &ap = params->assets.at(i);
     ComponentAssetData &cad = g.component[m_id].asset[i];
 
-    //  ap.processes do not overwrite as read only
+    //  DO NOT overwrite cad.processes
     cad.flags(ap.flags);
     cad.filterType(ap.filterType);
     cad.filter(ap.filter);
@@ -515,7 +511,7 @@ const bool UpdateInterface::isLatestRelease()
   QString currentVer = currentVersion();
   QString latestVer = releases->version();
   // nightlies often have the same version so also check id
-  if (isLatestVersion(currentVer, latestVer) && g.component[m_id].id() == releases->id()) {
+  if (isLatestVersion(currentVer, latestVer) && g.component[m_id].releaseId() == releases->id()) {
     return true;
   }
   else {
@@ -585,14 +581,14 @@ bool UpdateInterface::setRunFolders()
     }
   }
 
-  downloadDir = QString("%1/%2/%3").arg(params->downloadDir).arg(name).arg(fldr);
+  downloadDir = QString("%1/%2/%3").arg(params->downloadDir).arg(m_name).arg(fldr);
 
   if (!checkCreateDirectory(downloadDir, UPDFLG_Download))
     return false;
 
   //reportProgress(tr("Download directory: %1").arg(downloadDir), QtDebugMsg);
 
-  decompressDir = QString("%1/%2/%3").arg(params->decompressDir).arg(name).arg(fldr);
+  decompressDir = QString("%1/%2/%3").arg(params->decompressDir).arg(m_name).arg(fldr);
 
   if (!checkCreateDirectory(decompressDir, UPDFLG_Decompress))
     return false;
@@ -682,7 +678,7 @@ bool UpdateInterface::downloadReleaseMetaData(const int releaseId)
 bool UpdateInterface::downloadReleaseAssetsMetaData(const int releaseId)
 {
   //progressMessage(tr("Download release %1 assets metadata").arg(releaseId));
-  downloadMetaData(MDT_ReleaseAssets, assets->urlReleaseAssets(releaseId, resultsPerPage));
+  downloadMetaData(MDT_ReleaseAssets, assets->urlReleaseAssets(releaseId));
   return downloadSuccess;
 }
 
@@ -1415,7 +1411,7 @@ bool UpdateInterface::saveReleaseSettings()
   reportProgress(tr("Save release settings"), QtDebugMsg);
   g.component[m_id].release(releases->name());
   g.component[m_id].version(releases->version());
-  g.component[m_id].id(releases->id());
+  g.component[m_id].releaseId(releases->id());
   g.component[m_id].date(releases->date());
 
   return true;
@@ -1534,7 +1530,7 @@ const QMap<QString, int> UpdateFactories::sortedComponentsList(bool updateableOn
   foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
     if (updateableOnly && !factory->instance()->isUpdateable())
       continue;
-    map.insert(factory->name(), factory->instance()->settingsIndex());
+    map.insert(factory->name(), factory->instance()->id());
   }
 
   return map;

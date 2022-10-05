@@ -346,7 +346,7 @@ bool ComponentData::existsOnDisk()
 void ComponentData::clearRelease()
 {
   releaseReset();
-  idReset();
+  releaseIdReset();
   prereleaseReset();
   dateReset();
   versionReset();

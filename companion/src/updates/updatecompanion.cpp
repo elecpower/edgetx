@@ -63,9 +63,9 @@ void UpdateCompanion::initAssetSettings()
   if (!isValidSettingsIndex())
     return;
 
-  g.component[settingsIndex()].initAllAssets();
+  g.component[id()].initAllAssets();
 
-  ComponentAssetData &cad = g.component[settingsIndex()].asset[0];
+  ComponentAssetData &cad = g.component[id()].asset[0];
 
   cad.desc("installer");
   cad.processes((UPDFLG_Common_Asset | UPDFLG_AsyncInstall) & ~UPDFLG_CopyDest);

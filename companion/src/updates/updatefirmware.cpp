@@ -25,7 +25,7 @@
 UpdateFirmware::UpdateFirmware(QWidget * parent) :
   UpdateInterface(parent)
 {
-  init(CID_Firmware, tr("Firmware"), GH_REPOS_EDGETX).append("/edgetx"), "nightly");
+  init(CID_Firmware, tr("Firmware"), QString(GH_REPOS_EDGETX).append("/edgetx"), "nightly");
 }
 
 void UpdateFirmware::initAssetSettings()
@@ -33,9 +33,9 @@ void UpdateFirmware::initAssetSettings()
   if (!isValidSettingsIndex())
     return;
 
-  g.component[settingsIndex()].initAllAssets();
+  g.component[id()].initAllAssets();
 
-  ComponentAssetData &cad = g.component[settingsIndex()].asset[0];
+  ComponentAssetData &cad = g.component[id()].asset[0];
 
   cad.desc("binary");
   cad.processes(UPDFLG_Common_Asset | UPDFLG_AsyncInstall);

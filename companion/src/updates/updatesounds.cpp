@@ -43,9 +43,9 @@ void UpdateSounds::initAssetSettings()
   if (!isValidSettingsIndex())
     return;
 
-  g.component[settingsIndex()].initAllAssets();
+  g.component[id()].initAllAssets();
 
-  ComponentAssetData &cad = g.component[settingsIndex()].asset[0];
+  ComponentAssetData &cad = g.component[id()].asset[0];
   cad.desc("sounds");
   cad.processes(UPDFLG_Common_Asset);
   cad.flags(cad.processes() | UPDFLG_CopyStructure);

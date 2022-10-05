@@ -114,7 +114,7 @@ class UpdateInterface : public QWidget
     };
     Q_ENUM(UpdateFlags)
 
-    //  The id is used as a key to the application settings therefore
+    //  The CID is used as a key to the application settings therefore
     //  ids must be explicit so no renumbering if components removed
     //  new components must be added to the end of the enum
     enum ComponentIdentity {
@@ -131,9 +131,7 @@ class UpdateInterface : public QWidget
     explicit UpdateInterface(QWidget * parent);
     virtual ~UpdateInterface();
 
-    void id(ComponentIdentity id) { m_id = id; }
-    const int id() const { return m_id; }
-    void name(QString name) { m_name = name; }
+    const int id() const { return (int)m_id; }
     const QString name() const { return m_name; }
 
   protected:
@@ -170,10 +168,14 @@ class UpdateInterface : public QWidget
     virtual const bool isLatestRelease();
     virtual const bool isLatestVersion(const QString & current, const QString & latest);
     virtual QString latestRelease();
+
     void clearRelease();
     const QStringList getReleases();
 
     void init(ComponentIdentity id, QString name, QString repo, QString nightly = "", int resultsPerPage = -1);
+
+    void setId(ComponentIdentity id) { m_id = id; }
+    void setName(QString name) { m_name = name; }
 
     void setReleaseChannel(int channel);
     void setReleaseId(QString val);
@@ -234,13 +236,12 @@ class UpdateInterface : public QWidget
     QUrl url;
     int m_id;
     QString m_name;
-    int m_resultsPerPage;
 
     bool downloadSuccess;
 
     static QString semanticVersion(QString version);
 
-    void setSettingsIndex();
+    void initAppSettings();
     bool setRunFolders();
     bool checkCreateDirectory(const QString & dirSetting, const UpdateFlags flag);
 
@@ -257,8 +258,8 @@ class UpdateFactoryInterface
     explicit UpdateFactoryInterface() {}
     virtual ~UpdateFactoryInterface() {}
     virtual UpdateInterface * instance() = 0;
-    virtual QString name() = 0;
-    virtual QString name() = 0;
+    virtual const QString name() = 0;
+    virtual const int id() = 0;
 };
 
 template <class T>
@@ -272,8 +273,8 @@ class UpdateFactory : public UpdateFactoryInterface
     virtual ~UpdateFactory() {}
 
     virtual UpdateInterface * instance() { return m_instance; }
-    virtual QString name() { return m_instance->getName(); }
-    virtual int id() { return m_instance->getId(); }
+    virtual const QString name() { return m_instance->name(); }
+    virtual const int id() { return m_instance->id(); }
 
   private:
     UpdateInterface *m_instance;

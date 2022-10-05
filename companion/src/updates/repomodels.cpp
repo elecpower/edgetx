@@ -435,7 +435,7 @@ bool AssetsFilteredItemModel::setCopyFilter(const int id, const QString filter)
 
 
 /*
-    ReleasesMetaData
+    RepoMetaData
 */
 
 RepoMetaData::RepoMetaData(QObject * parent) :
@@ -454,6 +454,14 @@ ReleasesMetaData::ReleasesMetaData(QObject * parent) :
 {
   itemModel = new ReleasesItemModel();
   filteredItemModel = new ReleasesFilteredItemModel(itemModel);
+}
+
+void ReleasesMetaData::init(const QString repo, const QString nightly, const int settingsIndex, const int resultsPerPage)
+{
+  m_repo = repo;
+  m_resultsPerPage = resultsPerPage;
+  itemModel->setNightlyName(nightly);
+  itemModel->setSettingsIndex(settingsIndex);
 }
 
 bool ReleasesMetaData::refreshRequired()
@@ -504,6 +512,12 @@ AssetsMetaData::AssetsMetaData(QObject * parent) :
 {
   itemModel = new AssetsItemModel();
   filteredItemModel = new AssetsFilteredItemModel(itemModel);
+}
+
+void AssetsMetaData::init(const QString repo, const int resultsPerPage)
+{
+  m_repo = repo;
+  m_resultsPerPage = resultsPerPage;
 }
 
 int AssetsMetaData::getSetId(int row)
