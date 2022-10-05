@@ -136,6 +136,7 @@ SDCardRepoPage::SDCardRepoPage(QWidget * parent, UpdateFactories * updateFactori
   cboRelease = new QComboBox();
 
   connect(cboRelease, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](const int index) {
+    factories->setReleaseId(factoryName, cboRelease->currentText());
     releaseChanged(index);
   });
 
@@ -149,7 +150,7 @@ SDCardRepoPage::SDCardRepoPage(QWidget * parent, UpdateFactories * updateFactori
       cboRelease->addItems(factories->releases(factoryName));
       cboRelease->setCurrentIndex(-1);
     }
-    cboRelease->setCurrentIndex(factoryParams->releaseChannel);
+    cboRelease->setCurrentIndex(0);
     status->hide();
   });
 
@@ -227,7 +228,8 @@ SDCardSelectPage::SDCardSelectPage(QWidget * parent) :
 
   QLabel *lblDrive = new QLabel(tr("Drive/Device:"));
   cboDrive = new QComboBox();
-  registerField("sdDrive*", cboDrive);
+  //registerField("sdDrive*", cboDrive);    //  TODO swap these lines around when testing finished
+  registerField("sdDrive", cboDrive);       //  TODO swap these lines around when testing finished
 
   chkErase = new QCheckBox();
   registerField("sdErase", chkErase);
@@ -410,7 +412,7 @@ SDCardSoundsPage::SDCardSoundsPage(QWidget * parent, UpdateFactories * updateFac
   SDCardRepoPage(parent, updateFactories, tr("Sounds"))
 {
   setTitle(tr("Sounds"));
-  setSubTitle(tr("Select one or more sound packs from the list below"));
+  setSubTitle(tr("Select one or more sound packs"));
 
   cboLang = new QComboBox();
 
@@ -418,23 +420,22 @@ SDCardSoundsPage::SDCardSoundsPage(QWidget * parent, UpdateFactories * updateFac
 
   for (const char *lang : getCurrentFirmware()->getFirmwareBase()->languageList()) {
     cboLang->addItem(lang);
-    if (currLang == lang) {
+    if (currLang == lang)
       cboLang->setCurrentIndex(cboLang->count() - 1);
-    }
   }
 
   soundPacksItemModel = new QStandardItemModel(this);
   soundPacksFilteredModel = new QSortFilterProxyModel(this);
   soundPacksFilteredModel->setSourceModel(soundPacksItemModel);
   soundPacksFilteredModel->setFilterRole(IMDR_Language);
-  soundPacksFilteredModel->setFilterRegularExpression(QRegularExpression(cboLang->currentText(), QRegularExpression::CaseInsensitiveOption));
+  setSoundPacksFilter();
 
   lstSounds = new QListView();
   lstSounds->setModel(soundPacksFilteredModel);
   lstSounds->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   connect(cboLang, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](const int index) {
-    soundPacksFilteredModel->setFilterRegularExpression(QRegularExpression(cboLang->currentText(), QRegularExpression::CaseInsensitiveOption));
+    setSoundPacksFilter();
   });
 
   grid->addWidget(new QLabel(tr("Language")), row, 0);
@@ -442,7 +443,8 @@ SDCardSoundsPage::SDCardSoundsPage(QWidget * parent, UpdateFactories * updateFac
   grid->addWidget(new QLabel(tr("Sound packs")), row, 0, Qt::AlignTop);
   grid->addWidget(lstSounds, row++, 1);
 
-  selSoundPacks = new QLabel();
+  selSoundPacks = new QLabel(this);
+  selSoundPacks->setVisible(false);
   registerField("soundpacks", selSoundPacks);
 }
 
@@ -483,6 +485,12 @@ void SDCardSoundsPage::releaseChanged(const int index)
   }
 
   delete json;
+  setSoundPacksFilter();
+}
+
+void SDCardSoundsPage::setSoundPacksFilter()
+{
+  soundPacksFilteredModel->setFilterRegularExpression(QRegularExpression(cboLang->currentText(), QRegularExpression::CaseInsensitiveOption));
 }
 
 bool SDCardSoundsPage::validatePage()

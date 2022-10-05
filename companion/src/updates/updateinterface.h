@@ -163,6 +163,7 @@ class UpdateInterface : public QWidget
     void setResultsPerPage(int cnt) { resultsPerPage = cnt; }
     void setReleasesNightlyName(QString name) { releases->setNightlyName(name); }
     void setReleaseChannel(int channel);
+    void setReleaseId(QString val);
 
     void setParamFolders();
     UpdateParameters * getParams() { return params; }
@@ -282,6 +283,7 @@ class UpdateFactories : public QWidget
 
     void clearRelease(const QString & name);
     void setReleaseChannel(const QString & name, int channel);
+    void setReleaseId(const QString & name, QString val);
     const QString currentRelease(const QString & name);
     const QString updateRelease(const QString & name);
     const bool isLatestRelease(const QString & name);

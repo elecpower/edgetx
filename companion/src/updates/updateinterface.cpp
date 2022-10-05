@@ -402,6 +402,11 @@ void UpdateInterface::setReleaseChannel(int channel)
   releases->setReleaseChannel(channel);
 }
 
+void UpdateInterface::setReleaseId(QString val)
+{
+  releases->getSetId(val);
+}
+
 void UpdateInterface::setFlavourLanguage()
 {
   const Firmware * baseFw = getCurrentFirmware()->getFirmwareBase();
@@ -630,7 +635,10 @@ bool UpdateInterface::checkCreateDirectory(const QString & dir, const UpdateFlag
   if (!repoReleaseAssetsMetaData())
     return false;
 
-  if (!downloadTextFileToBuffer(assetName)) {
+  if (!assets->getSetId(assetName))
+    return false;
+
+  if (!downloadAssetToBuffer(assets->id())) {
     return false;
   }
 
@@ -1533,6 +1541,16 @@ void UpdateFactories::setReleaseChannel(const QString & name, int channel)
   foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
     if (name == factory->name()) {
       factory->instance()->setReleaseChannel(channel);
+      break;
+    }
+  }
+}
+
+void UpdateFactories::setReleaseId(const QString & name, QString val)
+{
+  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
+    if (name == factory->name()) {
+      factory->instance()->setReleaseId(val);
       break;
     }
   }

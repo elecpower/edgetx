@@ -199,6 +199,7 @@ class SDCardSoundsPage : public SDCardRepoPage
     QLabel *selSoundPacks;
     QListView *lstSounds;
 
+    void setSoundPacksFilter();
     bool validatePage();
     int nextId() const;
 };
