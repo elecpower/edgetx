@@ -114,7 +114,18 @@ class UpdateInterface : public QWidget
     };
     Q_ENUM(UpdateFlags)
 
-    explicit UpdateInterface(QWidget * parent);
+    enum UpdateInterfaceIdentity {
+      UPDIFID_None            = 0,
+      UPDIFID_Firmware        = 1,
+      UPDIFID_Companion       = 2,
+      UPDIFID_SDCard          = 3,
+      UPDIFID_Sounds          = 4,
+      UPDIFID_Themes          = 5,
+      UPDIFID_MultiProtocol   = 6,
+    };
+    Q_ENUM(UpdateInterfaceIdentity)
+
+    explicit UpdateInterface(QWidget * parent, UpdateInterfaceIdentity id);
     virtual ~UpdateInterface();
 
     const QString getName() const { return name; }
@@ -127,6 +138,7 @@ class UpdateInterface : public QWidget
     UpdateParameters *params;
     ProgressWidget *progress;
 
+    UpdateInterfaceIdentity id;
     QString name;
     int resultsPerPage;
     QString downloadDir;

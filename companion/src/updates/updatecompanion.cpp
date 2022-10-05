@@ -53,7 +53,7 @@
 #endif
 
 UpdateCompanion::UpdateCompanion(QWidget * parent) :
-  UpdateInterface(parent)
+  UpdateInterface(parent, UPDIFID_Companion)
 {
   setName(tr("Companion"));
   setRepo(QString(GH_REPOS_EDGETX).append("/edgetx"));

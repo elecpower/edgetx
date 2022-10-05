@@ -111,9 +111,10 @@ QString UpdateParameters::updateFilterTypeToString(UpdateFilterType uft)
 
 */
 
-UpdateInterface::UpdateInterface(QWidget * parent) :
+UpdateInterface::UpdateInterface(QWidget * parent, UpdateInterfaceIdentity id) :
   QWidget(parent),
   progress(nullptr),
+  id(id),
   resultsPerPage(-1),
   reply(nullptr),
   buffer(new QByteArray()),

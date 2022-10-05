@@ -23,7 +23,7 @@
 #include "flashfirmwaredialog.h"
 
 UpdateFirmware::UpdateFirmware(QWidget * parent) :
-  UpdateInterface(parent)
+  UpdateInterface(parent, UPDIFID_Firmware)
 {
   setName(tr("Firmware"));
   setRepo(QString(GH_REPOS_EDGETX).append("/edgetx"));

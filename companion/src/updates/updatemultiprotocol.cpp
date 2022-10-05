@@ -22,7 +22,7 @@
 #include "updatemultiprotocol.h"
 
 UpdateMultiProtocol::UpdateMultiProtocol(QWidget * parent) :
-  UpdateInterface(parent)
+  UpdateInterface(parent, UPDIFID_MultiProtocol)
 {
   setName(tr("Multiprotocol"));
   setRepo(QString(GITHUB_API_REPOS).append("/pascallanger/DIY-Multiprotocol-TX-Module"));

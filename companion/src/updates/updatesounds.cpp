@@ -27,7 +27,7 @@
 #include <QItemSelectionModel>
 
 UpdateSounds::UpdateSounds(QWidget * parent) :
-  UpdateInterface(parent),
+  UpdateInterface(parent, UPDIFID_Sounds),
   langPacks(new QStandardItemModel())
 {
   setName(tr("Sounds"));
