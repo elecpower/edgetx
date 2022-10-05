@@ -159,7 +159,7 @@ class UpdateInterface : public QWidget
     const QStringList getReleases();
 
     void setName(QString name);
-    void setRepo(QString repo);
+    void setRepo(QString name);
     void setResultsPerPage(int cnt) { resultsPerPage = cnt; }
     void setReleasesNightlyName(QString name) { releases->setNightlyName(name); }
     void setReleaseChannel(int channel);
@@ -178,6 +178,7 @@ class UpdateInterface : public QWidget
     bool downloadReleaseLatestMetaData();
     bool downloadReleaseMetaData(const int releaseId);
 
+    bool getReleaseJsonAsset(const QString assetName, QJsonDocument * json);
     bool downloadReleaseAssetsMetaData(const int releaseId);
     bool downloadAssetMetaData(const int assetId);
     bool getSetAssets(const UpdateParameters::AssetParams & ap);
@@ -188,8 +189,8 @@ class UpdateInterface : public QWidget
     bool copyFlaggedAssets();
     bool copyStructure();
     bool copyFiles();
+
     bool saveReleaseSettings();
-    bool getReleaseJsonAsset(const QString assetName, QJsonDocument * json);
 
     bool downloadAssetToBuffer(const int assetId);
     bool downloadTextFileToBuffer(const QString & path);
@@ -197,6 +198,8 @@ class UpdateInterface : public QWidget
     bool convertDownloadToJson(QJsonDocument * json);
     bool decompressArchive(const QString & archivePath, const QString & destPath);
     QByteArray * getDownloadBuffer() { return buffer; }
+
+    bool getRepoJsonFile(const QString filename, QJsonDocument * json);
 
     void reportProgress(const QString & text, const int type = QtInfoMsg);
     void progressMessage(const QString & text);
@@ -290,6 +293,8 @@ class UpdateFactories : public QWidget
     const QString latestRelease(const QString & name);
     const QStringList releases(const QString & name);
     bool getReleaseJsonAsset(const QString & name, const QString assetName, QJsonDocument * json);
+
+    bool getRepoJsonFile(const QString & name, const QString filename, QJsonDocument * json);
 
     bool update(const QString & name, ProgressWidget * progress = nullptr);
     bool updateAll(ProgressWidget * progress = nullptr);

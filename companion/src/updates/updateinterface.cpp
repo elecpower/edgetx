@@ -295,10 +295,10 @@ void UpdateInterface::setName(QString name)
   currentRelease();
 }
 
-void UpdateInterface::setRepo(QString repo)
+void UpdateInterface::setRepo(QString name)
 {
-  releases->setRepo(repo);
-  assets->setRepo(repo);
+  releases->repo(name);
+  assets->repo(name);
 }
 
 void UpdateInterface::setSettingsIndex()
@@ -639,6 +639,19 @@ bool UpdateInterface::checkCreateDirectory(const QString & dir, const UpdateFlag
     return false;
 
   if (!downloadAssetToBuffer(assets->id())) {
+    return false;
+  }
+
+  if (!convertDownloadToJson(json)) {
+    return false;
+  }
+
+  return true;
+}
+
+ bool UpdateInterface::getRepoJsonFile(const QString filename, QJsonDocument * json)
+{
+  if (!downloadTextFileToBuffer(filename)) {
     return false;
   }
 
@@ -1675,6 +1688,20 @@ bool UpdateFactories::getReleaseJsonAsset(const QString & name, const QString as
   foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
     if (name == factory->name()) {
       ret = factory->instance()->getReleaseJsonAsset(assetName, json);
+      break;
+    }
+  }
+
+  return ret;
+}
+
+bool UpdateFactories::getRepoJsonFile(const QString & name, const QString filename, QJsonDocument * json)
+{
+  bool ret = false;
+
+  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
+    if (name == factory->name()) {
+      ret = factory->instance()->getRepoJsonFile(filename, json);
       break;
     }
   }

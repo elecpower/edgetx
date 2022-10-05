@@ -212,9 +212,6 @@ class SDCardThemesPage : public SDCardRepoPage
     SDCardThemesPage(QWidget * parent, UpdateFactories * updateFactories);
     virtual ~SDCardThemesPage() {}
 
-  protected slots:
-    virtual void releaseChanged(const int index) override;
-
   private:
     QCheckBox *chkInstall;
 
@@ -230,7 +227,6 @@ class SDCardConfirmPage : public SDCardCommonPage
     virtual ~SDCardConfirmPage() {}
 
   private:
-
     void initializePage();
     void cleanupPage();
     int nextId() const;

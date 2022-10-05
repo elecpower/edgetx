@@ -202,7 +202,23 @@ class AssetsFilteredItemModel : public UpdatesFilteredItemModel
   private:
 };
 
-class ReleasesMetaData : public QObject
+class RepoMetaData : public QObject
+{
+    Q_OBJECT
+  public:
+    explicit RepoMetaData(QObject * parent);
+    virtual ~RepoMetaData() {};
+
+    void repo(const QString & repo) { m_repo = repo; }
+    const QString repo() const { return m_repo; }
+    const QString urlReleases() { return QString("%1/releases").arg(m_repo); }
+    const QString urlContent(const QString & path) { return QString("%1/contents/%2").arg(m_repo).arg(path); }
+
+  private:
+    QString m_repo;
+};
+
+class ReleasesMetaData : public RepoMetaData
 {
     Q_OBJECT
   public:
@@ -211,7 +227,6 @@ class ReleasesMetaData : public QObject
 
     bool refreshRequired();
 
-    void setRepo(QString repo) { m_repo = repo; }
     void setNightlyName(QString name) { itemModel->setNightlyName(name); }
     void setSettingsIndex(const int index) { itemModel->setSettingsIndex(index); }
     void setReleaseChannel(const int channel) { itemModel->setReleaseChannel(channel); }
@@ -234,25 +249,21 @@ class ReleasesMetaData : public QObject
     bool prerelease() { return filteredItemModel->prerelease(m_id); }
     QString version();
 
-    QString urlReleases() { return QString("%1/releases").arg(m_repo); }
     QString urlReleaseLatest() { return QString("%1/latest").arg(urlReleases()); }
     QString urlRelease() { return QString("%1/%2").arg(urlReleases()).arg(m_id); }
 
   private:
     ReleasesItemModel *itemModel;
     ReleasesFilteredItemModel *filteredItemModel;
-    QString m_repo;
     int m_id;
 };
 
-class AssetsMetaData : public QObject
+class AssetsMetaData : public RepoMetaData
 {
     Q_OBJECT
   public:
     explicit AssetsMetaData(QObject * parent);
     virtual ~AssetsMetaData() {};
-
-    void setRepo(QString repo) { m_repo = repo; }
 
     void setId(int id) { m_id = id; }
     int id() { return m_id; }
@@ -286,13 +297,8 @@ class AssetsMetaData : public QObject
                             { return QString("%1/%2/assets").arg(urlReleases()).arg(releaseId) % (max > -1 ? QString("\?per_page=%1").arg(max) : ""); }
     QString urlAsset() { return QString("%1/assets/%2").arg(urlReleases()).arg(m_id); }
 
-    QString urlContent(QString path) { return QString("%1/contents/%2").arg(m_repo).arg(path); }
-
   private:
     AssetsItemModel *itemModel;
     AssetsFilteredItemModel *filteredItemModel;
-    QString m_repo;
     int m_id;
-
-    QString urlReleases() { return m_repo % "/releases"; }
 };

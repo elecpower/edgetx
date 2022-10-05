@@ -367,7 +367,7 @@ void SDCardImagePage::releaseChanged(const int index)
   QStringList imageList;
   QString radioImage;
   QJsonDocument *json = new QJsonDocument();
-  factories->getReleaseJsonAsset(factoryName, "sdcard.json", json);
+  factories->getRepoJsonFile(factoryName, "sdcard.json", json);
   /*
   {
     "targets": [
@@ -462,7 +462,7 @@ void SDCardSoundsPage::releaseChanged(const int index)
   */
   soundPacksItemModel->clear();
 
-  if (json->isArray()) {
+  if (!json->isNull() && json->isArray()) {
     const QJsonArray &arr = json->array();
 
     foreach (const QJsonValue &v, arr) {
@@ -507,7 +507,7 @@ bool SDCardSoundsPage::validatePage()
   for (int i = 0; i < selIndexes.size(); i++) {
     if (i > 0)
       str.append("||");
-    str.append(soundPacksItemModel->data(selIndexes.at(i)).toString());
+    str.append(lstSounds->model()->data(selIndexes.at(i)).toString());
   }
 
   selSoundPacks->setText(str);
@@ -524,19 +524,13 @@ SDCardThemesPage::SDCardThemesPage(QWidget * parent, UpdateFactories * updateFac
   SDCardRepoPage(parent, updateFactories, tr("Themes"))
 {
   setTitle(tr("Themes"));
-  setSubTitle(tr("Select whether you wish to have custom themes installed"));
+  setSubTitle(tr("Select to have custom themes included"));
 
   chkInstall = new QCheckBox();
   registerField("themes", chkInstall);
 
-  grid->addWidget(new QLabel(tr("Install")), row, 0);
+  grid->addWidget(new QLabel(tr("Include")), row, 0);
   grid->addWidget(chkInstall, row++, 1);
-}
-
-void SDCardThemesPage::releaseChanged(const int index)
-{
-
-
 }
 
 int SDCardThemesPage::nextId() const

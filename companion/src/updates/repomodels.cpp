@@ -433,13 +433,23 @@ bool AssetsFilteredItemModel::setCopyFilter(const int id, const QString filter)
   return setMetaDataValue(id, UpdatesItemModel::IMDR_CopyFilter, QVariant(filter));
 }
 
+
+/*
+    ReleasesMetaData
+*/
+
+RepoMetaData::RepoMetaData(QObject * parent) :
+  QObject(parent)
+{
+
+}
+
 /*
     ReleasesMetaData
 */
 
 ReleasesMetaData::ReleasesMetaData(QObject * parent) :
-  QObject(parent),
-  m_repo(""),
+  RepoMetaData(parent),
   m_id(0)
 {
   itemModel = new ReleasesItemModel();
@@ -490,7 +500,7 @@ QString ReleasesMetaData::version()
 */
 
 AssetsMetaData::AssetsMetaData(QObject * parent) :
-  QObject(parent)
+  RepoMetaData(parent)
 {
   itemModel = new AssetsItemModel();
   filteredItemModel = new AssetsFilteredItemModel(itemModel);
