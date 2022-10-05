@@ -574,8 +574,6 @@ class AppData: public CompStoreObj
     //! List of all active profiles mapped by index.
     QMap<int, QString> getActiveProfiles() const;
 
-    //! Get a modifiable (non-const) index to ComponentData for \a name. Returns -1 if \a name not found.
-    int getComponentIndex(QString name) const;
     //! Get a modifiable (non-const) reference to the ComponentData at \a index. Returns component[0] if \a index is invalid.
     ComponentData & getComponent(int index);
     //! Get a non-modifiable (const) reference to the ComponentData at \a index. Returns component[0] if \a index is invalid.

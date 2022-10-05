@@ -516,15 +516,6 @@ QMap<int, QString> AppData::getActiveProfiles() const
   return active;
 }
 
-int AppData::getComponentIndex(QString name) const
-{
-  for (int i=0; i<MAX_COMPONENTS; i++) {
-    if (g.component[i].existsOnDisk() && g.component[i].name() == name)
-       return i;
-  }
-  return -1;
-}
-
 void AppData::convertSettings(QSettings & settings)
 {
   quint32 savedVer = settings.value(SETTINGS_VERSION_KEY, 0).toUInt();

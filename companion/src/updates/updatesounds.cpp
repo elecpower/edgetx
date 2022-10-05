@@ -27,11 +27,10 @@
 #include <QItemSelectionModel>
 
 UpdateSounds::UpdateSounds(QWidget * parent) :
-  UpdateInterface(parent, UPDIFID_Sounds),
-  langPacks(new QStandardItemModel())
+  UpdateInterface(parent)
 {
-  setName(tr("Sounds"));
-  setRepo(QString(GH_REPOS_EDGETX).append("/edgetx-sdcard-sounds"));
+  init(CID_Sounds, tr("Sounds"), QString(GH_REPOS_EDGETX).append("/edgetx-sdcard-sounds"));
+  langPacks = new QStandardItemModel();
 }
 
 UpdateSounds::~UpdateSounds()

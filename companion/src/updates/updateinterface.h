@@ -114,21 +114,27 @@ class UpdateInterface : public QWidget
     };
     Q_ENUM(UpdateFlags)
 
-    enum UpdateInterfaceIdentity {
-      UPDIFID_None            = 0,
-      UPDIFID_Firmware        = 1,
-      UPDIFID_Companion       = 2,
-      UPDIFID_SDCard          = 3,
-      UPDIFID_Sounds          = 4,
-      UPDIFID_Themes          = 5,
-      UPDIFID_MultiProtocol   = 6,
+    //  The id is used as a key to the application settings therefore
+    //  ids must be explicit so no renumbering if components removed
+    //  new components must be added to the end of the enum
+    enum ComponentIdentity {
+      CID_Unknown         = -1,
+      CID_SDCard          = 0,
+      CID_Firmware        = 1,
+      CID_Sounds          = 2,
+      CID_Themes          = 3,
+      CID_MultiProtocol   = 4,
+      CID_Companion       = 5,
     };
-    Q_ENUM(UpdateInterfaceIdentity)
+    Q_ENUM(ComponentIdentity)
 
-    explicit UpdateInterface(QWidget * parent, UpdateInterfaceIdentity id);
+    explicit UpdateInterface(QWidget * parent);
     virtual ~UpdateInterface();
 
-    const QString getName() const { return name; }
+    void id(ComponentIdentity id) { m_id = id; }
+    const int id() const { return m_id; }
+    void name(QString name) { m_name = name; }
+    const QString name() const { return m_name; }
 
   protected:
     friend class UpdateFactories;
@@ -138,9 +144,6 @@ class UpdateInterface : public QWidget
     UpdateParameters *params;
     ProgressWidget *progress;
 
-    UpdateInterfaceIdentity id;
-    QString name;
-    int resultsPerPage;
     QString downloadDir;
     QString decompressDir;
     QString updateDir;
@@ -170,10 +173,8 @@ class UpdateInterface : public QWidget
     void clearRelease();
     const QStringList getReleases();
 
-    void setName(QString name);
-    void setRepo(QString name);
-    void setResultsPerPage(int cnt) { resultsPerPage = cnt; }
-    void setReleasesNightlyName(QString name) { releases->setNightlyName(name); }
+    void init(ComponentIdentity id, QString name, QString repo, QString nightly = "", int resultsPerPage = -1);
+
     void setReleaseChannel(int channel);
     void setReleaseId(QString val);
 
@@ -219,8 +220,7 @@ class UpdateInterface : public QWidget
     static QString downloadDataTypeToString(DownloadDataType val);
     static QString updateFlagsToString(UpdateFlags val);
     void setFlavourLanguage();
-    int settingsIndex() { return m_settingsIdx; }
-    bool isValidSettingsIndex() { return m_settingsIdx > -1 && m_settingsIdx < MAX_COMPONENTS; }
+    bool isValidSettingsIndex() { return m_id > -1 && m_id < MAX_COMPONENTS; }
 
   private slots:
     void onDownloadFinished(QNetworkReply * reply, DownloadDataType ddt, int subtype);
@@ -232,9 +232,11 @@ class UpdateInterface : public QWidget
     QByteArray *buffer;
     QFile *file;
     QUrl url;
+    int m_id;
+    QString m_name;
+    int m_resultsPerPage;
 
     bool downloadSuccess;
-    int m_settingsIdx;
 
     static QString semanticVersion(QString version);
 
@@ -256,6 +258,7 @@ class UpdateFactoryInterface
     virtual ~UpdateFactoryInterface() {}
     virtual UpdateInterface * instance() = 0;
     virtual QString name() = 0;
+    virtual QString name() = 0;
 };
 
 template <class T>
@@ -270,6 +273,7 @@ class UpdateFactory : public UpdateFactoryInterface
 
     virtual UpdateInterface * instance() { return m_instance; }
     virtual QString name() { return m_instance->getName(); }
+    virtual int id() { return m_instance->getId(); }
 
   private:
     UpdateInterface *m_instance;

@@ -111,23 +111,21 @@ QString UpdateParameters::updateFilterTypeToString(UpdateFilterType uft)
 
 */
 
-UpdateInterface::UpdateInterface(QWidget * parent, UpdateInterfaceIdentity id) :
+UpdateInterface::UpdateInterface(QWidget * parent) :
   QWidget(parent),
   progress(nullptr),
-  id(id),
-  resultsPerPage(-1),
   reply(nullptr),
   buffer(new QByteArray()),
   file(nullptr),
-  m_settingsIdx(-1)
+  m_id(CID_Unknown),
+  m_name(""),
+  m_resultsPerPage(-1)
 {
   QNetworkProxyFactory::setUseSystemConfiguration(true);
 
   releases = new ReleasesMetaData(this);
   assets = new AssetsMetaData(this);
   params = new UpdateParameters(this);
-
-  setReleasesNightlyName("");
 }
 
 UpdateInterface::~UpdateInterface()
@@ -289,39 +287,35 @@ void UpdateInterface::criticalMsg(const QString & msg)
   QMessageBox::critical(progress, tr("Update Interface"), msg);
 }
 
-void UpdateInterface::setName(QString name)
+void UpdateInterface::init(ComponentIdentity id, QString name, QString repo, QString nightly, int resultsPerPage)
 {
-  this->name = name;
-  setSettingsIndex();
+  m_id = id;
+  m_name = name;
+  m_resultsPerPage = resultsPerPage;
+
+  releases->repo(repo);
+  releases->setNightlyName(nightly);
+  releases->setSettingsIndex(id());
+
+  assets->repo(repo);
+
+  initAppSettings();
   currentRelease();
 }
 
-void UpdateInterface::setRepo(QString name)
+void UpdateInterface::initAppSettings()
 {
-  releases->repo(name);
-  assets->repo(name);
-}
-
-void UpdateInterface::setSettingsIndex()
-{
-  int i = g.getComponentIndex(name);
-
-  if (i < 0) {
-    for (i = 0; i < MAX_COMPONENTS && g.component[i].existsOnDisk(); i++)
-      ;
-    if (i >= MAX_COMPONENTS) {
-      reportProgress(tr("No free slot to save interface settings!"), QtCriticalMsg);
-      i = -1;
-    }
-    else {
-      g.component[i].init();
-      g.component[i].name(name);
-    }
+  if (!isValidSettingsIndex()) {
+    reportProgress(tr("Component id: %1 exceeds maximum application settings components: %2!").arg(m_id).arg(MAX_COMPONENTS), QtCriticalMsg);
+    return;
   }
 
-  m_settingsIdx = i;
-  releases->setSettingsIndex(m_settingsIdx);
-  if (isValidSettingsIndex() && !g.component[m_settingsIdx].asset[0].existsOnDisk())
+  if (!g.component[m_id].existsOnDisk() {
+    g.component[m_id].init();
+    g.component[m_id].name(m_name);
+  }
+
+  if (!g.component[m_id].asset[0].existsOnDisk())
     initAssetSettings();
 }
 
@@ -334,7 +328,7 @@ void UpdateInterface::loadAssetSettings()
 
   for (int i = 0; i < MAX_COMPONENT_ASSETS && g.component[m_settingsIdx].asset[i].existsOnDisk(); i++) {
     UpdateParameters::AssetParams &ap = params->addAsset();
-    ComponentAssetData &cad = g.component[m_settingsIdx].asset[i];
+    ComponentAssetData &cad = g.component[m_id].asset[i];
 
     ap.processes = cad.processes();
     ap.flags = cad.flags();
@@ -352,9 +346,9 @@ void UpdateInterface::saveAssetSettings()
   if (!isValidSettingsIndex())
     return;
 
-  for (int i = 0; i < MAX_COMPONENT_ASSETS && g.component[m_settingsIdx].asset[i].existsOnDisk(); i++) {
+  for (int i = 0; i < MAX_COMPONENT_ASSETS && g.component[m_id].asset[i].existsOnDisk(); i++) {
     const UpdateParameters::AssetParams &ap = params->assets.at(i);
-    ComponentAssetData &cad = g.component[m_settingsIdx].asset[i];
+    ComponentAssetData &cad = g.component[m_id].asset[i];
 
     //  ap.processes do not overwrite as read only
     cad.flags(ap.flags);
@@ -369,7 +363,7 @@ void UpdateInterface::saveAssetSettings()
 
 bool UpdateInterface::isUpdateable()
 {
-  return g.component[m_settingsIdx].checkForUpdate();
+  return g.component[m_id].checkForUpdate();
 }
 
 void UpdateInterface::resetEnvironment()
@@ -379,7 +373,7 @@ void UpdateInterface::resetEnvironment()
   progress = nullptr;
 
   params->logLevel = g.updLogLevel();
-  setReleaseChannel(g.component[m_settingsIdx].releaseChannel());
+  setReleaseChannel(g.component[m_id].releaseChannel());
   params->updateRelease = "";
   setFlavourLanguage();
   loadAssetSettings();
@@ -467,13 +461,13 @@ void UpdateInterface::setParamFolders()
 
 void UpdateInterface::clearRelease()
 {
-  g.component[m_settingsIdx].clearRelease();
+  g.component[m_id].clearRelease();
   currentRelease();
 }
 
 const QString UpdateInterface::currentRelease()
 {
-  params->currentRelease = g.component[m_settingsIdx].release();
+  params->currentRelease = g.component[m_id].release();
   return params->currentRelease;
 }
 
@@ -493,7 +487,7 @@ const QString UpdateInterface::updateRelease()
 
 const bool UpdateInterface::isUpdateAvailable()
 {
-  if (g.component[m_settingsIdx].checkForUpdate())
+  if (g.component[m_id].checkForUpdate())
     return !isLatestRelease();
   else {
     return false;
@@ -521,7 +515,7 @@ const bool UpdateInterface::isLatestRelease()
   QString currentVer = currentVersion();
   QString latestVer = releases->version();
   // nightlies often have the same version so also check id
-  if (isLatestVersion(currentVer, latestVer) && g.component[m_settingsIdx].id() == releases->id()) {
+  if (isLatestVersion(currentVer, latestVer) && g.component[m_id].id() == releases->id()) {
     return true;
   }
   else {
@@ -531,7 +525,7 @@ const bool UpdateInterface::isLatestRelease()
 
 const QString UpdateInterface::currentVersion()
 {
-  return g.component[m_settingsIdx].version();
+  return g.component[m_id].version();
 }
 
 const QStringList UpdateInterface::getReleases()
@@ -1419,10 +1413,10 @@ bool UpdateInterface::asyncInstall()
 bool UpdateInterface::saveReleaseSettings()
 {
   reportProgress(tr("Save release settings"), QtDebugMsg);
-  g.component[m_settingsIdx].release(releases->name());
-  g.component[m_settingsIdx].version(releases->version());
-  g.component[m_settingsIdx].id(releases->id());
-  g.component[m_settingsIdx].date(releases->date());
+  g.component[m_id].release(releases->name());
+  g.component[m_id].version(releases->version());
+  g.component[m_id].id(releases->id());
+  g.component[m_id].date(releases->date());
 
   return true;
 }
@@ -1444,6 +1438,12 @@ UpdateFactories::~UpdateFactories()
 
 void UpdateFactories::registerUpdateFactory(UpdateFactoryInterface * factory)
 {
+  foreach (UpdateFactoryInterface * registeredFactory, registeredUpdateFactories) {
+    if (registeredFactory->id() == factory->id()) {
+      qDebug() << "Duplicate factory - id:" << factory->id() << "name:" << factory->name();
+      return;
+    }
+  }
   registeredUpdateFactories.append(factory);
   qDebug() << "Registered update factory:" << factory->name();
 }

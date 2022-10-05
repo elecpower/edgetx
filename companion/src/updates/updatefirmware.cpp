@@ -23,11 +23,9 @@
 #include "flashfirmwaredialog.h"
 
 UpdateFirmware::UpdateFirmware(QWidget * parent) :
-  UpdateInterface(parent, UPDIFID_Firmware)
+  UpdateInterface(parent)
 {
-  setName(tr("Firmware"));
-  setRepo(QString(GH_REPOS_EDGETX).append("/edgetx"));
-  setReleasesNightlyName("nightly");
+  init(CID_Firmware, tr("Firmware"), GH_REPOS_EDGETX).append("/edgetx"), "nightly");
 }
 
 void UpdateFirmware::initAssetSettings()

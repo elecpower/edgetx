@@ -22,10 +22,9 @@
 #include "updatethemes.h"
 
 UpdateThemes::UpdateThemes(QWidget * parent) :
-  UpdateInterface(parent, UPDIFID_Themes)
+  UpdateInterface(parent)
 {
-  setName(tr("Themes"));
-  setRepo(QString(GH_REPOS_EDGETX).append("/themes"));
+  init(CID_Themes, tr("Themes"), QString(GH_REPOS_EDGETX).append("/themes"));
 }
 
 void UpdateThemes::initAssetSettings()

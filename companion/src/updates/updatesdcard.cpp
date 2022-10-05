@@ -24,10 +24,9 @@
 #include <QMessageBox>
 
 UpdateSDCard::UpdateSDCard(QWidget * parent) :
-  UpdateInterface(parent, UPDIFID_SDCard)
+  UpdateInterface(parent)
 {
-  setName(tr("SD Card"));
-  setRepo(QString(GH_REPOS_EDGETX).append("/edgetx-sdcard"));
+  init(CID_SDCard, tr("SD Card"), QString(GH_REPOS_EDGETX).append("/edgetx-sdcard"));
 }
 
 void UpdateSDCard::initAssetSettings()
