@@ -288,32 +288,33 @@ class UpdateFactories : public QWidget
     explicit UpdateFactories(QWidget * parent = nullptr);
     virtual ~UpdateFactories();
 
+    UpdateInterface * interface(const int id);
+
     void registerUpdateFactory(UpdateFactoryInterface * factory);
     void registerUpdateFactories();
     void unregisterUpdateFactories();
 
-    void initAssetSettings(const QString & name);
-    void saveAssetSettings(const QString & name);
+    void saveAssetSettings(const int id);
 
-    UpdateParameters * const getParams(const QString & name);
-    void resetEnvironment(const QString & name);
+    UpdateParameters * const getParams(const int id);
+    void resetEnvironment(const int id);
     void resetAllEnvironments();
-    void setRunUpdate(const QString & name);
+    void setRunUpdate(const int id);
     const QMap<QString, int> sortedComponentsList(bool updateableOnly = false);
 
-    void clearRelease(const QString & name);
-    void setReleaseChannel(const QString & name, int channel);
-    void setReleaseId(const QString & name, QString val);
-    const QString currentRelease(const QString & name);
-    const QString updateRelease(const QString & name);
-    const bool isLatestRelease(const QString & name);
-    const QString latestRelease(const QString & name);
-    const QStringList releases(const QString & name);
-    bool getReleaseJsonAsset(const QString & name, const QString assetName, QJsonDocument * json);
+    void clearRelease(const int id);
+    void setReleaseChannel(const int id, int channel);
+    void setReleaseId(const int id, QString val);
+    const QString currentRelease(const int id);
+    const QString updateRelease(const int id);
+    const bool isLatestRelease(const int id);
+    const QString latestRelease(const int id);
+    const QStringList releases(const int id);
+    bool getReleaseJsonAsset(const int id, const QString assetName, QJsonDocument * json);
 
-    bool getRepoJsonFile(const QString & name, const QString filename, QJsonDocument * json);
+    bool getRepoJsonFile(const int id, const QString filename, QJsonDocument * json);
 
-    bool update(const QString & name, ProgressWidget * progress = nullptr);
+    bool update(const const int id, ProgressWidget * progress = nullptr);
     bool updateAll(ProgressWidget * progress = nullptr);
     const bool isUpdateAvailable(QStringList & names);
 

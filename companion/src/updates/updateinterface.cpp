@@ -1464,63 +1464,51 @@ void UpdateFactories::unregisterUpdateFactories()
     delete factory;
 }
 
-void UpdateFactories::initAssetSettings(const QString & name)
+UpdateInterface * UpdateFactories::interface(const int id)
 {
   foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      factory->instance()->initAssetSettings();
-      break;
-    }
+    if (id == factory->id())
+      return factory->instance();
   }
+  qDebug() << "Critical error - Interface not found for id:" << id;
+  return nullptr;
 }
 
-void UpdateFactories::saveAssetSettings(const QString & name)
+void UpdateFactories::saveAssetSettings(const int id)
 {
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      factory->instance()->saveAssetSettings();
-      break;
-    }
-  }
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    iface->saveAssetSettings();
 }
 
-UpdateParameters * const UpdateFactories::getParams(const QString & name)
+UpdateParameters * const UpdateFactories::getParams(const int id)
 {
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      return factory->instance()->getParams();
-      break;
-    }
-  }
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    return iface->getParams();
 
   return nullptr;
 }
 
-void UpdateFactories::resetEnvironment(const QString & name)
+void UpdateFactories::resetEnvironment(const int id)
 {
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      factory->instance()->resetEnvironment();
-      break;
-    }
-  }
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    iface->resetEnvironment();
 }
 
 void UpdateFactories::resetAllEnvironments()
 {
   foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    resetEnvironment(factory->name());
+    resetEnvironment(factory->id());
   }
 }
 
-void UpdateFactories::setRunUpdate(const QString & name)
+void UpdateFactories::setRunUpdate(const int id)
 {
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      factory->instance()->setRunUpdate();
-      break;
-    }
-  }
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    iface->setRunUpdate();
 }
 
 const QMap<QString, int> UpdateFactories::sortedComponentsList(bool updateableOnly)
@@ -1530,124 +1518,85 @@ const QMap<QString, int> UpdateFactories::sortedComponentsList(bool updateableOn
   foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
     if (updateableOnly && !factory->instance()->isUpdateable())
       continue;
-    map.insert(factory->name(), factory->instance()->id());
+    map.insert(factory->name(), factory->id());
   }
 
   return map;
 }
 
-void UpdateFactories::clearRelease(const QString & name)
+void UpdateFactories::clearRelease(const int id)
 {
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      factory->instance()->clearRelease();
-      break;
-    }
-  }
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    iface->clearRelease();
 }
 
-void UpdateFactories::setReleaseChannel(const QString & name, int channel)
+void UpdateFactories::setReleaseChannel(const int id, int channel)
 {
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      factory->instance()->setReleaseChannel(channel);
-      break;
-    }
-  }
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    iface->setReleaseChannel(channel);
 }
 
-void UpdateFactories::setReleaseId(const QString & name, QString val)
+void UpdateFactories::setReleaseId(const int id, QString val)
 {
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      factory->instance()->setReleaseId(val);
-      break;
-    }
-  }
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    iface->setReleaseId(val);
 }
 
-const QString UpdateFactories::currentRelease(const QString & name)
+const QString UpdateFactories::currentRelease(const int id)
 {
-  QString ret;
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    return iface->currentRelease();
 
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      ret = factory->instance()->currentRelease();
-      break;
-    }
-  }
-
-  return ret;
+  return "";
 }
 
-const QString UpdateFactories::updateRelease(const QString & name)
+const QString UpdateFactories::updateRelease(const int id)
 {
-  QString ret;
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    return iface->updateRelease();
 
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      ret = factory->instance()->updateRelease();
-      break;
-    }
-  }
-
-  return ret;
+  return "";
 }
 
-const bool UpdateFactories::isLatestRelease(const QString & name)
+const bool UpdateFactories::isLatestRelease(const int id)
 {
-  bool ret = true;
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    return iface->isLatestRelease();
 
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      ret = factory->instance()->isLatestRelease();
-      break;
-    }
-  }
-
-  return ret;
+  return true;
 }
 
-const QString UpdateFactories::latestRelease(const QString & name)
+const QString UpdateFactories::latestRelease(const int id)
 {
-  QString ret;
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    return iface->latestRelease();
 
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      ret = factory->instance()->latestRelease();
-      break;
-    }
-  }
-
-  return ret;
+  return "";
 }
 
-const QStringList UpdateFactories::releases(const QString & name)
+const QStringList UpdateFactories::releases(const int id)
 {
-  QStringList ret;
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    return iface->getReleases();
 
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      ret = factory->instance()->getReleases();
-      break;
-    }
-  }
-
-  return ret;
+  return "";
 }
 
-bool UpdateFactories::update(const QString & name, ProgressWidget * progress)
+bool UpdateFactories::update(const int id, ProgressWidget * progress)
 {
-  bool ret = false;
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    return iface->update(progress);
 
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      ret = factory->instance()->update(progress);
-      break;
-    }
-  }
-
-  return ret;
+  return false;
 }
 
 bool UpdateFactories::updateAll(ProgressWidget * progress)
@@ -1655,12 +1604,12 @@ bool UpdateFactories::updateAll(ProgressWidget * progress)
   bool ret = false;
 
   foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    ret = update(factory->name(), progress);
+    ret = factory->instance()->update(progress);
     if (!ret)
       break;
   }
 
-  return ret;
+  return false;
 }
 
 const bool UpdateFactories::isUpdateAvailable(QStringList & names)
@@ -1678,30 +1627,20 @@ const bool UpdateFactories::isUpdateAvailable(QStringList & names)
   return ret;
 }
 
-bool UpdateFactories::getReleaseJsonAsset(const QString & name, const QString assetName, QJsonDocument * json)
+bool UpdateFactories::getReleaseJsonAsset(const int id, const QString assetName, QJsonDocument * json)
 {
-  bool ret = false;
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    return iface->getReleaseJsonAsset(assetName, json);
 
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      ret = factory->instance()->getReleaseJsonAsset(assetName, json);
-      break;
-    }
-  }
-
-  return ret;
+  return false;
 }
 
-bool UpdateFactories::getRepoJsonFile(const QString & name, const QString filename, QJsonDocument * json)
+bool UpdateFactories::getRepoJsonFile(const int id, const QString filename, QJsonDocument * json)
 {
-  bool ret = false;
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    return iface->getRepoJsonFile(filename, json);
 
-  foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
-    if (name == factory->name()) {
-      ret = factory->instance()->getRepoJsonFile(filename, json);
-      break;
-    }
-  }
-
-  return ret;
+  return false;
 }
