@@ -115,10 +115,10 @@ SDCardCommonPage::SDCardCommonPage(QWidget * parent) :
   setLayout(layout);
 }
 
-SDCardRepoPage::SDCardRepoPage(QWidget * parent, UpdateFactories * updateFactories, const QString factoryName) :
+SDCardRepoPage::SDCardRepoPage(QWidget * parent, UpdateFactories * updateFactories, const int factoryId) :
   SDCardCommonPage(parent),
   factories(updateFactories),
-  factoryName(factoryName)
+  factoryId(factoryId)
 {
   status = new QDialog(parent);
   status->setWindowTitle(tr("Downloading Release Metadata"));
@@ -136,18 +136,18 @@ SDCardRepoPage::SDCardRepoPage(QWidget * parent, UpdateFactories * updateFactori
   cboRelease = new QComboBox();
 
   connect(cboRelease, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](const int index) {
-    factories->setReleaseId(factoryName, cboRelease->currentText());
+    factories->setReleaseId(factoryId, cboRelease->currentText());
     releaseChanged(index);
   });
 
   connect(cboReleaseChannel, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](const int index) {
     status->show();
-    msg->setText(tr("Retrieving release information for %1").arg(factoryName));
-    factories->setReleaseChannel(factoryName, index);
+    msg->setText(tr("Retrieving release information for %1").arg(factories->name(factoryId)));
+    factories->setReleaseChannel(factoryId, index);
     {
       const QSignalBlocker blocker(cboRelease);
       cboRelease->clear();
-      cboRelease->addItems(factories->releases(factoryName));
+      cboRelease->addItems(factories->releases(factoryId));
       cboRelease->setCurrentIndex(-1);
     }
     cboRelease->setCurrentIndex(0);
@@ -163,8 +163,8 @@ SDCardRepoPage::SDCardRepoPage(QWidget * parent, UpdateFactories * updateFactori
 
 void SDCardRepoPage::initializePage()
 {
-  factories->resetEnvironment(factoryName);
-  factoryParams = factories->getParams(factoryName);
+  factories->resetEnvironment(factoryId);
+  factoryParams = factories->getParams(factoryId);
   {
     const QSignalBlocker blocker(cboReleaseChannel);
     cboReleaseChannel->setCurrentIndex(-1);
@@ -350,7 +350,7 @@ int SDCardRadioPage::nextId() const
 }
 
 SDCardImagePage::SDCardImagePage(QWidget * parent, UpdateFactories * updateFactories) :
-  SDCardRepoPage(parent, updateFactories, tr("SD Card"))
+  SDCardRepoPage(parent, updateFactories, UpdateInterface::CID_SDCard)
 {
   setTitle(tr("Image"));
   setSubTitle(tr("Select the base SD card image to be loaded"));
@@ -367,7 +367,7 @@ void SDCardImagePage::releaseChanged(const int index)
   QStringList imageList;
   QString radioImage;
   QJsonDocument *json = new QJsonDocument();
-  factories->getRepoJsonFile(factoryName, "sdcard.json", json);
+  factories->getRepoJsonFile(factoryId, "sdcard.json", json);
   /*
   {
     "targets": [
@@ -409,7 +409,7 @@ int SDCardImagePage::nextId() const
 }
 
 SDCardSoundsPage::SDCardSoundsPage(QWidget * parent, UpdateFactories * updateFactories) :
-  SDCardRepoPage(parent, updateFactories, tr("Sounds"))
+  SDCardRepoPage(parent, updateFactories, UpdateInterface::CID_Sounds)
 {
   setTitle(tr("Sounds"));
   setSubTitle(tr("Select one or more sound packs"));
@@ -451,7 +451,7 @@ SDCardSoundsPage::SDCardSoundsPage(QWidget * parent, UpdateFactories * updateFac
 void SDCardSoundsPage::releaseChanged(const int index)
 {
   QJsonDocument *json = new QJsonDocument();
-  factories->getReleaseJsonAsset(factoryName, "sounds.json", json);
+  factories->getReleaseJsonAsset(factoryId, "sounds.json", json);
   /*
   {
       "language": "en-GB",
@@ -521,7 +521,7 @@ int SDCardSoundsPage::nextId() const
 }
 
 SDCardThemesPage::SDCardThemesPage(QWidget * parent, UpdateFactories * updateFactories) :
-  SDCardRepoPage(parent, updateFactories, tr("Themes"))
+  SDCardRepoPage(parent, updateFactories, UpdateInterface::CID_Themes)
 {
   setTitle(tr("Themes"));
   setSubTitle(tr("Select to have custom themes included"));

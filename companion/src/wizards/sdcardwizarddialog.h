@@ -74,7 +74,7 @@ class SDCardRepoPage : public SDCardCommonPage
   Q_OBJECT
 
   public:
-    SDCardRepoPage(QWidget * parent, UpdateFactories * updateFactories, const QString factoryName);
+    SDCardRepoPage(QWidget * parent, UpdateFactories * updateFactories, const int factoryId);
     virtual ~SDCardRepoPage() {}
 
   protected slots:
@@ -82,7 +82,7 @@ class SDCardRepoPage : public SDCardCommonPage
 
   protected:
     UpdateFactories *factories;
-    const QString factoryName;
+    const int factoryId;
     UpdateParameters *factoryParams;
 
     QDialog *status;

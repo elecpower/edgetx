@@ -288,7 +288,7 @@ class UpdateFactories : public QWidget
     explicit UpdateFactories(QWidget * parent = nullptr);
     virtual ~UpdateFactories();
 
-    UpdateInterface * interface(const int id);
+    const QString name(const int id);
 
     void registerUpdateFactory(UpdateFactoryInterface * factory);
     void registerUpdateFactories();
@@ -314,10 +314,12 @@ class UpdateFactories : public QWidget
 
     bool getRepoJsonFile(const int id, const QString filename, QJsonDocument * json);
 
-    bool update(const const int id, ProgressWidget * progress = nullptr);
+    bool update(const int id, ProgressWidget * progress = nullptr);
     bool updateAll(ProgressWidget * progress = nullptr);
-    const bool isUpdateAvailable(QStringList & names);
+    const bool isUpdateAvailable(QMap<QString, int> & names);
 
   private:
     QVector<UpdateFactoryInterface *> registeredUpdateFactories;
+
+    UpdateInterface * interface(const int id);
 };

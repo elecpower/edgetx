@@ -139,6 +139,76 @@ UpdateInterface::~UpdateInterface()
   delete params;
 }
 
+void UpdateInterface::init(ComponentIdentity id, QString name, QString repo, QString nightly, int resultsPerPage)
+{
+  setId(id);
+  setName(name);
+
+  initAppSettings();
+
+  releases->init(repo, nightly, resultsPerPage, id);
+  assets->init(repo, resultsPerPage);
+
+  currentRelease();
+}
+
+void UpdateInterface::initAppSettings()
+{
+  if (!isValidSettingsIndex()) {
+    reportProgress(tr("Component id: %1 exceeds maximum application settings components: %2!").arg(m_id).arg(MAX_COMPONENTS), QtCriticalMsg);
+    return;
+  }
+
+  if (!g.component[m_id].existsOnDisk()) {
+    g.component[m_id].init();
+  }
+
+  if (!g.component[m_id].asset[0].existsOnDisk())
+    initAssetSettings();
+}
+
+void UpdateInterface::loadAssetSettings()
+{
+  if (!isValidSettingsIndex())
+    return;
+
+  params->assets.clear();
+
+  for (int i = 0; i < MAX_COMPONENT_ASSETS && g.component[m_id].asset[i].existsOnDisk(); i++) {
+    UpdateParameters::AssetParams &ap = params->addAsset();
+    ComponentAssetData &cad = g.component[m_id].asset[i];
+
+    ap.processes = cad.processes();
+    ap.flags = cad.flags();
+    ap.filterType = (UpdateParameters::UpdateFilterType)cad.filterType();
+    ap.filter = cad.filter();
+    ap.maxExpected = cad.maxExpected();
+    ap.destSubDir = cad.destSubDir();
+    ap.copyFilterType = (UpdateParameters::UpdateFilterType)cad.copyFilterType();
+    ap.copyFilter = cad.copyFilter();
+  }
+}
+
+void UpdateInterface::saveAssetSettings()
+{
+  if (!isValidSettingsIndex())
+    return;
+
+  for (int i = 0; i < MAX_COMPONENT_ASSETS && g.component[m_id].asset[i].existsOnDisk(); i++) {
+    const UpdateParameters::AssetParams &ap = params->assets.at(i);
+    ComponentAssetData &cad = g.component[m_id].asset[i];
+
+    //  DO NOT overwrite cad.processes
+    cad.flags(ap.flags);
+    cad.filterType(ap.filterType);
+    cad.filter(ap.filter);
+    cad.maxExpected(ap.maxExpected);
+    cad.destSubDir(ap.destSubDir);
+    cad.copyFilterType(ap.copyFilterType);
+    cad.copyFilter(ap.copyFilter);
+  }
+}
+
 bool UpdateInterface::update(ProgressWidget * progress)
 {
   if (!(params->flags & UPDFLG_Update))
@@ -284,77 +354,6 @@ void UpdateInterface::progressMessage(const QString & text)
 void UpdateInterface::criticalMsg(const QString & msg)
 {
   QMessageBox::critical(progress, tr("Update Interface"), msg);
-}
-
-void UpdateInterface::init(ComponentIdentity id, QString name, QString repo, QString nightly, int resultsPerPage)
-{
-  setId(id);
-  setName(name);
-
-  initAppSettings();
-
-  releases->init(repo, nightly, resultsPerPage, id);
-  assets->init(repo, resultsPerPage);
-
-  currentRelease();
-}
-
-void UpdateInterface::initAppSettings()
-{
-  if (!isValidSettingsIndex()) {
-    reportProgress(tr("Component id: %1 exceeds maximum application settings components: %2!").arg(m_id).arg(MAX_COMPONENTS), QtCriticalMsg);
-    return;
-  }
-
-  if (!g.component[m_id].existsOnDisk()) {
-    g.component[m_id].init();
-    g.component[m_id].name(m_name);
-  }
-
-  if (!g.component[m_id].asset[0].existsOnDisk())
-    initAssetSettings();
-}
-
-void UpdateInterface::loadAssetSettings()
-{
-  if (!isValidSettingsIndex())
-    return;
-
-  params->assets.clear();
-
-  for (int i = 0; i < MAX_COMPONENT_ASSETS && g.component[m_id].asset[i].existsOnDisk(); i++) {
-    UpdateParameters::AssetParams &ap = params->addAsset();
-    ComponentAssetData &cad = g.component[m_id].asset[i];
-
-    ap.processes = cad.processes();
-    ap.flags = cad.flags();
-    ap.filterType = (UpdateParameters::UpdateFilterType)cad.filterType();
-    ap.filter = cad.filter();
-    ap.maxExpected = cad.maxExpected();
-    ap.destSubDir = cad.destSubDir();
-    ap.copyFilterType = (UpdateParameters::UpdateFilterType)cad.copyFilterType();
-    ap.copyFilter = cad.copyFilter();
-  }
-}
-
-void UpdateInterface::saveAssetSettings()
-{
-  if (!isValidSettingsIndex())
-    return;
-
-  for (int i = 0; i < MAX_COMPONENT_ASSETS && g.component[m_id].asset[i].existsOnDisk(); i++) {
-    const UpdateParameters::AssetParams &ap = params->assets.at(i);
-    ComponentAssetData &cad = g.component[m_id].asset[i];
-
-    //  DO NOT overwrite cad.processes
-    cad.flags(ap.flags);
-    cad.filterType(ap.filterType);
-    cad.filter(ap.filter);
-    cad.maxExpected(ap.maxExpected);
-    cad.destSubDir(ap.destSubDir);
-    cad.copyFilterType(ap.copyFilterType);
-    cad.copyFilter(ap.copyFilter);
-  }
 }
 
 bool UpdateInterface::isUpdateable()
@@ -1474,6 +1473,15 @@ UpdateInterface * UpdateFactories::interface(const int id)
   return nullptr;
 }
 
+const QString UpdateFactories::name(const int id)
+{
+  UpdateInterface * iface = interface(id);
+  if (iface)
+    return iface->name();
+
+  return "";
+}
+
 void UpdateFactories::saveAssetSettings(const int id)
 {
   UpdateInterface * iface = interface(id);
@@ -1587,7 +1595,7 @@ const QStringList UpdateFactories::releases(const int id)
   if (iface)
     return iface->getReleases();
 
-  return "";
+  return QStringList();
 }
 
 bool UpdateFactories::update(const int id, ProgressWidget * progress)
@@ -1609,17 +1617,18 @@ bool UpdateFactories::updateAll(ProgressWidget * progress)
       break;
   }
 
-  return false;
+  return ret;
 }
 
-const bool UpdateFactories::isUpdateAvailable(QStringList & names)
+const bool UpdateFactories::isUpdateAvailable(QMap<QString, int> & list)
 {
   bool ret = false;
-  names.clear();
+
+  list.clear();
 
   foreach (UpdateFactoryInterface * factory, registeredUpdateFactories) {
     if (factory->instance()->isUpdateable() && factory->instance()->isUpdateAvailable()) {
-      names.append(factory->name());
+      list.insert(factory->name(), factory->id());
       ret = true;
     }
   }

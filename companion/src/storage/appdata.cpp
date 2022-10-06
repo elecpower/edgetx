@@ -558,6 +558,18 @@ void AppData::convertSettings(QSettings & settings)
     }
   }
 
+  if (savedMajMin < 0x209) {
+    //  2.9 component id renamed releaseId - copy value before calling clearUnusedSettings
+    qInfo().noquote() << "Converting components - moving id to releaseId";
+    static const QString path = QStringLiteral("Components/component%1/%2");
+    for (int i = 0; i < MAX_COMPONENTS; i++) {
+      if (settings.contains(path.arg(i).arg("id"))) {
+        const QVariant id = settings.value(path.arg(i).arg("id"));
+        settings.setValue(path.arg(i).arg("releaseId"), id);
+      }
+    }
+  }
+
   if (removeUnused)
     clearUnusedSettings(settings);
 
