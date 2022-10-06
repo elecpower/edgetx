@@ -388,7 +388,7 @@ void UpdateInterface::resetEnvironment()
 void UpdateInterface::setReleaseChannel(int channel)
 {
   params->releaseChannel = channel;
-  repoReleasesMetaData();
+  //repoReleasesMetaData();
   releases->setReleaseChannel(channel);
 }
 
@@ -468,7 +468,9 @@ const QString UpdateInterface::currentRelease()
 
 QString UpdateInterface::latestRelease()
 {
-  repoReleasesMetaData();
+  if (!repoReleasesMetaData())
+    return tr("unknown");
+
   return releases->name();
 }
 
@@ -506,7 +508,9 @@ const bool UpdateInterface::isLatestVersion(const QString & installed, const QSt
 
 const bool UpdateInterface::isLatestRelease()
 {
-  repoReleasesMetaData();
+  if (!repoReleasesMetaData())
+    return false;
+
   QString currentVer = currentVersion();
   QString latestVer = releases->version();
   // nightlies often have the same version so also check id
@@ -525,7 +529,9 @@ const QString UpdateInterface::currentVersion()
 
 const QStringList UpdateInterface::getReleases()
 {
-  repoReleasesMetaData();
+  if (!repoReleasesMetaData())
+    return QStringList();
+
   return releases->list();
 }
 
@@ -546,8 +552,11 @@ bool UpdateInterface::repoReleasesMetaData()
 
 bool UpdateInterface::repoReleaseAssetsMetaData()
 {
+  if (!repoReleasesMetaData())
+    return false;
+
   if (!downloadReleaseAssetsMetaData(releases->id())) {
-    reportProgress(tr("Unable to download release channel assets information"), QtDebugMsg);
+    reportProgress(tr("Unable to download release assets information"), QtDebugMsg);
     return false;
   }
 
