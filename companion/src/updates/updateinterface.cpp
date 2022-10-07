@@ -543,9 +543,9 @@ bool UpdateInterface::repoReleasesMetaData()
       releases->setId(0);
       return false;
     }
-  }
 
-  releases->getSetId();
+    releases->getSetId();
+  }
 
   return true;
 }
