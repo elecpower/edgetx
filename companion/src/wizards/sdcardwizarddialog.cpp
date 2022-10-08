@@ -128,6 +128,9 @@ SDCardRepoPage::SDCardRepoPage(QWidget * parent, UpdateFactories * updateFactori
   msg->setContentsMargins(50, 50, 50, 50);
   msglayout->addWidget(msg);
 
+  factories->resetEnvironment(factoryId);
+  factoryParams = factories->getParams(factoryId);
+
   lblReleaseChannel = new QLabel(tr("Release Channel"));
   cboReleaseChannel = new QComboBox();
   cboReleaseChannel->addItems(ComponentData::releaseChannelsList());
@@ -163,8 +166,6 @@ SDCardRepoPage::SDCardRepoPage(QWidget * parent, UpdateFactories * updateFactori
 
 void SDCardRepoPage::initializePage()
 {
-  factories->resetEnvironment(factoryId);
-  factoryParams = factories->getParams(factoryId);
   {
     const QSignalBlocker blocker(cboReleaseChannel);
     cboReleaseChannel->setCurrentIndex(-1);
