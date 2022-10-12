@@ -61,7 +61,7 @@ class ReleasesRawItemModel : public RepoRawItemModel
     int m_releaseChannel;
     bool m_refreshRequired;
 
-    virtual void setDynamicItemData(QStandardItem * item);
+    virtual void setDynamicItemData(QStandardItem * item) override;
 
     bool isReleaseAvailable(QStandardItem * item);
 

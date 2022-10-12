@@ -41,7 +41,7 @@ QString repoMetaDataTypeToString(RepoMetaDataType val)
     RepoRawItemModel
 */
 
-RepoRawItemModel(QString name = "") :
+RepoRawItemModel(QString name) :
   QStandardItemModel(nullptr),
   json(nullptr),
   m_name(name)

@@ -61,7 +61,7 @@ class RepoRawItemModel : public QStandardItemModel
     QString modelName() { return m_modelName; }
 
   protected:
-    virtual void setDynamicItemData(QStandardItem * item) = 0;
+    virtual void setDynamicItemData(QStandardItem * item) {}
 
     void update();
 
