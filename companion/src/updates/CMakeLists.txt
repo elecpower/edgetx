@@ -4,7 +4,11 @@ set(updates_NAMES
   updates
   updatesdialog
   updateoptionsdialog
-  repomodels
+  network
+  repodatamodels
+  reporeleases
+  repoassets
+  repo
   updateinterface
   updatefirmware
   updatecompanion
