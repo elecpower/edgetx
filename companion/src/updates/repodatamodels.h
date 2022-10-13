@@ -60,8 +60,11 @@ class RepoRawItemModel : public QStandardItemModel
 
     QString modelName() { return m_modelName; }
 
+    void dumpContents();
+
   protected:
-    virtual void setDynamicItemData(QStandardItem * item) {}
+    virtual bool isAvailable(QStandardItem * item) = 0;
+    virtual void setDynamicItemData(QStandardItem * item) = 0;
 
     void update();
 
@@ -85,6 +88,8 @@ class RepoFilteredItemModel: public QSortFilterProxyModel
 
     QString date(const int id) { return metaDataValue(id, RIMR_Date).toString(); }
     QString name(const int id) { return metaDataValue(id, Qt::DisplayRole).toString(); }
+
+    void dumpContents();
 
   protected slots:
     void setFilterFlags(const int flags);

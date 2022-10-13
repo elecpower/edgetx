@@ -23,24 +23,15 @@
 
 #include "repodatamodels.h"
 
-class ReleasesItemModel : public QObject
-{
-    Q_OBJECT
-
-  public:
-    explicit ReleasesItemModel() = default;
-    virtual ~ReleasesItemModel() {}
-
-    static void dumpContents(QAbstractItemModel * itemModel, QString & name);
-};
-
 class ReleasesRawItemModel : public RepoRawItemModel
 {
   Q_OBJECT
 
-  friend class ReleasesMetaData;
-
   public:
+
+  protected:
+    friend class ReleasesMetaData;
+
     explicit ReleasesRawItemModel();
     virtual ~ReleasesRawItemModel() {}
 
@@ -53,17 +44,14 @@ class ReleasesRawItemModel : public RepoRawItemModel
     int settingsIndex() { return m_settingsIdx; }
     bool refreshRequired() { return m_refreshRequired; }
 
-    void dumpContents();
-
   private:
     int m_settingsIdx;
     QString m_nightlyName;
     int m_releaseChannel;
     bool m_refreshRequired;
 
-    virtual void setDynamicItemData(QStandardItem * item) override;
-
-    bool isReleaseAvailable(QStandardItem * item);
+    virtual bool isAvailable(QStandardItem * item);
+    virtual void setDynamicItemData(QStandardItem * item);
 
     void parseRelease();
     void parseReleases();
@@ -82,19 +70,17 @@ class ReleasesFilteredItemModel: public RepoFilteredItemModel
     explicit ReleasesFilteredItemModel(UpdatesItemModel * sourceModel);
     virtual ~ReleasesFilteredItemModel() {}
 
-    void dumpContents() { ReleasesItemModel::dumpContents(this, modelName()); }
-
     int channelLatestId();
-
     bool prerelease(const int id) { return metaDataValue(id, RIMR_Prerelease).toBool(); }
     QString version(const int id) { return metaDataValue(id, RIMR_Tag).toString(); }
 
   private:
 };
 
-class ReleasesMetaData : public RepoMetaData
+class ReleasesMetaData : public QObject
 {
     Q_OBJECT
+
   public:
     explicit ReleasesMetaData(QObject * parent);
     virtual ~ReleasesMetaData() {}
@@ -115,8 +101,6 @@ class ReleasesMetaData : public RepoMetaData
 
     int count() { return filteredItemModel->rows(); }
     QStringList list() { return filteredItemModel->list(); }
-    void dumpModelRaw() { itemModel->dumpContents(); }
-    void dumpModelFiltered() { filteredItemModel->dumpContents(); }
 
     QString date() { return filteredItemModel->date(m_id); }
     QString name();
@@ -125,8 +109,16 @@ class ReleasesMetaData : public RepoMetaData
 
     const QString urlRelease() { return QString("%1/%2").arg(urlReleases()).arg(m_id); }
 
+    void dumpModelRaw() { itemModel->dumpContents(); }
+    void dumpModelFiltered() { filteredItemModel->dumpContents(); }
+
+  signals:
+    void idChanged(int id);
+
   private:
     ReleasesItemModel *itemModel;
     ReleasesFilteredItemModel *filteredItemModel;
+    QString m_repo;
+    int m_resultsPerPage;
     int m_id;
 };

@@ -22,27 +22,6 @@
 #include "reporeleases.h"
 #include "appdata.h"
 
-//  static
-//  itemModel can either be the raw or filtered model
-void ReleasesItemModel::dumpContents(QAbstractItemModel * itemModel, QString & name)
-{
-  qDebug() << "Contents of" << name;
-
-  if (itemModel) {
-    for (int i = 0; i < rowCount(); ++i) {
-      qDebug().noquote()
-               << "row:"         << i
-               << "name:"        << itemModel->data(itemModel->index(i, 0), Qt::DisplayRole).toString()
-               << "id:"          << itemModel->data(itemModel->index(i, 0), RIMR_Id).toInt()
-               << "date:"        << itemModel->data(itemModel->index(i, 0), RIMR_Date).toDateTime()
-               << "tag:"         << itemModel->data(itemModel->index(i, 0), RIMR_Tag).toString()
-               << "prerelease:"  << itemModel->data(itemModel->index(i, 0), RIMR_Prerelease).toBool()
-               << "avail:"       << itemModel->data(itemModel->index(i, 0), RIMR_Available).toBool()
-               << "flags:"       << itemModel->data(itemModel->index(i, 0), RIMR_Flags).toInt();
-    }
-  }
-}
-
 /*
     ReleasesRawItemModel
 */
@@ -147,10 +126,10 @@ void ReleasesRawItemModel::parseJsonObject(const QJsonObject & obj)
 
 void ReleasesRawItemModel::setDynamicItemData(QStandardItem * item)
 {
-  item->setData(isReleaseAvailable(item), RIMR_Available);
+  item->setData(isAvailable(item), RIMR_Available);
 }
 
-bool ReleasesRawItemModel::isReleaseAvailable(QStandardItem * item)
+bool ReleasesRawItemModel::isAvailable(QStandardItem * item)
 {
   if (item->data(IMDR_Prerelease).toBool()) {
     if (m_releaseChannel == ComponentData::RELEASE_CHANNEL_STABLE) {
@@ -167,11 +146,6 @@ bool ReleasesRawItemModel::isReleaseAvailable(QStandardItem * item)
   return true;
 }
 
-void ReleasesRawItemModel::dumpContents()
-{
-  ReleasesItemModel::dumpContents(qobject_cast<QAbstractItemModel *>(this), modelName());
-}
-
 /*
     ReleasesFilteredItemModel
 */
@@ -185,11 +159,6 @@ ReleasesFilteredItemModel::ReleasesFilteredItemModel(UpdatesItemModel * sourceMo
 int ReleasesFilteredItemModel::channelLatestId()
 {
   return rows() > 0 ? id(0) : 0;
-}
-
-void ReleasesFilteredItemModel::dumpContents()
-{
-  ReleasesItemModel::dumpContents(qobject_cast<QAbstractItemModel *>(this), modelName());
 }
 
 /*
@@ -248,5 +217,5 @@ QString ReleasesMetaData::version()
   if (m_id)
     return filteredItemModel->version(m_id);
 
-  return "0";
+  return "0.0";
 }

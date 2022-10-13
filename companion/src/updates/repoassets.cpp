@@ -21,34 +21,13 @@
 
 #include "repoassets.h"
 
-//  static
-//  itemModel can either be the raw or filtered model
-void AssetsItemModel::dumpContents(QAbstractItemModel * itemModel, QString & name)
-{
-  qDebug() << "Contents of" << name;
-
-  if (itemModel) {
-    for (int i = 0; i < rowCount(); ++i) {
-      qDebug().noquote()
-               << "row:"         << i
-               << "name:"        << itemModel->data(itemModel->index(i, 0), Qt::DisplayRole).toString()
-               << "id:"          << itemModel->data(itemModel->index(i, 0), RIMR_Id).toInt()
-               << "date:"        << itemModel->data(itemModel->index(i, 0), RIMR_Date).toDateTime()
-               << "content:"     << itemModel->data(itemModel->index(i, 0), RIMR_Content).toString()
-               << "avail:"       << itemModel->data(itemModel->index(i, 0), RIMR_Available).toBool()
-               << "flags:"       << itemModel->data(itemModel->index(i, 0), RIMR_Flags).toInt()
-               << "cpfltr:"      << itemModel->data(itemModel->index(i, 0), RIMR_CopyFilter).toString()
-               << "subdir:"      << itemModel->data(itemModel->index(i, 0), RIMR_SubDirectory).toString();
-    }
-  }
-}
-
 /*
-    AssetsItemModel
+    AssetsRawItemModel
 */
 
 AssetsRawItemModel::AssetsRawItemModel() :
-  RepoRawItemModel("Assets")
+  RepoRawItemModel("Assets"),
+  m_refreshRequired(true)
 {
 
 }
@@ -107,55 +86,39 @@ void AssetsRawItemModel::parseJsonObject(const QJsonObject & obj)
   }
 
   if (!obj.value("id").isUndefined()) {
-    item->setData(obj.value("id").toInt(), UpdatesItemModel::IMDR_Id);
+    item->setData(obj.value("id").toInt(), RIMR_Id);
   }
 
   if (!obj.value("content_type").isUndefined()) {
-    item->setData(obj.value("content_type").toString(), UpdatesItemModel::IMDR_Content);
+    item->setData(obj.value("content_type").toString(), RIMR_Content);
   }
 
   if (!obj.value("updated_at").isUndefined()) {
-    item->setData(QDateTime::fromString(obj.value("updated_at").toString(), Qt::ISODate), UpdatesItemModel::IMDR_Date);
+    item->setData(QDateTime::fromString(obj.value("updated_at").toString(), Qt::ISODate), RIMR_Date);
   }
 
-  item->setData(true, UpdatesItemModel::IMDR_Available);
+  item->setData(true, RIMR_Available);
 
   appendRow(item);
-}
-
-void AssetsRawItemModel::dumpContents()
-{
-  AssetsItemModel::dumpContents(qobject_cast<QAbstractItemModel *>(this), modelName());
 }
 
 /*
     AssetsFilteredItemModel
 */
 
-AssetsFilteredItemModel::AssetsFilteredItemModel(UpdatesItemModel * sourceModel) :
-  RepoFilteredItemModel(sourceModel, "Filtered Assets")
-{
-
-}
-
 bool AssetsFilteredItemModel::setFlags(const int id, const int flags)
 {
-  return setMetaDataValue(id, UpdatesItemModel::IMDR_Flags, QVariant(flags));
+  return setMetaDataValue(id, RIMR_Flags, QVariant(flags));
 }
 
 bool AssetsFilteredItemModel::setSubDirectory(const int id, const QString path)
 {
-  return setMetaDataValue(id, UpdatesItemModel::IMDR_SubDirectory, QVariant(path));
+  return setMetaDataValue(id, RIMR_SubDirectory, QVariant(path));
 }
 
 bool AssetsFilteredItemModel::setCopyFilter(const int id, const QString filter)
 {
-  return setMetaDataValue(id, UpdatesItemModel::IMDR_CopyFilter, QVariant(filter));
-}
-
-void AssetsFilteredItemModel::dumpContents()
-{
-  AssetsItemModel::dumpContents(qobject_cast<QAbstractItemModel *>(this), modelName());
+  return setMetaDataValue(id, RIMR_CopyFilter, QVariant(filter));
 }
 
 /*

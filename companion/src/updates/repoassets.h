@@ -23,30 +23,26 @@
 
 #include "repodatamodels.h"
 
-class AssetsItemModel : public QObject
-{
-    Q_OBJECT
-
-  public:
-    explicit AssetsItemModel() = default;
-    virtual ~AssetsItemModel() {}
-
-    static void dumpContents(QAbstractItemModel * itemModel, QString & name);
-};
-
 class AssetsRawItemModel : public RepoRawItemModel
 {
   Q_OBJECT
 
-  friend class AssetsMetaData;
-
   public:
-    explicit AssetsItemModel();
-    virtual ~AssetsItemModel() {}
+
+  protected:
+    friend class AssetsMetaData;
+
+    explicit AssetsRawItemModel();
+    virtual ~AssetsRawItemModel() {}
 
     virtual void parseMetaData(const int mdt, QJsonDocument * json);
 
   private:
+    bool m_refreshRequired;
+
+    virtual bool isAvailable(QStandardItem * item) {}
+    virtual void setDynamicItemData(QStandardItem * item) {}
+
     void parseAsset();
     void parseReleaseAssets();
     void parseJsonObject(const QJsonObject & obj);
@@ -61,7 +57,7 @@ class AssetsFilteredItemModel : public RepoFilteredItemModel
   protected:
     friend class AssetsMetaData;
 
-    explicit AssetsFilteredItemModel(UpdatesItemModel * sourceModel);
+    explicit AssetsFilteredItemModel(UpdatesItemModel * sourceModel) : RepoFilteredItemModel(sourceModel, "Filtered Assets") {}
     virtual ~AssetsFilteredItemModel() {};
 
     bool setFlags(const int id, const int flags);
@@ -73,14 +69,17 @@ class AssetsFilteredItemModel : public RepoFilteredItemModel
   private:
 };
 
-class AssetsMetaData : public RepoMetaData
+class AssetsMetaData : public QObject
 {
     Q_OBJECT
+
   public:
     explicit AssetsMetaData(QObject * parent);
     virtual ~AssetsMetaData() {};
 
     void init(const QString repo, const int resultsPerPage);
+
+    void setReleaseId(int id);
 
     void setId(int id) { m_id = id; }
     int id() { return m_id; }
@@ -100,24 +99,31 @@ class AssetsMetaData : public RepoMetaData
 
     int count() { return filteredItemModel->rows(); }
     QStringList list() { return filteredItemModel->list(); }
-    void dumpModelRaw() { itemModel->dumpContents(); }
-    void dumpModelFiltered() { filteredItemModel->dumpContents(); }
 
     QString date() { return filteredItemModel->date(m_id); }
     QString name() { return filteredItemModel->name(m_id); }
     QString filename() { return filteredItemModel->metaDataValue(m_id, Qt::DisplayRole).toString(); }
-    QString contentType() { return filteredItemModel->metaDataValue(m_id, UpdatesItemModel::IMDR_Content).toString(); }
-    QString subDirectory() { return filteredItemModel->metaDataValue(m_id, UpdatesItemModel::IMDR_SubDirectory).toString(); }
-    QString copyFilter() { return filteredItemModel->metaDataValue(m_id, UpdatesItemModel::IMDR_CopyFilter).toString(); }
-    int flags() { return filteredItemModel->metaDataValue(m_id, UpdatesItemModel::IMDR_Flags).toInt(); }
+    QString contentType() { return filteredItemModel->metaDataValue(m_id, RIMR_Content).toString(); }
+    QString subDirectory() { return filteredItemModel->metaDataValue(m_id, RIMR_SubDirectory).toString(); }
+    QString copyFilter() { return filteredItemModel->metaDataValue(m_id, RIMR_CopyFilter).toString(); }
+    int flags() { return filteredItemModel->metaDataValue(m_id, RIMR_Flags).toInt(); }
 
     const QString urlReleaseAssets(int releaseId) {
                                    return QString("%1/%2/assets").arg(urlReleases()).arg(releaseId) % (m_resultsPerPage > -1 ?
                                    QString("\?per_page=%1").arg(m_resultsPerPage) : ""); }
     const QString urlAsset() { return QString("%1/assets/%2").arg(urlReleases()).arg(m_id); }
 
+    void dumpModelRaw() { itemModel->dumpContents(); }
+    void dumpModelFiltered() { filteredItemModel->dumpContents(); }
+
+  signals:
+    void idChanged(int id);
+
   private:
     AssetsItemModel *itemModel;
     AssetsFilteredItemModel *filteredItemModel;
+    QString m_repo;
+    int m_resultsPerPage;
     int m_id;
+    int m_releaseId;
 };

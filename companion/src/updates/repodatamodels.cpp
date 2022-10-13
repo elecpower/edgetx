@@ -55,6 +55,25 @@ void RepoRawItemModel::update()
     setDynamicItemData(item(i));
 }
 
+void RepoRawItemModel::dumpContents()
+{
+  qDebug() << "Contents of" << m_modelName;
+
+  if (itemModel) {
+    for (int i = 0; i < rowCount(); ++i) {
+      qDebug().noquote()
+               << "row:"         << i
+               << "name:"        << data(index(i, 0), Qt::DisplayRole).toString()
+               << "id:"          << data(index(i, 0), RIMR_Id).toInt()
+               << "date:"        << data(index(i, 0), RIMR_Date).toDateTime()
+               << "tag:"         << data(index(i, 0), RIMR_Tag).toString()
+               << "prerelease:"  << data(index(i, 0), RIMR_Prerelease).toBool()
+               << "avail:"       << data(index(i, 0), RIMR_Available).toBool()
+               << "flags:"       << data(index(i, 0), RIMR_Flags).toInt();
+    }
+  }
+}
+
 /*
     RepoFilteredItemModel
 */
@@ -184,4 +203,23 @@ QStringList RepoFilteredItemModel::list()
     strl << data(index(i, 0)).toString();
 
   return strl;
+}
+
+void RepoFilteredItemModel::dumpContents()
+{
+  qDebug() << "Contents of" << m_modelName;
+
+  if (itemModel) {
+    for (int i = 0; i < rowCount(); ++i) {
+      qDebug().noquote()
+               << "row:"         << i
+               << "name:"        << data(index(i, 0), Qt::DisplayRole).toString()
+               << "id:"          << data(index(i, 0), RIMR_Id).toInt()
+               << "date:"        << data(index(i, 0), RIMR_Date).toDateTime()
+               << "tag:"         << data(index(i, 0), RIMR_Tag).toString()
+               << "prerelease:"  << data(index(i, 0), RIMR_Prerelease).toBool()
+               << "avail:"       << data(index(i, 0), RIMR_Available).toBool()
+               << "flags:"       << data(index(i, 0), RIMR_Flags).toInt();
+    }
+  }
 }
