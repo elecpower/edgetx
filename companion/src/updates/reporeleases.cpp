@@ -149,8 +149,8 @@ bool ReleasesRawItemModel::isAvailable(QStandardItem * item)
     ReleasesFilteredItemModel
 */
 
-ReleasesFilteredItemModel::ReleasesFilteredItemModel(UpdatesItemModel * sourceModel) :
-  RepoFilteredItemModel(sourceModel, "Filtered Releases")
+ReleasesFilteredItemModel::ReleasesFilteredItemModel() :
+  RepoFilteredItemModel("Filtered Releases")
 {
   setSortRole(RIMR_Date);
 }
@@ -181,13 +181,16 @@ void ReleasesMetaData::init(const QString repo, const QString nightly, const int
 
 int ReleasesMetaData::getSetId()
 {
-  m_id = filteredItemModel->channelLatestId();
+  ReleasesFilteredItemModel *mdl = qobject_cast<ReleasesFilteredItemModel *>(m_itemFilteredModel);
+  if (mdl)
+    m_id = mdl->channelLatestId();
+
   return m_id;
 }
 
 void ReleasesMetaData::parseMetaData(int mdt, QJsonDocument * jsonDoc)
 {
-  ReleasesRawItemModel *itemModel = qobject_cast<ReleasesRawItemModel *>(m_itemModel);
-  if (itemModel)
-    itemModel->parseMetaData(mdt, jsonDoc);
+  ReleasesRawItemModel *mdl = qobject_cast<ReleasesRawItemModel *>(m_itemModel);
+  if (mdl)
+    mdl->parseMetaData(mdt, jsonDoc);
 }

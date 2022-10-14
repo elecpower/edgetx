@@ -57,7 +57,7 @@ class AssetsFilteredItemModel : public RepoFilteredItemModel
   protected:
     friend class AssetsMetaData;
 
-    explicit AssetsFilteredItemModel(UpdatesItemModel * sourceModel) : RepoFilteredItemModel(sourceModel, "Filtered Assets") {}
+    explicit AssetsFilteredItemModel() : RepoFilteredItemModel("Filtered Assets") {}
     virtual ~AssetsFilteredItemModel() {};
 
     bool setFlags(const int id, const int flags);
@@ -83,19 +83,19 @@ class AssetsMetaData : public RepoMetaData
 
     void setReleaseId(int id);
 
-    bool setFlags(int flags) { return filteredItemModel->setFlags(m_id, flags); }
+    bool setFlags(int flags) { return m_filteredItemModel->setFlags(m_id, flags); }
 
-    void setFilterFlags(int flags) { filteredItemModel->setFilterFlags(flags); }
-    void setFilterPattern(const QString & pattern) { filteredItemModel->setFilterPattern(pattern); }
+    void setFilterFlags(int flags) { m_filteredItemModel->setFilterFlags(flags); }
+    void setFilterPattern(const QString & pattern) { m_filteredItemModel->setFilterPattern(pattern); }
 
-    bool setSubDirectory(const QString path) { return filteredItemModel->setSubDirectory(m_id, path); }
-    bool setCopyFilter(const QString filter) { return filteredItemModel->setCopyFilter(m_id, filter); }
+    bool setSubDirectory(const QString path) { return m_filteredItemModel->setSubDirectory(m_id, path); }
+    bool setCopyFilter(const QString filter) { return m_filteredItemModel->setCopyFilter(m_id, filter); }
 
-    QString filename() { return filteredItemModel->metaDataValue(m_id, Qt::DisplayRole).toString(); }
-    QString contentType() { return filteredItemModel->metaDataValue(m_id, RIMR_Content).toString(); }
-    QString subDirectory() { return filteredItemModel->metaDataValue(m_id, RIMR_SubDirectory).toString(); }
-    QString copyFilter() { return filteredItemModel->metaDataValue(m_id, RIMR_CopyFilter).toString(); }
-    int flags() { return filteredItemModel->metaDataValue(m_id, RIMR_Flags).toInt(); }
+    QString filename() { return m_filteredItemModel->metaDataValue(m_id, Qt::DisplayRole).toString(); }
+    QString contentType() { return m_filteredItemModel->metaDataValue(m_id, RIMR_Content).toString(); }
+    QString subDirectory() { return m_filteredItemModel->metaDataValue(m_id, RIMR_SubDirectory).toString(); }
+    QString copyFilter() { return m_filteredItemModel->metaDataValue(m_id, RIMR_CopyFilter).toString(); }
+    int flags() { return m_filteredItemModel->metaDataValue(m_id, RIMR_Flags).toInt(); }
 
     const QString urlReleaseAssets(int releaseId) {
                                    return QString("%1/%2/assets").arg(urlReleases()).arg(releaseId) % (m_resultsPerPage > -1 ?

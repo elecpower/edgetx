@@ -27,12 +27,12 @@ RepoMetaData::RepoMetaData(QObject * parent) :
   releases = new ReleasesMetaData();
   assets = new AssetsMetaData();
 
-  connect(releases, &ReleasesMetaData::idChanged, [=](const int id) {
+  connect(releases, &RepoMetaData::idChanged, [=](const int id) {
     m_currentReleaseId = id;
     assets->setReleaseId(id);
   });
 
-  connect(assets, &AssetsMetaData::idChanged, [=](const int id) {
+  connect(assets, &RepoMetaData::idChanged, [=](const int id) {
     m_currentAssetId = id;
   });
 }
