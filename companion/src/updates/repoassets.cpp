@@ -75,6 +75,7 @@ void AssetsRawItemModel::parseReleaseAssets()
   }
 
   sort(0);
+  m_refreshRequired = false;
 }
 
 void AssetsRawItemModel::parseJsonObject(const QJsonObject & obj)
@@ -126,10 +127,10 @@ bool AssetsFilteredItemModel::setCopyFilter(const int id, const QString filter)
 */
 
 AssetsMetaData::AssetsMetaData(QObject * parent) :
-  RepoMetaData(parent)
+  RepoMetaData(parent),
+  m_id(0)
 {
-  itemModel = new AssetsItemModel();
-  filteredItemModel = new AssetsFilteredItemModel(itemModel);
+  setModels(new AssetsItemModel(), new AssetsFilteredItemModel());
 }
 
 void AssetsMetaData::init(const QString repo, const int resultsPerPage)
@@ -138,14 +139,14 @@ void AssetsMetaData::init(const QString repo, const int resultsPerPage)
   m_resultsPerPage = resultsPerPage;
 }
 
-int AssetsMetaData::getSetId(int row)
+bool AssetsMetaData::refreshRequired()
 {
-  m_id = filteredItemModel->id(row);
-  return m_id;
+  return m_id == 0 ? true : itemModel->refreshRequired();
 }
 
-int AssetsMetaData::getSetId(QVariant value, Qt::MatchFlags flags, int role)
+void AssetsMetaData::parseMetaData(int mdt, QJsonDocument * jsonDoc)
 {
-  m_id = filteredItemModel->id(value, flags, role);
-  return m_id;
+  AssetsRawItemModel *itemModel = qobject_cast<AssetsRawItemModel *>(m_itemModel);
+  if (itemModel)
+    itemModel->parseMetaData(mdt, jsonDoc);
 }

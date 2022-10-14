@@ -70,6 +70,7 @@ class RepoRawItemModel : public QStandardItemModel
 
   private:
     QString m_modelName;
+    bool m_refreshRequired;
 };
 
 class RepoFilteredItemModel: public QSortFilterProxyModel
@@ -77,7 +78,7 @@ class RepoFilteredItemModel: public QSortFilterProxyModel
     Q_OBJECT
 
   public:
-    explicit RepoFilteredItemModel(UpdatesItemModel * sourceModel, QString name = "");
+    explicit RepoFilteredItemModel(QString name = "");
     virtual ~RepoFilteredItemModel() {}
 
     QStringList list();

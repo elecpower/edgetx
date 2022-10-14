@@ -22,6 +22,7 @@
 #pragma once
 
 #include "repodatamodels.h"
+#include "repometadata.h"
 
 class ReleasesRawItemModel : public RepoRawItemModel
 {
@@ -42,13 +43,11 @@ class ReleasesRawItemModel : public RepoRawItemModel
     void setReleaseChannel(const int channel);
 
     int settingsIndex() { return m_settingsIdx; }
-    bool refreshRequired() { return m_refreshRequired; }
 
   private:
     int m_settingsIdx;
     QString m_nightlyName;
     int m_releaseChannel;
-    bool m_refreshRequired;
 
     virtual bool isAvailable(QStandardItem * item);
     virtual void setDynamicItemData(QStandardItem * item);
@@ -77,7 +76,7 @@ class ReleasesFilteredItemModel: public RepoFilteredItemModel
   private:
 };
 
-class ReleasesMetaData : public QObject
+class ReleasesMetaData : public RepoMetaData
 {
     Q_OBJECT
 
@@ -85,40 +84,17 @@ class ReleasesMetaData : public QObject
     explicit ReleasesMetaData(QObject * parent);
     virtual ~ReleasesMetaData() {}
 
+    virtual void parseMetaData(int mdt, QJsonDocument * jsonDoc);
+    virtual int getSetId();
+
     void init(const QString repo, const QString nightly, const int settingsIndex, const int resultsPerPage);
 
-    bool refreshRequired();
-    void setReleaseChannel(const int channel) { itemModel->setReleaseChannel(channel); }
+    void setReleaseChannel(const int channel) { m_itemModel->setReleaseChannel(channel); }
 
-    void setId(int id) { m_id = id; }
-    int id() { return m_id; }
-
-    int getSetId();
-    int getSetId(int row);
-    int getSetId(QVariant value, Qt::MatchFlags flags = Qt::MatchExactly, int role = Qt::DisplayRole);
-
-    void parseMetaData(int mdt, QJsonDocument * jsonDoc) { itemModel->parseMetaData(mdt, jsonDoc); }
-
-    int count() { return filteredItemModel->rows(); }
-    QStringList list() { return filteredItemModel->list(); }
-
-    QString date() { return filteredItemModel->date(m_id); }
-    QString name();
-    bool prerelease() { return filteredItemModel->prerelease(m_id); }
-    QString version();
+    bool prerelease() { return m_filteredItemModel->prerelease(m_id); }
 
     const QString urlRelease() { return QString("%1/%2").arg(urlReleases()).arg(m_id); }
 
-    void dumpModelRaw() { itemModel->dumpContents(); }
-    void dumpModelFiltered() { filteredItemModel->dumpContents(); }
-
-  signals:
-    void idChanged(int id);
-
   private:
-    ReleasesItemModel *itemModel;
-    ReleasesFilteredItemModel *filteredItemModel;
-    QString m_repo;
-    int m_resultsPerPage;
-    int m_id;
+
 };

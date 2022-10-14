@@ -44,7 +44,8 @@ QString repoMetaDataTypeToString(RepoMetaDataType val)
 RepoRawItemModel(QString name) :
   QStandardItemModel(nullptr),
   json(nullptr),
-  m_name(name)
+  m_name(name),
+  m_refreshRequired(true)
 {
 
 }
@@ -78,7 +79,7 @@ void RepoRawItemModel::dumpContents()
     RepoFilteredItemModel
 */
 
-RepoFilteredItemModel::RepoFilteredItemModel(UpdatesItemModel * sourceModel, QString name) :
+RepoFilteredItemModel::RepoFilteredItemModel(QString name) :
   QSortFilterProxyModel(nullptr),
   filterFlags(0),
   m_name(name)
@@ -88,7 +89,6 @@ RepoFilteredItemModel::RepoFilteredItemModel(UpdatesItemModel * sourceModel, QSt
   setFilterRole(RIMR_Available);
   setFilterKeyColumn(0);
   setDynamicSortFilter(true);
-  setSourceModel(sourceModel);
 }
 
 void RepoFilteredItemModel::setFilterFlags(const int flags)

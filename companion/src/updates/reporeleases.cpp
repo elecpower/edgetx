@@ -30,8 +30,7 @@ ReleasesRawItemModel::ReleasesRawItemModel() :
   RepoRawItemModel("Releases"),
   m_settingsIdx(-1),
   m_nightlyName(""),
-  m_releaseChannel(-1),
-  m_refreshRequired(true)
+  m_releaseChannel(-1)
 {
   setSortRole(RIMR_Date);
 }
@@ -169,21 +168,15 @@ ReleasesMetaData::ReleasesMetaData(QObject * parent) :
   RepoMetaData(parent),
   m_id(0)
 {
-  itemModel = new ReleasesRawItemModel();
-  filteredItemModel = new ReleasesFilteredItemModel(itemModel);
+  setModels(new ReleasesRawItemModel(), new ReleasesFilteredItemModel());
 }
 
 void ReleasesMetaData::init(const QString repo, const QString nightly, const int settingsIndex, const int resultsPerPage)
 {
   m_repo = repo;
   m_resultsPerPage = resultsPerPage;
-  itemModel->setNightlyName(nightly);
-  itemModel->setSettingsIndex(settingsIndex);
-}
-
-bool ReleasesMetaData::refreshRequired()
-{
-  return m_id == 0 ? true : itemModel->refreshRequired();
+  m_itemModel->setNightlyName(nightly);
+  m_itemModel->setSettingsIndex(settingsIndex);
 }
 
 int ReleasesMetaData::getSetId()
@@ -192,30 +185,9 @@ int ReleasesMetaData::getSetId()
   return m_id;
 }
 
-int ReleasesMetaData::getSetId(int row)
+void ReleasesMetaData::parseMetaData(int mdt, QJsonDocument * jsonDoc)
 {
-  m_id = filteredItemModel->id(row);
-  return m_id;
-}
-
-int ReleasesMetaData::getSetId(QVariant value, Qt::MatchFlags flags, int role)
-{
-  m_id = filteredItemModel->id(value, flags, role);
-  return m_id;
-}
-
-QString ReleasesMetaData::name()
-{
-  if (m_id)
-    return filteredItemModel->name(m_id);
-
-  return "";
-}
-
-QString ReleasesMetaData::version()
-{
-  if (m_id)
-    return filteredItemModel->version(m_id);
-
-  return "0.0";
+  ReleasesRawItemModel *itemModel = qobject_cast<ReleasesRawItemModel *>(m_itemModel);
+  if (itemModel)
+    itemModel->parseMetaData(mdt, jsonDoc);
 }

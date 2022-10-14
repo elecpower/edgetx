@@ -69,7 +69,7 @@ class AssetsFilteredItemModel : public RepoFilteredItemModel
   private:
 };
 
-class AssetsMetaData : public QObject
+class AssetsMetaData : public RepoMetaData
 {
     Q_OBJECT
 
@@ -77,17 +77,11 @@ class AssetsMetaData : public QObject
     explicit AssetsMetaData(QObject * parent);
     virtual ~AssetsMetaData() {};
 
+    virtual void parseMetaData(int mdt, QJsonDocument * jsonDoc);
+
     void init(const QString repo, const int resultsPerPage);
 
     void setReleaseId(int id);
-
-    void setId(int id) { m_id = id; }
-    int id() { return m_id; }
-
-    int getSetId(int row);
-    int getSetId(QVariant value, Qt::MatchFlags flags = Qt::MatchExactly, int role = Qt::DisplayRole);
-
-    void parseMetaData(int mdt, QJsonDocument * jsonDoc) { itemModel->parseMetaData(mdt, jsonDoc); }
 
     bool setFlags(int flags) { return filteredItemModel->setFlags(m_id, flags); }
 
@@ -97,11 +91,6 @@ class AssetsMetaData : public QObject
     bool setSubDirectory(const QString path) { return filteredItemModel->setSubDirectory(m_id, path); }
     bool setCopyFilter(const QString filter) { return filteredItemModel->setCopyFilter(m_id, filter); }
 
-    int count() { return filteredItemModel->rows(); }
-    QStringList list() { return filteredItemModel->list(); }
-
-    QString date() { return filteredItemModel->date(m_id); }
-    QString name() { return filteredItemModel->name(m_id); }
     QString filename() { return filteredItemModel->metaDataValue(m_id, Qt::DisplayRole).toString(); }
     QString contentType() { return filteredItemModel->metaDataValue(m_id, RIMR_Content).toString(); }
     QString subDirectory() { return filteredItemModel->metaDataValue(m_id, RIMR_SubDirectory).toString(); }
@@ -113,17 +102,6 @@ class AssetsMetaData : public QObject
                                    QString("\?per_page=%1").arg(m_resultsPerPage) : ""); }
     const QString urlAsset() { return QString("%1/assets/%2").arg(urlReleases()).arg(m_id); }
 
-    void dumpModelRaw() { itemModel->dumpContents(); }
-    void dumpModelFiltered() { filteredItemModel->dumpContents(); }
-
-  signals:
-    void idChanged(int id);
-
   private:
-    AssetsItemModel *itemModel;
-    AssetsFilteredItemModel *filteredItemModel;
-    QString m_repo;
-    int m_resultsPerPage;
-    int m_id;
     int m_releaseId;
 };

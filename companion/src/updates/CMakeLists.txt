@@ -6,6 +6,7 @@ set(updates_NAMES
   updateoptionsdialog
   network
   repodatamodels
+  repometadata
   reporeleases
   repoassets
   repo
