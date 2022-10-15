@@ -37,6 +37,12 @@ class ReleasesRawItemModel : public RepoRawItemModel
     virtual ~ReleasesRawItemModel() {}
 
     virtual void parseMetaData(const int mdt, QJsonDocument * json);
+    virtual void parseJsonObject(const QJsonObject & obj);
+    virtual void parseOne();
+    virtual void parseAll();
+
+    virtual bool isAvailable(QStandardItem * item);
+    virtual void setDynamicItemData(QStandardItem * item);
 
     void setNightlyName(const QString name) { m_nightlyName = name.toLower(); }
     void setSettingsIndex(const int index) { m_settingsIdx = index; }
@@ -49,12 +55,6 @@ class ReleasesRawItemModel : public RepoRawItemModel
     QString m_nightlyName;
     int m_releaseChannel;
 
-    virtual bool isAvailable(QStandardItem * item);
-    virtual void setDynamicItemData(QStandardItem * item);
-
-    void parseRelease();
-    void parseReleases();
-    void parseJsonObject(const QJsonObject & obj);
 };
 
 class ReleasesFilteredItemModel: public RepoFilteredItemModel
@@ -93,8 +93,8 @@ class ReleasesMetaData : public RepoMetaData
 
     bool prerelease() { return m_filteredItemModel->prerelease(m_id); }
 
-    const QString urlRelease() { return QString("%1/%2").arg(urlReleases()).arg(m_id); }
-
   private:
-
+    const QString urlRelease() { return QString("%1/%2").arg(urlReleases()).arg(m_id); }
+    const QString urlReleases() { return QString("%1/releases").arg(m_repo); }
+    const QString urlReleaseLatest() { return QString("%1/latest").arg(urlReleases()); }
 };

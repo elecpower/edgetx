@@ -38,10 +38,10 @@ void AssetsRawItemModel::parseMetaData(const int mdt, QJsonDocument * jsonDoc)
 
   switch (mdt) {
     case MDT_Asset:
-      parseAsset();
+      parseOne();
       break;
-    case MDT_ReleaseAssets:
-      parseReleaseAssets();
+    case MDT_Assets:
+      parseAll();
       break;
     default;
       qDebug() << "Unexpected meta data type" << repoMetaDataTypeToString(mdt);
@@ -49,7 +49,7 @@ void AssetsRawItemModel::parseMetaData(const int mdt, QJsonDocument * jsonDoc)
   }
 }
 
-void AssetsRawItemModel::parseAsset()
+void AssetsRawItemModel::parseOne()
 {
   clear();
 
@@ -59,7 +59,7 @@ void AssetsRawItemModel::parseAsset()
   }
 }
 
-void AssetsRawItemModel::parseReleaseAssets()
+void AssetsRawItemModel::parseAll()
 {
   clear();
 

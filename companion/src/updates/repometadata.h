@@ -35,7 +35,7 @@ class RepoMetaData : public QObject
     void idChanged(int id);
 
   protected:
-    virtual void parseMetaData(int mdt, QJsonDocument * jsonDoc) = 0;
+    void setModels(RepoRawItemModel * itemModel, RepoFilteredItemModel * filteredItemModel);
 
     virtual int getSetId() = 0;
     void setId(int id) { m_id = id; }
@@ -43,8 +43,6 @@ class RepoMetaData : public QObject
 
     int getSetId(int row);
     int getSetId(QVariant value, Qt::MatchFlags flags = Qt::MatchExactly, int role = Qt::DisplayRole);
-
-    void setModels(RepoRawItemModel * itemModel, RepoFilteredItemModel * filteredItemModel);
 
     int count() { return m_filteredItemModel->rows(); }
     QStringList list() { return m_filteredItemModel->list(); }

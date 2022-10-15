@@ -31,7 +31,7 @@ enum RepoMetaDataType {
   RMDT_Release,
   RMDT_Releases,
   RMDT_Asset,
-  RMDT_ReleaseAssets
+  RMDT_Assets
 };
 
 QString repoMetaDataTypeToString(RepoMetaDataType val);
@@ -57,6 +57,9 @@ class RepoRawItemModel : public QStandardItemModel
     virtual ~RepoRawItemModel() {}
 
     virtual void parseMetaData(const int mdt, QJsonDocument * json) = 0;
+    virtual void parseJsonObject(const QJsonObject & obj) = 0;
+    virtual void parseOne() = 0;
+    virtual void parseAll() = 0;
 
     QString modelName() { return m_modelName; }
 

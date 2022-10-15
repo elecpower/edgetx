@@ -36,16 +36,16 @@ class AssetsRawItemModel : public RepoRawItemModel
     virtual ~AssetsRawItemModel() {}
 
     virtual void parseMetaData(const int mdt, QJsonDocument * json);
-
-  private:
-    bool m_refreshRequired;
+    virtual void parseJsonObject(const QJsonObject & obj);
+    virtual void parseOne();
+    virtual void parseAll();
 
     virtual bool isAvailable(QStandardItem * item) {}
     virtual void setDynamicItemData(QStandardItem * item) {}
 
-    void parseAsset();
-    void parseReleaseAssets();
-    void parseJsonObject(const QJsonObject & obj);
+  private:
+    bool m_refreshRequired;
+
 };
 
 class AssetsFilteredItemModel : public RepoFilteredItemModel

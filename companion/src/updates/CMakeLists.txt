@@ -4,7 +4,7 @@ set(updates_NAMES
   updates
   updatesdialog
   updateoptionsdialog
-  network
+  reponetwork
   repodatamodels
   repometadata
   reporeleases

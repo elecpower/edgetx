@@ -23,11 +23,12 @@
 
 #include "reporeleases.h"
 #include "repoassets.h"
+#include "reponetwork.h"
 
 #include <QtCore>
 
-constexpr char GITHUB_API_REPOS[]             {"https://api.github.com/repos"};
-constexpr char GH_REPOS_EDGETX[]              {"https://api.github.com/repos/EdgeTX"};
+constexpr char GH_API_REPOS[]                 {"https://api.github.com/repos"};
+constexpr char GH_API_REPOS_EDGETX[]          {"https://api.github.com/repos/EdgeTX"};
 
 constexpr char GH_ACCEPT_HEADER_BINARY[]      {"application/octet-stream"};
 constexpr char GH_ACCEPT_HEADER_METADATA[]    {"application/vnd.github.v3+json"};
@@ -44,8 +45,6 @@ class RepoMetaData : public QObject
     ReleasesMetaData *releases;
     AssetsMetaData *assets;
 
-    const QString urlReleases() { return QString("%1/releases").arg(m_repo); }
-    const QString urlReleaseLatest() { return QString("%1/latest").arg(urlReleases()); }
     const QString urlContent(const QString & path) { return QString("%1/contents/%2").arg(m_repo).arg(path); }
 
   protected:

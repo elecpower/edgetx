@@ -49,10 +49,10 @@ void ReleasesRawItemModel::parseMetaData(const int mdt, QJsonDocument * jsonDoc)
 
   switch (mdt) {
     case RMDT_Release:
-      parseRelease();
+      parseOne();
       break;
     case RMDT_Releases:
-      parseReleases();
+      parseAll();
       break;
     default;
       qDebug() << "Unexpected meta data type" << repoMetaDataTypeToString(mdt);
@@ -60,7 +60,7 @@ void ReleasesRawItemModel::parseMetaData(const int mdt, QJsonDocument * jsonDoc)
   }
 }
 
-void ReleasesRawItemModel::parseRelease()
+void ReleasesRawItemModel::parseOne()
 {
   clear();
 
@@ -70,7 +70,7 @@ void ReleasesRawItemModel::parseRelease()
   }
 }
 
-void ReleasesRawItemModel::parseReleases()
+void ReleasesRawItemModel::parseAll()
 {
   clear();
 
