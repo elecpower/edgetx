@@ -47,7 +47,7 @@ class RepoMetaData : public QObject
     int count() { return m_filteredItemModel->rows(); }
     QStringList list() { return m_filteredItemModel->list(); }
 
-    QString date() { return m_id ? m_filteredItemModel->date(m_id); }
+    QString date() { return m_id ? m_filteredItemModel->date(m_id) : "";}
     QString name() { return m_id ? m_filteredItemModel->name(m_id) : ""; }
     QString version() { return m_id ? m_filteredItemModel->version(m_id) : "0.0"; }
 
