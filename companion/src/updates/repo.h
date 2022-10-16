@@ -44,6 +44,7 @@ class RepoMetaData : public QObject
 
     ReleasesMetaData *releases;
     AssetsMetaData *assets;
+    RepoNetwork *network;   //  private??????
 
     const QString urlContent(const QString & path) { return QString("%1/contents/%2").arg(m_repo).arg(path); }
 
@@ -51,5 +52,4 @@ class RepoMetaData : public QObject
     QString m_repo;
     int m_currentReleaseId;
     int m_currentAssetId;
-
 };

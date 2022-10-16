@@ -1,6 +1,7 @@
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 set(updates_NAMES
+  updatehelpers
   updates
   updatesdialog
   updateoptionsdialog

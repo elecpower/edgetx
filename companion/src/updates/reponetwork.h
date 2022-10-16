@@ -41,7 +41,7 @@ class RepoNetwork : public QObject
     };
     Q_ENUM(DownloadDataType)
 
-    explicit RepoNetwork(QObject * parent);
+    explicit RepoNetwork(QObject * parent, ProgressWidget * progress);
     virtual ~RepoNetwork();
 
     void download(const DownloadDataType type, const int subtype, const QString & urlStr, const char * header, const QString & filePath);
@@ -50,11 +50,13 @@ class RepoNetwork : public QObject
     void onDownloadFinished(QNetworkReply * reply, DownloadDataType ddt, int subtype);
 
   private:
+    ProgressWidget *progress;
     QNetworkAccessManager manager;
     QNetworkRequest request;
     QNetworkReply *reply;
     QByteArray *buffer;
     QFile *file;
     QUrl url;
-    ProgressWidget *progress;
+
+    static QString downloadDataTypeToString(DownloadDataType val);
 };

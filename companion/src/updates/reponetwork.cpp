@@ -20,13 +20,15 @@
  */
 
 #include "reponetwork.h"
+#include "updatehelpers.h"
 #include "constants.h"
 
 #include <QMessageBox>
 #include <QtNetwork/QNetworkProxyFactory>
 
-RepoNetwork::RepoNetwork(QWidget * parent) :
-  QWidget(parent),
+RepoNetwork::RepoNetwork(QObject * parent, ProgressWidget * progress) :
+  QObject(parent),
+  progress(progress),
   reply(nullptr),
   buffer(new QByteArray()),
   file(nullptr)
@@ -43,6 +45,21 @@ RepoNetwork::~RepoNetwork()
     delete file;
 }
 
+//  static
+QString RepoNetwork::downloadDataTypeToString(DownloadDataType val)
+{
+  switch ((int)val) {
+    case DDT_Binary:
+      return "Binary";
+    case DDT_Content:
+      return "Content";
+    case DDT_MetaData:
+      return "Meta Data";
+    default:
+      return CPN_STR_UNKNOWN_ITEM;
+  }
+}
+
 bool RepoNetwork::download(const DownloadDataType type, const int subtype, const QString & urlStr,
                                const char * header, const QString & filePath)
 {
@@ -57,7 +74,7 @@ bool RepoNetwork::download(const DownloadDataType type, const int subtype, const
   if (type == DDT_SaveToFile) {
     file = new QFile(filePath);
     if (!file->open(QIODevice::WriteOnly)) {
-      QMessageBox::critical(nullptr, CPN_STR_APP_NAME, tr("Unable to open the download file %1 for writing.\nError: %2").arg(filePath).arg(file->errorString()));
+      UpdateHelpers::criticalMsg(progress, tr("Unable to open the download file %1 for writing.\nError: %2").arg(filePath).arg(file->errorString()));
       return false;
     }
   }
@@ -67,11 +84,11 @@ bool RepoNetwork::download(const DownloadDataType type, const int subtype, const
   url.setUrl(urlStr);
 
   if (!url.isValid()) {
-    QMessageBox::critical(nullptr, CPN_STR_APP_NAME, tr("Invalid URL: %1").arg(urlStr));
+    UpdateHelpers::criticalMsg(progress, tr("Invalid URL: %1").arg(urlStr));
     return false;
   }
   else
-    QMessageBox::critical(nullptr, CPN_STR_APP_NAME, tr("URL: %1").arg(urlStr));
+    UpdateHelpers::criticalMsg(progress, tr("URL: %1").arg(urlStr));
 
   request.setUrl(url);
   request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferNetwork);
@@ -83,7 +100,7 @@ bool RepoNetwork::download(const DownloadDataType type, const int subtype, const
 
   connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), [=] (QNetworkReply::NetworkError code) {
     //  leave it to the finished slot to deal with error condition
-    QMessageBox::critical(nullptr, CPN_STR_APP_NAME, tr("Network error has occurred. Error code: %1").arg(code));
+    UpdateHelpers::criticalMsg(progress, tr("Network error has occurred. Error code: %1").arg(code));
   });
 
   connect(reply, &QNetworkReply::readyRead, [=]() {
@@ -125,7 +142,7 @@ void RepoNetwork::onDownloadFinished(QNetworkReply * reply, DownloadDataType typ
     progress->setValue(progress->maximum());
 
   if (reply->error()) {
-    QMessageBox::critical(nullptr, CPN_STR_APP_NAME, tr("Unable to download %1.\nError:%2\n%3").arg(downloadDataTypeToString(type)).arg(reply->error()).arg(reply->errorString()));
+    UpdateHelpers::criticalMsg(progress, tr("Unable to download %1.\nError:%2\n%3").arg(downloadDataTypeToString(type)).arg(reply->error()).arg(reply->errorString()));
 
     if (type == DDT_SaveToFile) {
       file->remove();
@@ -181,7 +198,7 @@ bool RepoNetwork::convertDownloadToJson(QJsonDocument * json)
   *json = QJsonDocument::fromJson(*buffer, &res);
 
   if (res.error || json->isNull()) {
-    reportProgress(tr("Unable to convert downloaded data to json format.\nError:%1\n%2").arg(res.error).arg(res.errorString()), QtCriticalMsg);
+    UpdateHelpers::criticalMsg(progress, tr("Unable to convert downloaded data to json format.\nError:%1\n%2").arg(res.error).arg(res.errorString()), QtCriticalMsg);
     return false;
   }
 

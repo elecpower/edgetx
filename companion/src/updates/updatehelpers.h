@@ -19,28 +19,22 @@
  * GNU General Public License for more details.
  */
 
-#include "repo.h"
+#pragma once
 
-RepoMetaData::RepoMetaData(QObject * parent) :
-  QObject(parent)
+#include "progresswidget.h"
+
+#include <QtCore>
+
+class UpdateHelpers : QObject
 {
-  releases = new ReleasesMetaData(this);
-  assets = new AssetsMetaData(this);
-  network = new RepoNetwork(this);
+    QOBJECT
 
-  connect(releases, &RepoMetaData::idChanged, [=](const int id) {
-    m_currentReleaseId = id;
-    assets->setReleaseId(id);
-  });
+  public:
+    UpdateHelpers() = default;
+    virtual ~UpdateHelpers() = default;
 
-  connect(assets, &RepoMetaData::idChanged, [=](const int id) {
-    m_currentAssetId = id;
-  });
-}
-
-RepoMetaData::~RepoMetaData()
-{
-  delete releases;
-  delete assets;
-  delete network;
-}
+    static QString semanticVersion(QString version);
+    static void reportProgress(ProgressWidget * progress, QString & text, int type = QtInfoMsg);
+    static void progressMessage(ProgressWidget * progress, QString & text);
+    static void criticalMsg(ProgressWidget * progress, QString & msg);
+};

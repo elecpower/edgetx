@@ -22,6 +22,7 @@
 #include "updateinterface.h"
 #include "minizinterface.h"
 #include "helpers.h"
+#include "updatehelpers.h"
 #include "updatefirmware.h"
 #include "updatecompanion.h"
 #include "updatesdcard.h"
@@ -122,8 +123,7 @@ UpdateInterface::UpdateInterface(QWidget * parent) :
 {
   QNetworkProxyFactory::setUseSystemConfiguration(true);
 
-  releases = new ReleasesMetaData(this);
-  assets = new AssetsMetaData(this);
+  repo = new RepoMetaData(this);
   params = new UpdateParameters(this);
 }
 
@@ -222,45 +222,45 @@ bool UpdateInterface::update(ProgressWidget * progress)
     progress->setMaximum(100);
   }
 
-  reportProgress(tr("Processing updates for: %1").arg(m_name), QtInfoMsg);
+  UpdateHelpers::reportProgress(progress, tr("Processing updates for: %1").arg(m_name), QtInfoMsg);
 
   if (!preparation()) {
-    reportProgress(tr("%1 preparation failed").arg(m_name), QtCriticalMsg);
+    UpdateHelpers::reportProgress(progress, tr("%1 preparation failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
   if (!download()) {
-    reportProgress(tr("%1 download failed").arg(m_name), QtCriticalMsg);
+    UpdateHelpers::reportProgress(progress, tr("%1 download failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
   if (!decompress()) {
-    reportProgress(tr("%1 decompress failed").arg(m_name), QtCriticalMsg);
+    UpdateHelpers::reportProgress(progress, tr("%1 decompress failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
   if (!copyToDestination()) {
-    reportProgress(tr("%1 copy to destination failed").arg(m_name), QtCriticalMsg);
+    UpdateHelpers::reportProgress(progress, tr("%1 copy to destination failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
   //  perform before async install in case Companion restarted
   if (!saveReleaseSettings()) {
-    reportProgress(tr("Failed to save release settings"), QtDebugMsg);
+    UpdateHelpers::reportProgress(progress, tr("Failed to save release settings"), QtDebugMsg);
     return false;
   }
 
   if (!asyncInstall()) {
-    reportProgress(tr("%1 start async failed").arg(m_name), QtCriticalMsg);
+    UpdateHelpers::reportProgress(progress, tr("%1 start async failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
   if (!housekeeping()) {
-    reportProgress(tr("%1 housekeeping failed").arg(m_name), QtCriticalMsg);
+    UpdateHelpers::reportProgress(progress, tr("%1 housekeeping failed").arg(m_name), QtCriticalMsg);
     return false;
   }
 
-  reportProgress(tr("%1 update successful").arg(m_name), QtInfoMsg);
+  UpdateHelpers::reportProgress(progress, tr("%1 update successful").arg(m_name), QtInfoMsg);
 
   if (!progress)
     QMessageBox::information(progress, CPN_STR_APP_NAME, tr("%1 update successful").arg(m_name));
@@ -299,61 +299,6 @@ QString UpdateInterface::updateFlagsToString(UpdateFlags val)
     default:
       return CPN_STR_UNKNOWN_ITEM;
   }
-}
-
-//  static
-QString UpdateInterface::downloadDataTypeToString(DownloadDataType val)
-{
-  switch ((int)val) {
-    case DDT_Binary:
-      return "Binary";
-    case DDT_Content:
-      return "Content";
-    case DDT_MetaData:
-      return "Meta Data";
-    default:
-      return CPN_STR_UNKNOWN_ITEM;
-  }
-}
-
-//  static
-QString UpdateInterface::semanticVersion(QString version)
-{
-  QStringList strl = version.split(".");
-
-  while (strl.count() < 4) {
-    strl.append("0");
-  }
-
-  return strl.join(".");
-}
-
-void UpdateInterface::reportProgress(const QString & text, const int type)
-{
-  if (params->logLevel == QtDebugMsg ||
-     (params->logLevel == QtInfoMsg && type > QtDebugMsg) ||
-     (type < QtInfoMsg && type >= params->logLevel)) {
-    if (progress)
-      progress->addMessage(text, type);
-    else
-      qDebug() << text;
-  }
-
-  if (type == QtCriticalMsg || type == QtFatalMsg)
-    criticalMsg(text);
-}
-
-void UpdateInterface::progressMessage(const QString & text)
-{
-  if (progress)
-    progress->setInfo(text);
-  else
-    qDebug() << text;
-}
-
-void UpdateInterface::criticalMsg(const QString & msg)
-{
-  QMessageBox::critical(progress, tr("Update Interface"), msg);
 }
 
 bool UpdateInterface::isUpdateable()
@@ -493,8 +438,8 @@ const bool UpdateInterface::isUpdateAvailable()
 
 const bool UpdateInterface::isLatestVersion(const QString & installed, const QString & latest)
 {
-  QStringList a = semanticVersion(installed).split(".");
-  QStringList b = semanticVersion(latest).split(".");
+  QStringList a = UpdateHelpers::semanticVersion(installed).split(".");
+  QStringList b = UpdateHelpers::semanticVersion(latest).split(".");
 
   // not equal comparision used to force update if client upgraded and the release is subsequently withdrawn or subscribed to nightlies
   for (int i = 0; i < 4; i++) {

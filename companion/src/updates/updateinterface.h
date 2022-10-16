@@ -21,14 +21,12 @@
 
 #pragma once
 
-#include "repomodels.h"
+#include "repo.h"
 #include "constants.h"
 #include "progresswidget.h"
 #include "appdata.h"
 
 #include <QtCore>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
 
 class UpdateParameters : public QObject
 {
@@ -87,14 +85,6 @@ class UpdateInterface : public QWidget
 
   public:
 
-    enum DownloadDataType {
-      DDT_Binary,
-      DDT_Content,
-      DDT_SaveToFile,
-      DDT_MetaData,
-    };
-    Q_ENUM(DownloadDataType)
-
     enum UpdateFlags {
       UPDFLG_None            = 0,
       UPDFLG_Update          = 1 << 1,
@@ -137,8 +127,7 @@ class UpdateInterface : public QWidget
   protected:
     friend class UpdateFactories;
 
-    ReleasesMetaData *releases;
-    AssetsMetaData *assets;
+    RepoMetaData *repo;
     UpdateParameters *params;
     ProgressWidget *progress;
 
@@ -216,10 +205,6 @@ class UpdateInterface : public QWidget
 
     bool getRepoJsonFile(const QString filename, QJsonDocument * json);
 
-    void reportProgress(const QString & text, const int type = QtInfoMsg);
-    void progressMessage(const QString & text);
-    void criticalMsg(const QString & msg);
-    static QString downloadDataTypeToString(DownloadDataType val);
     static QString updateFlagsToString(UpdateFlags val);
     void setFlavourLanguage();
     bool isValidSettingsIndex() { return m_id > -1 && m_id < MAX_COMPONENTS; }
@@ -238,8 +223,6 @@ class UpdateInterface : public QWidget
     QString m_name;
 
     bool downloadSuccess;
-
-    static QString semanticVersion(QString version);
 
     void initAppSettings();
     bool setRunFolders();
