@@ -263,7 +263,7 @@ void SDCardSelectPage::initializePage()
 
   QRegularExpression deviceIncl("^([d-z]:|/(dev|media)/)", QRegularExpression::CaseInsensitiveOption);  //  possible devices
   QRegularExpression rootPathExcl("^/boot/", QRegularExpression::CaseInsensitiveOption);  //  exclusions
-  QRegularExpression fstIncl("^(fat32|vfat|msdos)", QRegularExpression::CaseInsensitiveOption);  // Win: "FAT32"; Linux: "vfat"; macOS: "msdos"
+  QRegularExpression fstIncl("^(fat32|vfat|msdos|lifs)", QRegularExpression::CaseInsensitiveOption);  // Win: "FAT32"; Linux: "vfat"; macOS: "msdos" and "lifs"
 
   foreach(const QStorageInfo & si, QStorageInfo::mountedVolumes()) {
     //qDebug() << si.rootPath() << si.name() << si.device() << si.displayName() << si.fileSystemType() << si.isReady() << si.isReadOnly() << si.bytesTotal();
