@@ -1429,7 +1429,7 @@ UpdateInterface * UpdateFactories::interface(const int id)
 
 const QString UpdateFactories::name(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     return iface->name();
 
@@ -1438,14 +1438,14 @@ const QString UpdateFactories::name(const int id)
 
 void UpdateFactories::saveAssetSettings(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     iface->saveAssetSettings();
 }
 
 UpdateParameters * const UpdateFactories::getParams(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     return iface->getParams();
 
@@ -1454,7 +1454,7 @@ UpdateParameters * const UpdateFactories::getParams(const int id)
 
 void UpdateFactories::resetEnvironment(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     iface->resetEnvironment();
 }
@@ -1468,7 +1468,7 @@ void UpdateFactories::resetAllEnvironments()
 
 void UpdateFactories::setRunUpdate(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     iface->setRunUpdate();
 }
@@ -1488,28 +1488,28 @@ const QMap<QString, int> UpdateFactories::sortedComponentsList(bool updateableOn
 
 void UpdateFactories::clearRelease(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     iface->clearRelease();
 }
 
 void UpdateFactories::setReleaseChannel(const int id, int channel)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     iface->setReleaseChannel(channel);
 }
 
 void UpdateFactories::setReleaseId(const int id, QString val)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     iface->setReleaseId(val);
 }
 
 const QString UpdateFactories::currentRelease(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     return iface->currentRelease();
 
@@ -1518,7 +1518,7 @@ const QString UpdateFactories::currentRelease(const int id)
 
 const QString UpdateFactories::updateRelease(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     return iface->updateRelease();
 
@@ -1527,7 +1527,7 @@ const QString UpdateFactories::updateRelease(const int id)
 
 const bool UpdateFactories::isLatestRelease(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     return iface->isLatestRelease();
 
@@ -1536,7 +1536,7 @@ const bool UpdateFactories::isLatestRelease(const int id)
 
 const QString UpdateFactories::latestRelease(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     return iface->latestRelease();
 
@@ -1545,7 +1545,7 @@ const QString UpdateFactories::latestRelease(const int id)
 
 const QStringList UpdateFactories::releases(const int id)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     return iface->getReleases();
 
@@ -1554,7 +1554,7 @@ const QStringList UpdateFactories::releases(const int id)
 
 bool UpdateFactories::update(const int id, ProgressWidget * progress)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     return iface->update(progress);
 
@@ -1592,7 +1592,7 @@ const bool UpdateFactories::isUpdateAvailable(QMap<QString, int> & list)
 
 bool UpdateFactories::getReleaseJsonAsset(const int id, const QString assetName, QJsonDocument * json)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     return iface->getReleaseJsonAsset(assetName, json);
 
@@ -1601,7 +1601,7 @@ bool UpdateFactories::getReleaseJsonAsset(const int id, const QString assetName,
 
 bool UpdateFactories::getRepoJsonFile(const int id, const QString filename, QJsonDocument * json)
 {
-  UpdateInterface * iface = interface(id);
+  UpdateInterface * iface = getInstance(id);
   if (iface)
     return iface->getRepoJsonFile(filename, json);
 

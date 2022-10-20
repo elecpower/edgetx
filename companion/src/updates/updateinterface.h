@@ -304,5 +304,5 @@ class UpdateFactories : public QWidget
   private:
     QVector<UpdateFactoryInterface *> registeredUpdateFactories;
 
-    UpdateInterface * interface(const int id);
+    UpdateInterface * getInstance(const int id);
 };
