@@ -26,8 +26,8 @@ foreach(name ${generaledit_NAMES})
   set(generaledit_UIS  ${generaledit_UIS}  ${name}.ui)
 endforeach()
 
-qt5_wrap_ui(generaledit_SRCS ${generaledit_UIS})
-qt5_wrap_cpp(generaledit_SRCS ${generaledit_HDRS})
+qt_wrap_ui(generaledit_SRCS ${generaledit_UIS})
+qt_wrap_cpp(generaledit_SRCS ${generaledit_HDRS})
 
 add_library(generaledit ${generaledit_SRCS})
-target_link_libraries(generaledit PRIVATE datamodels ${CPN_COMMON_LIB} Qt5::Multimedia)
+target_link_libraries(generaledit PRIVATE datamodels ${CPN_COMMON_LIB} Qt::Multimedia)

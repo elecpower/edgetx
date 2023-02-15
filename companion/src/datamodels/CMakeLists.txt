@@ -9,7 +9,7 @@ set(datamodels_HDRS
   filtereditemmodels.h
 )
 
-qt5_wrap_cpp(datamodels_SRCS ${datamodels_HDRS})
+qt_wrap_cpp(datamodels_SRCS ${datamodels_HDRS})
 
 add_library(datamodels ${datamodels_SRCS} ${datamodels_HDRS})
 target_link_libraries(datamodels PRIVATE ${CPN_COMMON_LIB})

@@ -34,7 +34,7 @@ foreach(name ${storage_NAMES})
   set(storage_HDRS ${storage_HDRS} ${name}.h)
 endforeach()
 
-qt5_wrap_cpp(storage_SRCS ${storage_MOC_HDRS})
+qt_wrap_cpp(storage_SRCS ${storage_MOC_HDRS})
 
 add_library(storage ${storage_SRCS} ${storage_HDRS})
 target_link_libraries(storage PRIVATE miniz ${CPN_COMMON_LIB})

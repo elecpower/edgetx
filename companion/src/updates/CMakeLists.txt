@@ -35,8 +35,8 @@ set(updates_QTS
   chooserdialog.h
 )
 
-qt5_wrap_ui(updates_SRCS ${updates_UIS})
-qt5_wrap_cpp(updates_SRCS ${updates_QTS})
+qt_wrap_ui(updates_SRCS ${updates_UIS})
+qt_wrap_cpp(updates_SRCS ${updates_QTS})
 
 add_library(updates ${updates_SRCS} ${updates_HDRS})
 target_link_libraries(updates PRIVATE ${CPN_COMMON_LIB})

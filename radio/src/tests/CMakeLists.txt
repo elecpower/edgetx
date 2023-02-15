@@ -1,6 +1,6 @@
 
 
-if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt5Widgets_FOUND)
+if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt6Widgets_FOUND)  # prefer Qt${QT_VERSION_MAJOR}Widgets_FOUND but variable not set yet
   add_library(gtests-radio-lib STATIC EXCLUDE_FROM_ALL ${GTEST_SRCDIR}/src/gtest-all.cc )
   target_include_directories(gtests-radio-lib PUBLIC ${GTEST_INCDIR} ${GTEST_INCDIR}/gtest ${GTEST_SRCDIR})
   set(TESTS_PATH ${RADIO_SRC_DIR}/tests)
@@ -9,7 +9,6 @@ if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt5Widgets_FOUND)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_DEBUG} -O0 -fsanitize=address")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_DEBUG} -O0 ${WARNING_FLAGS} -fsanitize=address")
-  use_cxx11()  # ensure gnu++11 in CXX_FLAGS with CMake < 3.1
 
   if(PCB STREQUAL X12S OR PCB STREQUAL X10)
 
@@ -28,7 +27,7 @@ if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt5Widgets_FOUND)
       set(HORUS_MODEL_FILES ${HORUS_MODEL_FILES} ${model_file}_files)
     endforeach()
   endif()
-  
+
   if(WIN32)
     target_include_directories(gtests-radio-lib PUBLIC ${WIN_INCLUDE_DIRS})
     target_link_libraries(gtests-radio-lib PRIVATE ${WIN_LINK_LIBRARIES})
@@ -60,8 +59,8 @@ if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt5Widgets_FOUND)
   if(PCB STREQUAL X12S OR PCB STREQUAL X10)
     add_dependencies(gtests-radio ${HORUS_MODEL_FILES})
   endif()
-  target_link_libraries(gtests-radio gtests-radio-lib pthread Qt5::Core Qt5::Widgets)
+  target_link_libraries(gtests-radio gtests-radio-lib pthread Qt::Core Qt::Widgets)
   message(STATUS "Added optional gtests target")
 else()
-  message(WARNING "WARNING: gtests target will not be available (check that GTEST_INCDIR, GTEST_SRCDIR, and Qt5Widgets are configured).")
+  message(WARNING "WARNING: gtests target will not be available (check that GTEST_INCDIR, GTEST_SRCDIR, and Qt6Widgets are configured).")
 endif()

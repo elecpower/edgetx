@@ -1,24 +1,28 @@
-if(APPLE AND EXISTS /usr/local/opt/qt5)
-	# Homebrew installs Qt5 (up to at least 5.9.1) in
-	# /usr/local/qt5, ensure it can be found by CMake since
+if(APPLE AND EXISTS /usr/local/opt/qt6)
+	# Homebrew installs Qt6 (up to at least 6.4.2) in
+	# /usr/local/qt6, ensure it can be found by CMake since
 	# it is not in the default /usr/local prefix.
-	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt5")
+	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt6")
 endif()
 
-find_package(Qt5Core)
-find_package(Qt5Widgets)
-find_package(Qt5Xml)
-find_package(Qt5LinguistTools)
-find_package(Qt5PrintSupport)
-find_package(Qt5Multimedia)
-find_package(Qt5Svg)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
-if(Qt5Core_FOUND)
-  message(STATUS "Qt Version: ${Qt5Core_VERSION}")
+if(Qt${QT_VERSION_MAJOR}Core_FOUND)
+  message(STATUS "Qt Version: ${Qt${QT_VERSION_MAJOR}Core_VERSION}")
+
+  qt_standard_project_setup()
+
+  find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+  find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Xml)
+  find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS LinguistTools)
+  find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS PrintSupport)
+  find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Multimedia)
+  find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Svg)
 
   ### Get locations of Qt binary executables & libs (libs are for distros, not for linking)
   # first set up some hints
-  get_target_property(QtCore_LOCATION Qt5::Core LOCATION)
+  get_target_property(QtCore_LOCATION Qt${QT_VERSION_MAJOR}::Core LOCATION)
   get_filename_component(qt_core_path ${QtCore_LOCATION} PATH)
   if(APPLE)
     get_filename_component(qt_core_path "${qt_core_path}/.." ABSOLUTE)

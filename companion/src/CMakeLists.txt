@@ -78,7 +78,9 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS}")
 
-use_cxx11()  # ensure gnu++11 in CXX_FLAGS with CMake < 3.1
+#use_cxx11()  # ensure gnu++11 in CXX_FLAGS with CMake < 3.1
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(
   ${CMAKE_BINARY_DIR}
@@ -107,7 +109,7 @@ foreach(language ${LANGUAGES})
   list(APPEND companion_TS translations/companion_${language}.ts)
 endforeach(language)
 # .ts -> .qm
-qt5_add_translation(companion_QM ${companion_TS})
+qt_add_translation(companion_QM ${companion_TS})
 
 # add Qt translations if found
 if(QT_TRANSLATIONS_DIR)
@@ -161,8 +163,8 @@ set(common_RESOURCES
   ${TRANSLATIONS_QRC}
   )
 
-qt5_wrap_cpp(common_SRCS ${common_MOC_HDRS})
-qt5_add_resources(common_RCC ${common_RESOURCES})
+qt_wrap_cpp(common_SRCS ${common_MOC_HDRS})
+qt_add_resources(common_RCC ${common_RESOURCES})
 
 add_library(common ${common_SRCS} ${common_RCC})
 
@@ -171,9 +173,9 @@ target_link_libraries(common
   storage
   simulation
   maxLibQtWidgets
-  Qt5::Core
-  Qt5::Xml
-  Qt5::Widgets
+  Qt::Core
+  Qt::Xml
+  Qt::Widgets
   ${PTHREAD_LIBRARY}
   ${SDL_LIBRARY}
   ${WIN_LINK_LIBRARIES}
@@ -288,8 +290,8 @@ if(WIN32)
   set(icon_RC images/winicons/icon.rc)
 endif()
 
-qt5_wrap_ui(companion_SRCS ${companion_UIS})
-qt5_wrap_cpp(companion_SRCS ${companion_MOC_HDRS})
+qt_wrap_ui(companion_SRCS ${companion_UIS})
+qt_wrap_cpp(companion_SRCS ${companion_MOC_HDRS})
 
 add_executable(${COMPANION_NAME} MACOSX_BUNDLE ${WIN_EXECUTABLE_TYPE} ${companion_SRCS} ${icon_RC})
 target_link_libraries(${COMPANION_NAME} PRIVATE generaledit modeledit qcustomplot miniz shared updates ${CPN_COMMON_LIB})
@@ -463,7 +465,7 @@ string(TOLOWER "${CPACK_PACKAGE_NAME}" CPACK_PACKAGE_NAME_LOWERCASE)
 # very poor trace-backs from the users when they report Companion crash
 set(CPACK_STRIP_FILES FALSE)
 
-# Qt5 + Cmake + Mac is poorly documented. A lot of this is guesswork
+# Qt6 + Cmake + Mac is poorly documented. A lot of this is guesswork
 # and trial and error. Do not hesitate to fix it for the better
 IF(APPLE)
   set(plugin_dest_dir ${COMPANION_NAME}.app/Contents/Plugins)
@@ -498,7 +500,7 @@ IF(APPLE)
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/companion/targets/mac/qt_menu.nib DESTINATION "${companion_res_dir}" COMPONENT Runtime)
 
   # manually add the required plugins
-  foreach (plugin ${Qt5Multimedia_PLUGINS} ${Qt5PrintSupport_PLUGINS} ${Qt5Gui_PLUGINS} ${Qt5Svg_PLUGINS})
+  foreach (plugin ${Qt6Multimedia_PLUGINS} ${Qt6PrintSupport_PLUGINS} ${Qt6Gui_PLUGINS} ${Qt6Svg_PLUGINS})
     get_target_property(QPA_PLUGIN ${plugin} LOCATION)
     get_filename_component(QPA_PLUGIN_FILENAME ${QPA_PLUGIN} NAME)
     # Todo is there a nicer way to get the QT Plugin directory name?!
