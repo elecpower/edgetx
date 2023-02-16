@@ -17,8 +17,6 @@ if(Qt${QT_VERSION_MAJOR}Core_FOUND)
   set(CMAKE_AUTOMOC ON)
   set(CMAKE_AUTOUIC ON)
 
-  qt_standard_project_setup()
-
   find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
   find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Xml)
   find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS LinguistTools)
