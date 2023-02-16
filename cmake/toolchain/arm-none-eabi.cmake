@@ -2,6 +2,9 @@
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
+set(CMAKE_CXX_STANDARD 11)
+add_definitions(-D_GLIBCXX_USE_C99=1) # proper to_string definition
+
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 if(MINGW OR WIN32)

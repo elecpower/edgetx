@@ -289,7 +289,7 @@ if(WIN32)
 endif()
 
 qt_wrap_ui(companion_SRCS ${companion_UIS})
-qt_wrap_cpp(companion_SRCS ${companion_MOC_HDRS})
+#qt_wrap_cpp(companion_SRCS ${companion_MOC_HDRS})
 
 add_executable(${COMPANION_NAME} MACOSX_BUNDLE ${WIN_EXECUTABLE_TYPE} ${companion_SRCS} ${icon_RC})
 target_link_libraries(${COMPANION_NAME} PRIVATE generaledit modeledit qcustomplot miniz shared updates ${CPN_COMMON_LIB})
