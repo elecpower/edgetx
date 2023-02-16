@@ -1,15 +1,20 @@
-if(APPLE AND EXISTS /usr/local/opt/qt6)
-	# Homebrew installs Qt6 (up to at least 6.4.2) in
-	# /usr/local/qt6, ensure it can be found by CMake since
-	# it is not in the default /usr/local prefix.
-	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt6")
-endif()
 
-find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core)
+# Try Qt6 and if not found try Qt5
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
+# use versionless functions and targets from Qt5.15 onwards
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+
+if(APPLE AND EXISTS /usr/local/opt/qt${QT_VERSION_MAJOR})
+	# Homebrew installs Qt5 (up to at least 5.9.1) in
+	# /usr/local/qt5, ensure it can be found by CMake since
+	# it is not in the default /usr/local prefix.
+	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt${QT_VERSION_MAJOR}")
+endif()
 
 if(Qt${QT_VERSION_MAJOR}Core_FOUND)
   message(STATUS "Qt Version: ${Qt${QT_VERSION_MAJOR}Core_VERSION}")
+
+  set(CMAKE_AUTOMOC ON)
 
   qt_standard_project_setup()
 
