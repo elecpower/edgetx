@@ -31,9 +31,9 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   CMAKE_GENERATOR: "MSYS Makefiles"
-  QT_VERSION: "5.12.9"
-  MINGW_VERSION: "win64_mingw73"
-  MINGW_PATH: "mingw73_64"
+  QT_VERSION: "6.4.2"
+  MINGW_VERSION: "win64_mingw"
+  MINGW_PATH: "mingw_64"
 
 jobs:
   build:
@@ -81,6 +81,7 @@ jobs:
           version: ${{ env.QT_VERSION }}
           arch: ${{ env.MINGW_VERSION }}
           tools: 'tools_openssl_x64'
+          modules: 'qtmultimedia'
 
       - name: Check out the repo
         uses: actions/checkout@v3
