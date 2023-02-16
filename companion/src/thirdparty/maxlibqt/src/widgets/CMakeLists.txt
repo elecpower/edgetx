@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.1.0)
+c#make_minimum_required(VERSION 3.1.0)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt5Core)
-find_package(Qt5Widgets)
+#find_package(Qt5Core)
+#find_package(Qt5Widgets)
 
 project(maxLibQtWidgets)
 
@@ -30,7 +30,7 @@ set(HDRS
 )
 
 add_library(${PROJECT_NAME} ${SRCS} ${HDRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Widgets)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Core Qt::Widgets)
 target_compile_definitions(${PROJECT_NAME} PRIVATE QT_USE_QSTRINGBUILDER)
 
 # need to push this upstream
