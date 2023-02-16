@@ -144,7 +144,6 @@ endif()
 ############# Common lib ###############
 
 set(common_SRCS
-  appdebugmessagehandler.cpp
   customdebug.cpp
   helpers.cpp
   translations.cpp
@@ -153,7 +152,6 @@ set(common_SRCS
   )
 
 set(common_MOC_HDRS
-  appdebugmessagehandler.h
   helpers.h
   modeledit/node.h
   )
@@ -172,7 +170,7 @@ target_link_libraries(common
   firmwares
   storage
   simulation
-  maxLibQtWidgets
+  maxLibQt
   Qt::Core
   Qt::Xml
   Qt::Widgets
@@ -193,7 +191,7 @@ add_subdirectory(generaledit)
 add_subdirectory(simulation)
 add_subdirectory(storage)
 add_subdirectory(thirdparty/qcustomplot)
-add_subdirectory(thirdparty/maxlibqt/src/widgets)
+add_subdirectory(thirdparty/maxlibqt/src)
 add_subdirectory(thirdparty/miniz)
 add_subdirectory(updates)
 
