@@ -15,6 +15,7 @@ if(Qt${QT_VERSION_MAJOR}Core_FOUND)
   message(STATUS "Qt Version: ${Qt${QT_VERSION_MAJOR}Core_VERSION}")
 
   set(CMAKE_AUTOMOC ON)
+  set(CMAKE_AUTOUIC ON)
 
   qt_standard_project_setup()
 

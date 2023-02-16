@@ -17,7 +17,7 @@ set(HDRS
 	"${CMAKE_CURRENT_LIST_DIR}/AppDebugMessageHandler.h"
 )
 
-qt_wrap_cpp(SRCS ${HDRS})
+#qt_wrap_cpp(SRCS ${HDRS})
 
 add_library(${PROJECT_NAME} ${SRCS} ${HDRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Core)
