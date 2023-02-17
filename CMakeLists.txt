@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 project(EdgeTX)
 
 set(VERSION_MAJOR "2")
@@ -47,7 +47,7 @@ if(EdgeTX_SUPERBUILD)
 
   # Add explicit targets for triggering cmake in the external projects
   set_property(DIRECTORY PROPERTY EP_STEP_TARGETS configure clean)
-  
+
   # Native targets
   ExternalProject_Add(native
     SOURCE_DIR ${CMAKE_SOURCE_DIR}
