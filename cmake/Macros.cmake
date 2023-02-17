@@ -16,12 +16,6 @@ macro(git_id RESULT)
   endif()
 endmacro(git_id)
 
-macro(use_cxx11)
-  if (CMAKE_VERSION VERSION_LESS "3.1" AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set (CMAKE_CXX_FLAGS "--std=gnu++11 ${CMAKE_CXX_FLAGS}")
-  endif ()
-endmacro(use_cxx11)
-
 macro(PrintTargetReport targetName)
   if(CMAKE_CXX_COMPILER MATCHES "/(clang-)?cl\\.exe$")
     set(cpp_version ${CMAKE_CXX_COMPILER_VERSION})
@@ -80,7 +74,7 @@ function(GenerateDatacopy source output)
 
   set(GEN_DATACOPY_CMD
     ${PYTHON_EXECUTABLE} ${GEN_DATACOPY} ${GEN_DATACOPY_ARGS})
-  
+
   add_custom_command(
     OUTPUT ${output}
     COMMAND ${GEN_DATACOPY_CMD} > ${output}
