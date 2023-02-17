@@ -14,9 +14,6 @@ if(ARM_TOOLCHAIN_DIR)
   set(ARM_TOOLCHAIN_DIR "${ARM_TOOLCHAIN_DIR}/")
 endif()
 
-set(CMAKE_CXX_STANDARD 11)
-add_definitions(-D_GLIBCXX_USE_C99=1) # proper to_string definition
-
 set(CMAKE_AR           ${ARM_TOOLCHAIN_DIR}arm-none-eabi-ar${EXE_SUFFIX})
 set(CMAKE_ASM_COMPILER ${ARM_TOOLCHAIN_DIR}arm-none-eabi-gcc${EXE_SUFFIX})
 set(CMAKE_C_COMPILER   ${ARM_TOOLCHAIN_DIR}arm-none-eabi-gcc${EXE_SUFFIX})

@@ -1,3 +1,4 @@
+# Qt check performed for all targets as needed for radio and Companion gtests
 # try Qt6 and if not found try Qt5. The version found is stored in QT_VERSION_MAJOR and QT_VERSION_MINOR
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
