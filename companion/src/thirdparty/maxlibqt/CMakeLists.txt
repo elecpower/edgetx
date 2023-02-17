@@ -11,7 +11,7 @@ set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 set(DOC_DIR "${PROJECT_SOURCE_DIR}/doc")
 
 find_package(Qt5Core)
-if(Qt5Core_FOUND)
+if(Qt${QT_VERSION_MAJOR}Core_FOUND)
 	message(STATUS "Qt Version: ${Qt5Core_VERSION}")
 else()
 	message(FATAL_ERROR "Qt not found!")

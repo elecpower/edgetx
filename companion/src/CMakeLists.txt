@@ -108,7 +108,7 @@ foreach(language ${LANGUAGES})
   list(APPEND companion_TS translations/companion_${language}.ts)
 endforeach(language)
 # .ts -> .qm
-qt5_add_translation(companion_QM ${companion_TS})
+qt_add_translation(companion_QM ${companion_TS})
 
 # add Qt translations if found
 if(QT_TRANSLATIONS_DIR)
@@ -162,8 +162,8 @@ set(common_RESOURCES
   ${TRANSLATIONS_QRC}
   )
 
-qt5_wrap_cpp(common_SRCS ${common_MOC_HDRS})
-qt5_add_resources(common_RCC ${common_RESOURCES})
+qt_wrap_cpp(common_SRCS ${common_MOC_HDRS})
+qt_add_resources(common_RCC ${common_RESOURCES})
 
 add_library(common ${common_SRCS} ${common_RCC})
 
@@ -172,9 +172,9 @@ target_link_libraries(common
   storage
   simulation
   maxLibQtWidgets
-  Qt5::Core
-  Qt5::Xml
-  Qt5::Widgets
+  Qt::Core
+  Qt::Xml
+  Qt::Widgets
   ${PTHREAD_LIBRARY}
   ${SDL2_LIBRARIES}
   ${WIN_LINK_LIBRARIES}
@@ -289,8 +289,8 @@ if(WIN32)
   set(icon_RC images/winicons/icon.rc)
 endif()
 
-qt5_wrap_ui(companion_SRCS ${companion_UIS})
-qt5_wrap_cpp(companion_SRCS ${companion_MOC_HDRS})
+qt_wrap_ui(companion_SRCS ${companion_UIS})
+qt_wrap_cpp(companion_SRCS ${companion_MOC_HDRS})
 
 add_executable(${COMPANION_NAME} MACOSX_BUNDLE ${WIN_EXECUTABLE_TYPE} ${companion_SRCS} ${icon_RC})
 target_link_libraries(${COMPANION_NAME} PRIVATE generaledit modeledit qcustomplot miniz shared updates ${CPN_COMMON_LIB})

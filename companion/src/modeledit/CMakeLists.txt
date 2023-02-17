@@ -58,8 +58,8 @@ foreach(name ${modeledit_NAMES})
   set(modeledit_UIS  ${modeledit_UIS}  ${name}.ui)
 endforeach()
 
-qt5_wrap_ui(modeledit_SRCS ${modeledit_UIS})
-qt5_wrap_cpp(modeledit_SRCS ${modeledit_HDRS})
+qt_wrap_ui(modeledit_SRCS ${modeledit_UIS})
+qt_wrap_cpp(modeledit_SRCS ${modeledit_HDRS})
 
 add_library(modeledit ${modeledit_SRCS})
-target_link_libraries(modeledit PRIVATE datamodels ${CPN_COMMON_LIB} Qt5::Multimedia)
+target_link_libraries(modeledit PRIVATE datamodels ${CPN_COMMON_LIB} Qt::Multimedia)

@@ -39,4 +39,4 @@ add_executable(${PROJECT_NAME} ${HDRS} ${SRCS} ${RSRCS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE QT_USE_QSTRINGBUILDER)
 target_compile_definitions(${PROJECT_NAME} PRIVATE SOURCE_DIR="${PWD}")
-target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Svg)
+target_link_libraries(${PROJECT_NAME} Qt::Core Qt::Gui Qt::Widgets Qt::Svg)

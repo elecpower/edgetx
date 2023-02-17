@@ -1,6 +1,6 @@
 
 
-if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt5Widgets_FOUND)
+if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt${QT_VERSION_MAJOR}Widgets_FOUND)
   add_library(gtests-companion-lib STATIC EXCLUDE_FROM_ALL ${GTEST_SRCDIR}/src/gtest-all.cc )
   target_include_directories(gtests-companion-lib PUBLIC ${GTEST_INCDIR} ${GTEST_INCDIR}/gtest ${GTEST_SRCDIR})
   add_definitions(-DGTESTS)
@@ -25,5 +25,5 @@ if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt5Widgets_FOUND)
   target_link_libraries(gtests-companion gtests-companion-lib simulation firmwares storage common)
   message(STATUS "Added optional gtests-companion target")
 else()
-  message(WARNING "WARNING: gtests target will not be available (check that GTEST_INCDIR, GTEST_SRCDIR, and Qt5Widgets are configured).")
+  message(WARNING "WARNING: gtests target will not be available (check that GTEST_INCDIR, GTEST_SRCDIR, and Qt${QT_VERSION_MAJOR}Widgets are configured).")
 endif()
