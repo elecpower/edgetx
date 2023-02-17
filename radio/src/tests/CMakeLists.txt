@@ -1,6 +1,6 @@
 
 
-if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt6Widgets_FOUND)  # qt version needs to be a variable but unable to perform find_package higher up
+if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt${QT_VERSION_MAJOR}Widgets_FOUND)
   add_library(gtests-radio-lib STATIC EXCLUDE_FROM_ALL ${GTEST_SRCDIR}/src/gtest-all.cc )
   target_include_directories(gtests-radio-lib PUBLIC ${GTEST_INCDIR} ${GTEST_INCDIR}/gtest ${GTEST_SRCDIR})
   set(TESTS_PATH ${RADIO_SRC_DIR}/tests)
@@ -62,5 +62,5 @@ if(GTEST_INCDIR AND GTEST_SRCDIR AND Qt6Widgets_FOUND)  # qt version needs to be
   target_link_libraries(gtests-radio gtests-radio-lib pthread Qt::Core Qt::Widgets)
   message(STATUS "Added optional gtests target")
 else()
-  message(WARNING "WARNING: gtests target will not be available (check that GTEST_INCDIR, GTEST_SRCDIR, and Qt6Widgets are configured).")
+  message(WARNING "WARNING: gtests target will not be available (check that GTEST_INCDIR, GTEST_SRCDIR, and QtWidgets are configured).")
 endif()
