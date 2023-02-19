@@ -193,7 +193,7 @@ add_subdirectory(generaledit)
 add_subdirectory(simulation)
 add_subdirectory(storage)
 add_subdirectory(thirdparty/qcustomplot)
-add_subdirectory(thirdparty/maxlibqt/src)
+add_subdirectory(thirdparty/maxlibqt)
 add_subdirectory(thirdparty/miniz)
 add_subdirectory(updates)
 
