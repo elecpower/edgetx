@@ -68,6 +68,8 @@ LogsDialog::LogsDialog(QWidget *parent) :
   ui->customPlot->setNoAntialiasingOnDrag(true);
   ui->customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
 
+  axisRect = ui->customPlot->axisRect();
+
   // configure bottom axis to show time instead of number:
   QDateTime now = QDateTime::currentDateTime();
   QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
