@@ -61,15 +61,21 @@ if [[ $PAUSEAFTEREACHLINE == "true" ]]; then
   read
 fi
 
-echo "=== Step $((STEP++)): Installing Python package aqtinstall in version 1.2.5 ==="
-python -m pip install aqtinstall==1.2.5
+echo "=== Step $((STEP++)): Installing Python package aqtinstall ==="
+python -m pip install aqtinstall
 if [[ $PAUSEAFTEREACHLINE == "true" ]]; then
   echo "Step finished. Please check the output above and press Enter to continue or Ctrl+C to stop."
   read
 fi
 
 echo "=== Step $((STEP++)): Installing Qt build environment ==="
-python -m aqt install 5.12.9 windows desktop win64_mingw73
+python -m aqt install-qt windows desktop 5.15.2 win64_mingw81
+if [[ $PAUSEAFTEREACHLINE == "true" ]]; then
+  echo "Step finished. Please check the output above and press Enter to continue or Ctrl+C to stop."
+fi
+
+echo "=== Step $((STEP++)): Installing Qt tools ==="
+python -m aqt install-tool windows desktop tools_openssl_x64
 if [[ $PAUSEAFTEREACHLINE == "true" ]]; then
   echo "Step finished. Please check the output above and press Enter to continue or Ctrl+C to stop."
 fi
