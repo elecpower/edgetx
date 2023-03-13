@@ -41,14 +41,11 @@ GenericPanel::~GenericPanel()
 {
 }
 
-void GenericPanel::update()
-{
-}
+void GenericPanel::update() {}
 
-void GenericPanel::onAction(ToolbarMenuActions action)
-{
+void GenericPanel::activate() {}
 
-}
+void GenericPanel::onToolbarAction(ToolbarActions action) {}
 
 void GenericPanel::addLabel(QGridLayout *gridLayout, const QString &text, int col, bool minimize)
 {

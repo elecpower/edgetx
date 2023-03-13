@@ -53,7 +53,7 @@ ModelEdit::ModelEdit(QWidget * parent, RadioData & radioData, int modelId, Firmw
   setAttribute(Qt::WA_DeleteOnClose);
   restoreGeometry(g.modelEditGeo());
 
-  toolbarMenuSetup();
+  toolbarSetup();
   retranslateUi();
 
   GeneralSettings &generalSettings = radioData.generalSettings;
@@ -149,16 +149,17 @@ void ModelEdit::addTab(GenericPanel *panel, QString text)
   baseLayout->addWidget(area);
   ui->tabWidget->addTab(widget, text);
   connect(panel, &GenericPanel::modified, this, &ModelEdit::modified);
-  connect(panel, &GenericPanel::updateToolbarMenu, this, &ModelEdit::toolbarMenuUpdate);
-  connect(this, &ModelEdit::toolbarAction, panel, &GenericPanel::onAction);
+  connect(panel, &GenericPanel::updateToolbar, this, &ModelEdit::onToolbarUpdate);
+  connect(this, &ModelEdit::toolbarAction, panel, &GenericPanel::onToolbarAction);
 }
 
 void ModelEdit::onTabIndexChanged(int index)
 {
-  toolbarMenuUpdate(0); //  disable all buttons in case the new tab does not emit updateToolbarMenu
-
-  if (index < panels.size())
-    panels.at(index)->update();
+  if (index < panels.size()) {
+    onToolbarUpdate(0);               //  default disable all buttons
+    panels.at(index)->activate();
+    panels.at(index)->update();     //  depreciated
+  }
 }
 
 void ModelEdit::launchSimulation()
@@ -166,7 +167,7 @@ void ModelEdit::launchSimulation()
   startSimulation(this, radioData, modelId);
 }
 
-QAction * ModelEdit::addAct(ToolbarMenuActions actId, const QString & icon, const char * slot, const QKeySequence & shortcut, QObject * slotObj)
+QAction * ModelEdit::addAct(ToolbarActions actId, const QString & icon, const char * slot, const QKeySequence & shortcut, QObject * slotObj)
 {
   QAction * newAction = new QAction(this);
   newAction->setMenuRole(QAction::NoRole);
@@ -182,75 +183,75 @@ QAction * ModelEdit::addAct(ToolbarMenuActions actId, const QString & icon, cons
   return newAction;
 }
 
-void ModelEdit::toolbarMenuSetup()
+void ModelEdit::toolbarSetup()
 {
   foreach (QAction * act, action) {
     if (act)
       act->deleteLater();
   }
   action.clear();
-  action.fill(NULL, TBM_ACT_ENUM_END);
+  action.fill(nullptr, TB_ACT_ENUM_END);
 
-  addAct(TBM_ACT_COPY,     "copy.png",     SLOT(copy()),                    tr("Ctrl+Alt+C"));
-  addAct(TBM_ACT_PASTE,    "paste.png",    SLOT(paste()),                   tr("Ctrl+Alt+V"));
-  addAct(TBM_ACT_SIMULATE, "simulate.png", SLOT(launchSimulation()),        tr("Alt+Shift+S"));
+  addAct(TB_ACT_COPY,     "copy.png",     SLOT(copy()),                    tr("Ctrl+Alt+C"));
+  addAct(TB_ACT_PASTE,    "paste.png",    SLOT(paste()),                   tr("Ctrl+Alt+V"));
+  addAct(TB_ACT_SIMULATE, "simulate.png", SLOT(launchSimulation()),        tr("Alt+Shift+S"));
 
   QToolButton * btn;
   QSize tbIcnSz(16, 16);
   QString tbCss = "QToolBar {border: 1px solid palette(midlight);}";
 
-  if (toolbarMenu)
-    toolbarMenu->deleteLater();
+  if (toolbar)
+    toolbar->deleteLater();
 
-  toolbarMenu = new QToolBar(this);
-  toolbarMenu->setFloatable(false);
-  toolbarMenu->setIconSize(tbIcnSz);
-  toolbarMenu->setStyleSheet(tbCss);
-  toolbarMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  toolbarMenu->addAction(getAction(TBM_ACT_SIMULATE));
-  toolbarMenu->addSeparator();
-  toolbarMenu->addAction(getAction(TBM_ACT_COPY));
-  toolbarMenu->addAction(getAction(TBM_ACT_PASTE));
+  toolbar = new QToolBar(this);
+  toolbar->setFloatable(false);
+  toolbar->setIconSize(tbIcnSz);
+  toolbar->setStyleSheet(tbCss);
+  toolbar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  toolbar->addAction(getAction(TB_ACT_SIMULATE));
+  toolbar->addSeparator();
+  toolbar->addAction(getAction(TB_ACT_COPY));
+  toolbar->addAction(getAction(TB_ACT_PASTE));
 
-  if ((btn = qobject_cast<QToolButton *>(toolbarMenu->widgetForAction(action[TBM_ACT_SIMULATE])))) {
+  if ((btn = qobject_cast<QToolButton *>(toolbar->widgetForAction(action[TB_ACT_SIMULATE])))) {
     btn->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   }
 
-  ui->toolbarMenuLayout->addWidget(toolbarMenu);
+  ui->toolbarLayout->addWidget(toolbar);
 
 }
 
-void ModelEdit::toolbarMenuUpdate(int mask)
+void ModelEdit::onToolbarUpdate(int mask)
 {
-  mask |= TBM_MASK_SIMULATE; // always available
-  action[TBM_ACT_SIMULATE]->setEnabled(mask & TBM_MASK_SIMULATE);
-  action[TBM_ACT_COPY]->setEnabled(mask & TBM_MASK_COPY);
-  action[TBM_ACT_PASTE]->setEnabled(mask & TBM_MASK_PASTE);
+  mask |= TB_ACT_SIMULATE_MASK; // always available
+  action[TB_ACT_SIMULATE]->setEnabled(mask & TB_ACT_SIMULATE_MASK);
+  action[TB_ACT_COPY]->setEnabled(mask & TB_ACT_COPY_MASK);
+  action[TB_ACT_PASTE]->setEnabled(mask & TB_ACT_PASTE_MASK);
 }
 
 void ModelEdit::retranslateUi()
 {
-  action[TBM_ACT_COPY]->setText(tr("Copy"));
-  action[TBM_ACT_PASTE]->setText(tr("Paste"));
-  action[TBM_ACT_SIMULATE]->setText(tr("Simulate"));
+  action[TB_ACT_COPY]->setText(tr("Copy"));
+  action[TB_ACT_PASTE]->setText(tr("Paste"));
+  action[TB_ACT_SIMULATE]->setText(tr("Simulate"));
 }
 
-QAction * ModelEdit::getAction(const ToolbarMenuActions type)
+QAction * ModelEdit::getAction(const ToolbarActions type)
 {
-  if (type < TBM_ACT_ENUM_END)
+  if (type < TB_ACT_ENUM_END)
     return action[type];
   else
-    return NULL;
+    return nullptr;
 }
 
 void ModelEdit::copy()
 {
   qDebug() << "Trace";
-  emit toolbarAction(TBM_ACT_COPY);
+  emit toolbarAction(TB_ACT_COPY);
 }
 
 void ModelEdit::paste()
 {
   qDebug() << "Trace";
-  emit toolbarAction(TBM_ACT_PASTE);
+  emit toolbarAction(TB_ACT_PASTE);
 }

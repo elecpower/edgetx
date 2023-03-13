@@ -18,8 +18,7 @@
  * GNU General Public License for more details.
  */
 
-#ifndef _LOGICALSWITCHES_H_
-#define _LOGICALSWITCHES_H_
+#pragma once
 
 #include "modeledit.h"
 #include "radiodata.h"
@@ -38,8 +37,9 @@ class LogicalSwitchesPanel : public ModelPanel
     LogicalSwitchesPanel(QWidget *parent, ModelData & model, GeneralSettings & generalSettings, Firmware * firmware, CompoundItemModelFactory * sharedItemModels);
     virtual ~LogicalSwitchesPanel();
 
+    virtual void activate();
     virtual void update();
-    void onAction(ToolbarMenuActions action);
+    virtual void onToolbarAction(ToolbarActions action);
 
   private slots:
     void onFunctionChanged();
@@ -92,5 +92,3 @@ class LogicalSwitchesPanel : public ModelPanel
     void updateItemModels();
     void connectItemModelEvents(const FilteredItemModel * itemModel);
 };
-
-#endif // _LOGICALSWITCHES_H_

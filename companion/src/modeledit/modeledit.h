@@ -47,7 +47,7 @@ class ModelEdit : public QDialog
     ModelEdit(QWidget * parent, RadioData & radioData, int modelId, Firmware * firmware);
     ~ModelEdit();
 
-    QAction * getAction(const ToolbarMenuActions type);
+    QAction * getAction(const ToolbarActions type);
 
     int getModelId() { return modelId; }
 
@@ -56,16 +56,14 @@ class ModelEdit : public QDialog
 
   signals:
     void modified();
-    void toolbarAction(ToolbarMenuActions);
+    void toolbarAction(ToolbarActions);
 
   private slots:
     void onTabIndexChanged(int index);
-    void retranslateUi();
     void copy();
     void paste();
     void launchSimulation();
-    void toolbarMenuSetup();
-    void toolbarMenuUpdate(int tabIndex);
+    void onToolbarUpdate(int tabIndex);
 
   private:
     Ui::ModelEdit *ui;
@@ -75,11 +73,13 @@ class ModelEdit : public QDialog
     QVector<GenericPanel *> panels;
     CompoundItemModelFactory *sharedItemModels;
 
-    QToolBar * toolbarMenu;
+    QToolBar * toolbar;
     QVector<QAction *> action;
 
-    QAction *addAct(ToolbarMenuActions actId, const QString & icon, const char * slot = 0, const QKeySequence & shortcut = 0, QObject * slotObj = nullptr);
+    QAction *addAct(ToolbarActions actId, const QString & icon, const char * slot = 0, const QKeySequence & shortcut = 0, QObject * slotObj = nullptr);
 
     void addTab(GenericPanel * panel, QString text);
+    void retranslateUi();
+    void toolbarSetup();
 
 };

@@ -481,15 +481,20 @@ void LogicalSwitchesPanel::populateFunctionCB(QComboBox *b)
   b->setMaxVisibleItems(10);
 }
 
+void LogicalSwitchesPanel::activate()
+{
+  update();
+
+  int mask = 0;
+  mask = TB_ACT_COPY_MASK | TB_ACT_PASTE_MASK;
+  emit updateToolbar(mask);
+}
+
 void LogicalSwitchesPanel::update()
 {
   for (int i = 0; i < lsCapability; i++) {
     updateLine(i);
   }
-
-  int mask = 0;
-  mask = TBM_MASK_COPY | TBM_MASK_PASTE;
-  emit updateToolbarMenu(mask);
 }
 
 void LogicalSwitchesPanel::cmPaste()
@@ -674,7 +679,7 @@ void LogicalSwitchesPanel::onItemModelUpdateComplete()
   }
 }
 
-void LogicalSwitchesPanel::onAction(ToolbarMenuActions action)
+void LogicalSwitchesPanel::onToolbarAction(ToolbarActions action)
 {
   QMessageBox::information(this, "Logical Switches", "Actions are under construction");
 }
