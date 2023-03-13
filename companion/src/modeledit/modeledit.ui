@@ -28,6 +28,9 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
+    <layout class="QHBoxLayout" name="toolbarMenuLayout"/>
+   </item>
+   <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="sizeConstraint">
       <enum>QLayout::SetMinimumSize</enum>
@@ -42,13 +45,6 @@
        </property>
        <property name="currentIndex">
         <number>-1</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>Simulate</string>
        </property>
       </widget>
      </item>

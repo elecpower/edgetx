@@ -28,6 +28,17 @@ class Firmware;
 class QGridLayout;
 class QString;
 
+constexpr int TBM_MASK_SIMULATE  {1 << 0};
+constexpr int TBM_MASK_COPY      {1 << 1};
+constexpr int TBM_MASK_PASTE     {1 << 2};
+
+enum ToolbarMenuActions {
+  TBM_ACT_COPY,
+  TBM_ACT_PASTE,
+  TBM_ACT_SIMULATE,
+  TBM_ACT_ENUM_END
+};
+
 class GenericPanel : public QWidget
 {
   Q_OBJECT
@@ -41,9 +52,11 @@ class GenericPanel : public QWidget
 
   signals:
     void modified();
+    void updateToolbarMenu(int mask);
 
   public slots:
     virtual void update();
+    virtual void onAction(ToolbarMenuActions action);
 
   protected:
     ModelData * model;

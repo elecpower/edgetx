@@ -45,6 +45,11 @@ void GenericPanel::update()
 {
 }
 
+void GenericPanel::onAction(ToolbarMenuActions action)
+{
+
+}
+
 void GenericPanel::addLabel(QGridLayout *gridLayout, const QString &text, int col, bool minimize)
 {
   QLabel *label = new QLabel(this);

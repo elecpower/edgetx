@@ -39,6 +39,7 @@ class LogicalSwitchesPanel : public ModelPanel
     virtual ~LogicalSwitchesPanel();
 
     virtual void update();
+    void onAction(ToolbarMenuActions action);
 
   private slots:
     void onFunctionChanged();

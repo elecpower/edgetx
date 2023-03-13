@@ -18,8 +18,7 @@
  * GNU General Public License for more details.
  */
 
-#ifndef _MODELEDIT_H_
-#define _MODELEDIT_H_
+#pragma once
 
 #include <QtWidgets>
 #include "genericpanel.h"
@@ -48,6 +47,8 @@ class ModelEdit : public QDialog
     ModelEdit(QWidget * parent, RadioData & radioData, int modelId, Firmware * firmware);
     ~ModelEdit();
 
+    QAction * getAction(const ToolbarMenuActions type);
+
     int getModelId() { return modelId; }
 
   protected:
@@ -55,9 +56,16 @@ class ModelEdit : public QDialog
 
   signals:
     void modified();
+    void toolbarAction(ToolbarMenuActions);
 
   private slots:
     void onTabIndexChanged(int index);
+    void retranslateUi();
+    void copy();
+    void paste();
+    void launchSimulation();
+    void toolbarMenuSetup();
+    void toolbarMenuUpdate(int tabIndex);
 
   private:
     Ui::ModelEdit *ui;
@@ -67,9 +75,11 @@ class ModelEdit : public QDialog
     QVector<GenericPanel *> panels;
     CompoundItemModelFactory *sharedItemModels;
 
+    QToolBar * toolbarMenu;
+    QVector<QAction *> action;
+
+    QAction *addAct(ToolbarMenuActions actId, const QString & icon, const char * slot = 0, const QKeySequence & shortcut = 0, QObject * slotObj = nullptr);
+
     void addTab(GenericPanel * panel, QString text);
-    void launchSimulation();
 
 };
-
-#endif // _MODELEDIT_H_

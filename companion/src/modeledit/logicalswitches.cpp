@@ -486,6 +486,10 @@ void LogicalSwitchesPanel::update()
   for (int i = 0; i < lsCapability; i++) {
     updateLine(i);
   }
+
+  int mask = 0;
+  mask = TBM_MASK_COPY | TBM_MASK_PASTE;
+  emit updateToolbarMenu(mask);
 }
 
 void LogicalSwitchesPanel::cmPaste()
@@ -668,4 +672,9 @@ void LogicalSwitchesPanel::onItemModelUpdateComplete()
     update();
     lock = false;
   }
+}
+
+void LogicalSwitchesPanel::onAction(ToolbarMenuActions action)
+{
+  QMessageBox::information(this, "Logical Switches", "Actions are under construction");
 }
