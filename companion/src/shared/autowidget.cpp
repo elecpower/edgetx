@@ -55,6 +55,7 @@ void AutoWidget::init(GenericPanel * panel, AutoWidgetParams * params)
 {
   m_panel = panel;
   setParams(params);
+  updateValue();
 }
 
 void AutoWidget::setParams(AutoWidgetParams * params)
