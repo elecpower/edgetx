@@ -62,6 +62,7 @@ typedef std::vector<StringTagMapping> StringTagMappingTable;
 
 #define STRINGTAGMAPPINGFUNCS(tbl, name)  STRINGTAGMAPPINGFUNCS_HELPER(tbl, get##name, Index, Tag)
 
+//  Depreciated - use AutoWidgetParams
 class FieldRange
 {
   public:
@@ -86,7 +87,7 @@ class FieldRange
     QString prefix;
     QString unit;
 };
-
+//  end Depreciated - use AutoWidgetParams
 
 constexpr unsigned int TIMESTR_MASK_HRSMINS   { 1 << 1 };
 constexpr unsigned int TIMESTR_MASK_ZEROHRS   { 1 << 2 };

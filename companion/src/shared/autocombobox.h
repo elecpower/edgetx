@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -43,13 +44,13 @@ class AutoComboBox : public QComboBox, public AutoWidget
 
     void clear();
 
-    void setField(unsigned int & field, GenericPanel * panel = nullptr);
-    void setField(int & field, GenericPanel * panel = nullptr);
-    void setField(RawSource & field, GenericPanel * panel = nullptr);
-    void setField(RawSwitch & field, GenericPanel * panel = nullptr);
+    void setField(unsigned int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
+    void setField(int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
+    void setField(RawSource & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
+    void setField(RawSwitch & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
 
     void setAutoIndexes();
-    void setModel(QAbstractItemModel * model);
+    void setModel(QAbstractItemModel * model = nullptr);
 
   signals:
     void currentDataChanged(int value);
@@ -59,10 +60,8 @@ class AutoComboBox : public QComboBox, public AutoWidget
 
   private:
     int *m_field;
-    int m_next;
-    bool m_hasModel;
     RawSource *m_rawSource;
     RawSwitch *m_rawSwitch;
-
-    void setFieldInit(GenericPanel * panel);
+    int m_next;
+    bool m_hasModel;  //  QComboBox::model() will always return a pointer to either an internal or override model
 };

@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -24,10 +25,10 @@ AutoComboBox::AutoComboBox(QWidget * parent):
   QComboBox(parent),
   AutoWidget(),
   m_field(nullptr),
-  m_next(0),
-  m_hasModel(false),
   m_rawSource(nullptr),
-  m_rawSwitch(nullptr)
+  m_rawSwitch(nullptr),
+  m_next(0),
+  m_hasModel(false)
 {
   connect(this, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoComboBox::onCurrentIndexChanged);
 }
@@ -38,99 +39,96 @@ AutoComboBox::~AutoComboBox()
 
 void AutoComboBox::clear()
 {
-  if (m_hasModel)
-    return;
-
-  setLock(true);
-  QComboBox::clear();
-  m_next = 0;
-  setLock(false);
+  if (!m_hasModel) {
+    setLock(true);
+    QComboBox::clear();
+    m_next = 0;
+    setLock(false);
+  }
 }
 
 void AutoComboBox::insertItems(int index, const QStringList & items)
 {
-  if (m_hasModel)
-    return;
-
-  foreach(QString item, items) {
-    addItem(item);
+  if (!m_hasModel) {
+    foreach(QString item, items) {
+      addItem(item);
+    }
   }
 }
 
 void AutoComboBox::addItem(const QString & item)
 {
-  if (m_hasModel)
-    return;
-
-  addItem(item, m_next++);
+  if (!m_hasModel)
+    addItem(item, m_next++);
 }
 
 void AutoComboBox::addItem(const QString & item, int value)
 {
-  if (m_hasModel)
-    return;
-
-  setLock(true);
-  QComboBox::addItem(item, value);
-  setLock(false);
-  updateValue();
+  if (!m_hasModel) {
+    setLock(true);
+    QComboBox::addItem(item, value);
+    setLock(false);
+    updateValue();
+  }
 }
 
-void AutoComboBox::setField(unsigned int & field, GenericPanel * panel)
+void AutoComboBox::setField(unsigned int & field, GenericPanel * panel, AutoWidgetParams * params)
 {
   m_field = (int *)&field;
   m_rawSource = nullptr;
   m_rawSwitch = nullptr;
-  setFieldInit(panel);
+  init(panel, params);
 }
 
-void AutoComboBox::setField(int & field, GenericPanel * panel)
+void AutoComboBox::setField(int & field, GenericPanel * panel, AutoWidgetParams * params)
 {
   m_field = &field;
   m_rawSource = nullptr;
   m_rawSwitch = nullptr;
-  setFieldInit(panel);
+  init(panel, params);
 }
 
-void AutoComboBox::setField(RawSource & field, GenericPanel * panel)
+void AutoComboBox::setField(RawSource & field, GenericPanel * panel, AutoWidgetParams * params)
 {
   m_rawSource = &field;
   m_rawSwitch = nullptr;
   m_field = nullptr;
-  setFieldInit(panel);
+  init(panel, params);
 }
 
-void AutoComboBox::setField(RawSwitch & field, GenericPanel * panel)
+void AutoComboBox::setField(RawSwitch & field, GenericPanel * panel, AutoWidgetParams * params)
 {
   m_rawSwitch = &field;
   m_rawSource = nullptr;
   m_field = nullptr;
-  setFieldInit(panel);
-}
-
-void AutoComboBox::setFieldInit(GenericPanel * panel)
-{
-  setPanel(panel);
-  updateValue();
+  init(panel, params);
 }
 
 void AutoComboBox::setModel(QAbstractItemModel * model)
 {
   setLock(true);
-  QComboBox::setModel(model);
+
+  if (model) {
+    QComboBox::setModel(model);
+    m_hasModel = true;
+  }
+  else {
+    clear();
+    m_hasModel = false;
+  }
+
   setLock(false);
-  m_hasModel = true;
   updateValue();
 }
 
 void AutoComboBox::setAutoIndexes()
 {
-  if (m_hasModel)
-    return;
+  if (!m_hasModel) {
+    for (int i = 0; i < count(); ++i)
+      setItemData(i, i);
 
-  for (int i = 0; i < count(); ++i)
-    setItemData(i, i);
-  updateValue();
+    updateValue();
+  }
 }
 
 void AutoComboBox::updateValue()
@@ -140,8 +138,18 @@ void AutoComboBox::updateValue()
 
   setLock(true);
 
-  if (m_field)
-    setCurrentIndex(findData(*m_field));
+  if (m_field) {
+    int val = 0;
+
+    if (params()->isBitMapped())
+      val = getBitMappedValue(m_field) + params()->offset();
+    else if (params()->hasIntFuncs())
+      val = (params()->intReadFunc())(*m_field);
+    else
+      val = *m_field + params()->offset();
+
+    setCurrentIndex(findData(val));
+  }
   else if (m_rawSource)
     setCurrentIndex(findData(m_rawSource->toValue()));
   else if (m_rawSwitch)
@@ -156,19 +164,22 @@ void AutoComboBox::onCurrentIndexChanged(int index)
     return;
 
   bool ok;
-  const int val = itemData(index).toInt(&ok);
+  int val = itemData(index).toInt(&ok);
   if (!ok)
     return;
 
-  if (m_field && *m_field != val) {
-    *m_field = val;
+  if (m_field) {
+    if (params()->isBitMapped())
+      setBitMappedValue(m_field, val - params()->offset());
+    else if (params()->hasIntFuncs())
+      *m_field = (params()->intWriteFunc())(val);
+    else
+      *m_field = val - params()->offset();
   }
-  else if (m_rawSource && m_rawSource->toValue() != val) {
+  else if (m_rawSource && m_rawSource->toValue() != val)
     *m_rawSource = RawSource(val);
-  }
-  else if (m_rawSwitch && m_rawSwitch->toValue() != val) {
+  else if (m_rawSwitch && m_rawSwitch->toValue() != val)
     *m_rawSwitch = RawSwitch(val);
-  }
   else
     return;
 

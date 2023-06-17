@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -20,72 +21,70 @@
 
 #include "autodoublespinbox.h"
 
+#include <math.h>
+
 AutoDoubleSpinBox::AutoDoubleSpinBox(QWidget * parent):
   QDoubleSpinBox(parent),
   AutoWidget(),
-  m_field(nullptr),
-  m_offset(0)
+  m_field(nullptr)
 {
   connect(this, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &AutoDoubleSpinBox::onValueChanged);
+  // param changes this widget needs to monitor and process
+  connect(params(), &AutoWidgetParams::precisionChanged, [=] (int val) { QDoubleSpinBox::setDecimals(val); updateValue(); });
+  connect(params(), &AutoWidgetParams::minChanged, [=] (float val) { setMinimum(val); });
+  connect(params(), &AutoWidgetParams::maxChanged, [=] (float val) { setMaximum(val); });
+  connect(params(), &AutoWidgetParams::stepChanged, [=] (float val) { setSingleStep(val); });
+  connect(params(), &AutoWidgetParams::offsetChanged, [=] (float val) { updateValue(); });
+  connect(params(), &AutoWidgetParams::prefixChanged, [=] (QString val) { setPrefix(val); });
+  connect(params(), &AutoWidgetParams::suffixChanged, [=] (QString val) { setSuffix(val); });
+  connect(params(), &AutoWidgetParams::floatFuncsChanged, [=] () { updateValue(); });
 }
 
 AutoDoubleSpinBox::~AutoDoubleSpinBox()
 {
 }
 
-void AutoDoubleSpinBox::setField(int & field, GenericPanel * panel)
+void AutoDoubleSpinBox::setField(int & field, GenericPanel * panel, AutoWidgetParams * params)
 {
   m_field = &field;
-  setPanel(panel);
-  updateValue();
+  init(panel, params);
 }
 
-void AutoDoubleSpinBox::setField(unsigned int & field, GenericPanel * panel)
+void AutoDoubleSpinBox::setField(unsigned int & field, GenericPanel * panel, AutoWidgetParams * params)
 {
   m_field = (int *)&field;
-  setPanel(panel);
-  updateValue();
+  init(panel, params);
 }
 
-void AutoDoubleSpinBox::setDecimals(int prec)
+// depreciated
+void AutoDoubleSpinBox::setDecimals(int precision)
 {
-  QDoubleSpinBox::setDecimals(prec);
-  updateValue();
+  params()->setPrecision(precision);
 }
 
+// depreciated
 void AutoDoubleSpinBox::setOffset(int offset)
 {
-  m_offset = offset;
-  updateValue();
+  params()->setOffset(offset);
 }
 
 void AutoDoubleSpinBox::updateValue()
 {
   if (m_field) {
     setLock(true);
-    setValue(float(*m_field + m_offset) / multiplier());
+    const float val = params()->hasFloatFuncs() ? (params()->floatReadFunc())(*m_field) :
+                                                   float(*m_field) / pow(10, params()->precision()) + params()->offset();
+    setValue(val);
     setLock(false);
   }
 }
 
-int AutoDoubleSpinBox::multiplier()
-{
-  switch (decimals()) {
-    case 1:
-      return 10;
-    case 2:
-      return 100;
-    case 3:
-      return 1000;
-    default:
-      return 1;
-   }
- }
-
 void AutoDoubleSpinBox::onValueChanged(double value)
 {
   if (m_field && !lock()) {
-    *m_field = round(value * multiplier() - m_offset);
+    const int val = params()->hasFloatFuncs() ? (params()->floatWriteFunc())(value) :
+                                                 (int)((value - params()->offset()) * pow(10, params()->precision()));
+    *m_field = val;
     emit currentDataChanged(*m_field);
     dataChanged();
   }

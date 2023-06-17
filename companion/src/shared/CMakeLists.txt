@@ -3,14 +3,13 @@ include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 set(shared_NAMES
   genericpanel
   verticalscrollarea
-  autobitsetcheckbox
+  autowidgetparams
   autocheckbox
+  autobitsetcheckbox
   autocombobox
   autodoublespinbox
   autohexspinbox
-  autolabel
   autolineedit
-  autoprecisioncombobox
   autoslider
   autospinbox
   autotimeedit

@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -22,7 +23,8 @@
 
 AutoSlider::AutoSlider(QWidget * parent):
   QSlider(parent),
-  AutoWidget()
+  AutoWidget(),
+  m_field(nullptr)
 {
   init();
 }
@@ -38,16 +40,23 @@ AutoSlider::~AutoSlider()
 {
 }
 
-void AutoSlider::setField(int & field, int min, int max, GenericPanel * panel)
+void AutoSlider::init()
 {
-  m_field = &field;
-  setFieldInit(min, max, panel);
+  connect(this, &QSlider::valueChanged, this, &AutoSlider::onValueChanged);
 }
 
-void AutoSlider::setField(unsigned int & field, int min, int max, GenericPanel * panel)
+// TODO: remove passing min and max
+void AutoSlider::setField(int & field, int min, int max, GenericPanel * panel, AutoWidgetParams * params)
+{
+  m_field = &field;
+  initField(min, max, panel, params);
+}
+
+// TODO: remove passing min and max
+void AutoSlider::setField(unsigned int & field, int min, int max, GenericPanel * panel, AutoWidgetParams * params)
 {
   m_field = (int *)&field;
-  setFieldInit(min, max, panel);
+  initField(min, max, panel, params);
 }
 
 void AutoSlider::setTick(int interval, QSlider::TickPosition position)
@@ -56,34 +65,34 @@ void AutoSlider::setTick(int interval, QSlider::TickPosition position)
   setTickPosition(position);
 }
 
+// TODO: remove passing min and max
+void AutoSlider::initField(int min, int max, GenericPanel * panel, AutoWidgetParams * params)
+{
+  AutoWidget::init(panel, params);
+  this->params()->setMin(min);
+  this->params()->setMax(max);
+  setRange(min, max);
+  updateValue();
+}
+
 void AutoSlider::updateValue()
 {
   if (m_field) {
     setLock(true);
-    setValue(*m_field);
+    const int value = params()->hasIntFuncs() ? (params()->intReadFunc())(*m_field) :
+                                                *m_field + params()->offset();
+    setValue(value);
     setLock(false);
   }
-}
-
-void AutoSlider::init()
-{
-  connect(this, &QSlider::valueChanged, this, &AutoSlider::onValueChanged);
-}
-
-void AutoSlider::setFieldInit(int min, int max, GenericPanel * panel)
-{
-  setPanel(panel);
-  setRange(min, max);
-  updateValue();
 }
 
 void AutoSlider::onValueChanged(int value)
 {
   if (m_field && !lock()) {
-    if (*m_field != value) {
-      *m_field = value;
-      emit currentDataChanged(value);
-      dataChanged();
-    }
+    const int val = params()->hasIntFuncs() ? (params()->intWriteFunc())(value) :
+                                              value - params()->offset();
+    *m_field = val;
+    emit currentDataChanged(*m_field);
+    dataChanged();
   }
 }

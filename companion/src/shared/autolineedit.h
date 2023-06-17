@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -23,7 +24,6 @@
 #include "autowidget.h"
 
 #include <QLineEdit>
-#include <QRegExpValidator>
 
 class AutoLineEdit: public QLineEdit, public AutoWidget
 {
@@ -34,9 +34,11 @@ class AutoLineEdit: public QLineEdit, public AutoWidget
     virtual ~AutoLineEdit();
 
     virtual void updateValue() override;
+    virtual void paramsChanged() override;
 
-    void setField(char * field, int len, GenericPanel * panel = nullptr);
-    void setField(QString & field, int len = 0, GenericPanel * panel = nullptr);
+    // TODO: remove passing len
+    void setField(char * field, int len, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
+    void setField(QString & field, int len = 0, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
 
   signals:
     void currentDataChanged();
@@ -47,4 +49,7 @@ class AutoLineEdit: public QLineEdit, public AutoWidget
   private:
     char *m_charField;
     QString *m_strField;
+
+    // TODO: remove passing len
+    void initField(int len, GenericPanel * panel, AutoWidgetParams * params);
 };

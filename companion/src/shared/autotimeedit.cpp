@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -32,26 +33,19 @@ AutoTimeEdit::~AutoTimeEdit()
 {
 }
 
-void AutoTimeEdit::setField(unsigned int & field, GenericPanel * panel)
+void AutoTimeEdit::setField(unsigned int & field, GenericPanel * panel, AutoWidgetParams * params)
 {
   m_field = &field;
-  setPanel(panel);
-  updateValue();
-}
-
-void AutoTimeEdit::setTimeRange(const QTime min, const QTime max)
-{
-  QTimeEdit::setMinimumTime(min);
-  QTimeEdit::setMaximumTime(max);
+  init(panel, params);
 }
 
 void AutoTimeEdit::updateValue()
 {
   if (m_field) {
     setLock(true);
-    int hour = *m_field / 3600;
-    int min = (*m_field - (hour * 3600)) / 60;
-    int sec = (*m_field - (hour * 3600)) % 60;
+    const int hour = *m_field / 3600;
+    const int min = (*m_field - (hour * 3600)) / 60;
+    const int sec = (*m_field - (hour * 3600)) % 60;
     setTime(QTime(hour, min, sec));
     setLock(false);
   }
@@ -59,13 +53,9 @@ void AutoTimeEdit::updateValue()
 
 void AutoTimeEdit::onTimeChanged(QTime time)
 {
-  if (!m_field || lock())
-    return;
-
-  unsigned int val = time.hour() * 3600 + time.minute() * 60 + time.second();
-  if (*m_field != val) {
-    *m_field = val;
-    emit currentDataChanged(val);
+  if (m_field && !lock()) {
+    *m_field = time.hour() * 3600 + time.minute() * 60 + time.second();
+    emit currentDataChanged(*m_field);
     dataChanged();
   }
 }

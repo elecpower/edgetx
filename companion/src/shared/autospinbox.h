@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -33,9 +34,10 @@ class AutoSpinBox : public QSpinBox, public AutoWidget
     virtual ~AutoSpinBox();
 
     virtual void updateValue() override;
+    virtual void paramsChanged() override;
 
-    void setField(int & field, GenericPanel * panel = nullptr);
-    void setField(unsigned int & field, GenericPanel * panel = nullptr);
+    void setField(int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
+    void setField(unsigned int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
 
   signals:
     void currentDataChanged(int value);
@@ -45,6 +47,4 @@ class AutoSpinBox : public QSpinBox, public AutoWidget
 
   private:
     int *m_field;
-
-    void setFieldInit(GenericPanel * panel);
 };

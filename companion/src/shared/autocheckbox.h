@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -34,7 +35,9 @@ class AutoCheckBox : public QCheckBox, public AutoWidget
 
     virtual void updateValue() override;
 
-    void setField(bool & field, GenericPanel * panel = nullptr, bool invert = false);
+    // TODO: remove passing invert
+    void setField(bool & field, GenericPanel * panel = nullptr, bool invert = false, AutoWidgetParams * params = nullptr);
+    // depreciated
     void setInvert(bool invert);
 
   signals:
@@ -45,5 +48,4 @@ class AutoCheckBox : public QCheckBox, public AutoWidget
 
   private:
     bool *m_field;
-    bool m_invert;
 };

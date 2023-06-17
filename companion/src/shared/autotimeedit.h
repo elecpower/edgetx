@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -34,8 +35,7 @@ class AutoTimeEdit : public QTimeEdit, public AutoWidget
 
     virtual void updateValue() override;
 
-    void setField(unsigned int & field, GenericPanel * panel = nullptr);
-    void setTimeRange(const QTime min, const QTime max);
+    void setField(unsigned int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
 
   signals:
     void currentDataChanged(unsigned int val);

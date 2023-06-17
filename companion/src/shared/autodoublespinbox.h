@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -24,10 +25,6 @@
 
 #include <QDoubleSpinBox>
 
-#if __GNUC__
-  #include <math.h>
-#endif
-
 class AutoDoubleSpinBox : public QDoubleSpinBox, public AutoWidget
 {
   Q_OBJECT
@@ -38,9 +35,10 @@ class AutoDoubleSpinBox : public QDoubleSpinBox, public AutoWidget
 
     virtual void updateValue() override;
 
-    void setField(int & field, GenericPanel * panel = nullptr);
-    void setField(unsigned int & field, GenericPanel * panel = nullptr);
-    void setDecimals(int prec);
+    void setField(int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
+    void setField(unsigned int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
+    // depreciated
+    void setDecimals(int precision);
     void setOffset(int offset);
 
   signals:
@@ -51,7 +49,4 @@ class AutoDoubleSpinBox : public QDoubleSpinBox, public AutoWidget
 
   private:
     int *m_field;
-    int m_offset;
-
-    int multiplier();
 };

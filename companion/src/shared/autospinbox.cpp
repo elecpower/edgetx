@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -32,21 +33,32 @@ AutoSpinBox::~AutoSpinBox()
 {
 }
 
-void AutoSpinBox::setField(int & field, GenericPanel * panel)
+void AutoSpinBox::setField(int & field, GenericPanel * panel, AutoWidgetParams * params)
 {
   m_field = &field;
-  setFieldInit(panel);
+  init(panel, params);
 }
 
-void AutoSpinBox::setField(unsigned int & field, GenericPanel * panel)
+void AutoSpinBox::setField(unsigned int & field, GenericPanel * panel, AutoWidgetParams * params)
 {
   m_field = (int *)&field;
-  setFieldInit(panel);
+  init(panel, params);
 }
 
-void AutoSpinBox::setFieldInit(GenericPanel * panel)
+void AutoSpinBox::paramsChanged()
 {
-  setPanel(panel);
+  setSingleStep(params()->step());
+  setMinimum(params()->min());
+
+  if (params()->max() != 0)
+    setMaximum(params()->max());
+
+  if (!params()->prefix().isEmpty())
+    setPrefix(params()->prefix());
+
+  if (!params()->suffix().isEmpty())
+    setSuffix(params()->suffix());
+
   updateValue();
 }
 
@@ -54,7 +66,16 @@ void AutoSpinBox::updateValue()
 {
   if (m_field) {
     setLock(true);
-    setValue(*m_field);
+    int value = 0;
+
+    if (params()->isBitMapped())
+      value = getBitMappedValue(m_field) + params()->offset();
+    else if (params()->hasIntFuncs())
+      value = (params()->intReadFunc())(*m_field);
+    else
+      value = *m_field + params()->offset();
+
+    setValue(value);
     setLock(false);
   }
 }
@@ -62,10 +83,14 @@ void AutoSpinBox::updateValue()
 void AutoSpinBox::onValueChanged(int value)
 {
   if (m_field && !lock()) {
-    if (*m_field != value) {
-      *m_field = value;
-      emit currentDataChanged(value);
-      dataChanged();
-    }
+    if (params()->isBitMapped())
+      setBitMappedValue(m_field, value - params()->offset());
+    else if (params()->hasIntFuncs())
+      *m_field = (params()->intWriteFunc())(value);
+    else
+      *m_field = value - params()->offset();
+
+    emit currentDataChanged(*m_field);
+    dataChanged();
   }
 }

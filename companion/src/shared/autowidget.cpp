@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -23,6 +24,7 @@
 
 AutoWidget::AutoWidget():
   m_panel(nullptr),
+  m_params(new AutoWidgetParams()),
   m_lock(false)
 {
 }
@@ -41,9 +43,26 @@ void AutoWidget::setLock(bool lock)
   m_lock = lock;
 }
 
-void AutoWidget::setPanel(GenericPanel * panel)
+bool AutoWidget::panelLock()
+{
+  if (m_panel)
+    return m_panel->lock;
+  else
+    return false;
+}
+
+void AutoWidget::init(GenericPanel * panel, AutoWidgetParams * params)
 {
   m_panel = panel;
+  setParams(params);
+}
+
+void AutoWidget::setParams(AutoWidgetParams * params)
+{
+  if (params)
+    *m_params = *params; // deep copy as no control over life of source
+  else if (m_params)
+    m_params->clear();
 }
 
 void AutoWidget::dataChanged()
@@ -52,10 +71,26 @@ void AutoWidget::dataChanged()
     emit m_panel->modified();
 }
 
-bool AutoWidget::panelLock()
+int AutoWidget::getBitMappedValue(int * field)
 {
-  if (m_panel)
-    return m_panel->lock;
-  else
-    return false;
+  return (*field >> bitShift()) & bitMask();
+}
+
+void AutoWidget::setBitMappedValue(int * field, const int value)
+{
+  int fieldmask = bitMask() << bitShift();
+  *field = (*field & ~fieldmask) | (value << bitShift());
+}
+
+int AutoWidget::bitMask()
+{
+  int mask = -1;
+  mask = mask << m_params->bitsCount();
+  mask = ~mask;
+  return mask;
+}
+
+int AutoWidget::bitShift()
+{
+  return m_params->bitsShift() + m_params->bitsCount() * m_params->bitsIndex();
 }

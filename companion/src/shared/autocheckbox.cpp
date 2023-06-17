@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -23,8 +24,7 @@
 AutoCheckBox::AutoCheckBox(QWidget * parent):
   QCheckBox(parent),
   AutoWidget(),
-  m_field(nullptr),
-  m_invert(false)
+  m_field(nullptr)
 {
   connect(this, &QCheckBox::toggled, this, &AutoCheckBox::onToggled);
 }
@@ -33,35 +33,35 @@ AutoCheckBox::~AutoCheckBox()
 {
 }
 
-void AutoCheckBox::setField(bool & field, GenericPanel * panel, bool invert)
+// TODO: remove passing invert
+void AutoCheckBox::setField(bool & field, GenericPanel * panel, bool invert, AutoWidgetParams * params)
 {
   m_field = &field;
-  m_invert = invert;
-  setPanel(panel);
-  updateValue();
+  init(panel, params);
+  setInvert(invert);
 }
 
+// depreciated
 void AutoCheckBox::setInvert(bool invert)
 {
-  m_invert = invert;
+  params()->setInvert(invert);
   updateValue();
-}
-
-void AutoCheckBox::onToggled(bool checked)
-{
-  if (m_field && !lock()) {
-    const bool val = m_invert ? !checked : checked;
-    *m_field = val;
-    emit currentDataChanged(val);
-    dataChanged();
-  }
 }
 
 void AutoCheckBox::updateValue()
 {
   if (m_field) {
     setLock(true);
-    setChecked(m_invert ? !(*m_field) : *m_field);
+    setChecked(params()->invert() ? !(*m_field) : *m_field);
     setLock(false);
+  }
+}
+
+void AutoCheckBox::onToggled(bool checked)
+{
+  if (m_field && !lock()) {
+    *m_field = params()->invert() ? !checked : checked;
+    emit currentDataChanged(*m_field);
+    dataChanged();
   }
 }

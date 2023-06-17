@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -35,8 +36,9 @@ class AutoSlider : public QSlider, public AutoWidget
 
     virtual void updateValue() override;
 
-    void setField(int & field, int min, int max, GenericPanel * panel = nullptr);
-    void setField(unsigned int & field, int min, int max, GenericPanel * panel = nullptr);
+    // TODO: remove passing min and max
+    void setField(int & field, int min, int max, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
+    void setField(unsigned int & field, int min, int max, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
     void setTick(int interval, QSlider::TickPosition position);
 
   signals:
@@ -46,8 +48,9 @@ class AutoSlider : public QSlider, public AutoWidget
     void onValueChanged(int value);
 
   private:
-    int *m_field = nullptr;
+    int *m_field;
 
     void init();
-    void setFieldInit(int min, int max, GenericPanel * panel);
+    // TODO: remove passing min and max
+    void initField(int min, int max, GenericPanel * panel, AutoWidgetParams * params);
 };

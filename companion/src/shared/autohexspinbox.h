@@ -1,7 +1,8 @@
 /*
- * Copyright (C) OpenTX
+ * Copyright (C) EdgeTX
  *
  * Based on code named
+ *   opentx - https://github.com/opentx/opentx
  *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
@@ -20,14 +21,11 @@
 
 #pragma once
 
-#include "autowidget.h"
+#include "autospinbox.h"
 
-#include <QSpinBox>
-#include <QString>
+class QRegularExpressionValidator;
 
-class QRegExpValidator;
-
-class AutoHexSpinBox : public QSpinBox, public AutoWidget
+class AutoHexSpinBox : public AutoSpinBox
 {
   Q_OBJECT
 
@@ -37,25 +35,12 @@ class AutoHexSpinBox : public QSpinBox, public AutoWidget
     explicit AutoHexSpinBox(QWidget * parent = nullptr);
     virtual ~AutoHexSpinBox();
 
-    virtual void updateValue();
-
-    void setField(unsigned int & field, const unsigned int min = 0, const unsigned int max = AUTOHEXSPINBOX_MAX_VALUE, GenericPanel * panel = nullptr);
-    void setField(unsigned int & field, GenericPanel * panel = nullptr);
-    void setRange(unsigned int min = 0, unsigned int max = AUTOHEXSPINBOX_MAX_VALUE);
-
   protected:
+    // reimplemented QSpinBox functions
     QValidator::State validate(QString &text, int &pos) const;
     int valueFromText(const QString &text) const;
     QString textFromValue(int value) const;
 
-  signals:
-    void currentDataChanged(int value);
-
-  protected slots:
-    void onValueChanged(int value);
-
   private:
-    unsigned int *m_field;
-    QRegExpValidator *m_validator;
-    unsigned int m_length;
+    QRegularExpressionValidator *m_validator;
 };
