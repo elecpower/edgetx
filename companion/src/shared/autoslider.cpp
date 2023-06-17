@@ -42,7 +42,14 @@ AutoSlider::~AutoSlider()
 
 void AutoSlider::init()
 {
+  // ui signals to monitor and process
   connect(this, &QSlider::valueChanged, this, &AutoSlider::onValueChanged);
+
+  // param signals to monitor and process
+  connect(params(), &AutoWidgetParams::minChanged, [=] (float val) { setMinimum(val); updateValue(); });
+  connect(params(), &AutoWidgetParams::maxChanged, [=] (float val) { setMaximum(val); updateValue(); });
+  connect(params(), &AutoWidgetParams::offsetChanged, [=] (float val) { updateValue(); });
+  connect(params(), &AutoWidgetParams::intFuncsChanged, [=] () { updateValue(); });
 }
 
 // TODO: remove passing min and max
@@ -71,8 +78,6 @@ void AutoSlider::initField(int min, int max, GenericPanel * panel, AutoWidgetPar
   AutoWidget::init(panel, params);
   this->params()->setMin(min);
   this->params()->setMax(max);
-  setRange(min, max);
-  updateValue();
 }
 
 void AutoSlider::updateValue()

@@ -26,7 +26,11 @@ AutoCheckBox::AutoCheckBox(QWidget * parent):
   AutoWidget(),
   m_field(nullptr)
 {
+  // ui signals to monitor and process
   connect(this, &QCheckBox::toggled, this, &AutoCheckBox::onToggled);
+
+  // param signals to monitor and process
+  connect(params(), &AutoWidgetParams::invertChanged, [=] (bool val) { updateValue(); });
 }
 
 AutoCheckBox::~AutoCheckBox()
@@ -45,7 +49,6 @@ void AutoCheckBox::setField(bool & field, GenericPanel * panel, bool invert, Aut
 void AutoCheckBox::setInvert(bool invert)
 {
   params()->setInvert(invert);
-  updateValue();
 }
 
 void AutoCheckBox::updateValue()

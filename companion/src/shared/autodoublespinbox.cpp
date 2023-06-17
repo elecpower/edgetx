@@ -28,11 +28,13 @@ AutoDoubleSpinBox::AutoDoubleSpinBox(QWidget * parent):
   AutoWidget(),
   m_field(nullptr)
 {
+  // ui signals to monitor and process
   connect(this, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &AutoDoubleSpinBox::onValueChanged);
-  // param changes this widget needs to monitor and process
+
+  // param signals to monitor and process
   connect(params(), &AutoWidgetParams::precisionChanged, [=] (int val) { QDoubleSpinBox::setDecimals(val); updateValue(); });
-  connect(params(), &AutoWidgetParams::minChanged, [=] (float val) { setMinimum(val); });
-  connect(params(), &AutoWidgetParams::maxChanged, [=] (float val) { setMaximum(val); });
+  connect(params(), &AutoWidgetParams::minChanged, [=] (float val) { setMinimum(val); updateValue(); });
+  connect(params(), &AutoWidgetParams::maxChanged, [=] (float val) { setMaximum(val); updateValue(); });
   connect(params(), &AutoWidgetParams::stepChanged, [=] (float val) { setSingleStep(val); });
   connect(params(), &AutoWidgetParams::offsetChanged, [=] (float val) { updateValue(); });
   connect(params(), &AutoWidgetParams::prefixChanged, [=] (QString val) { setPrefix(val); });

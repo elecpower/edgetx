@@ -34,7 +34,6 @@ class AutoSpinBox : public QSpinBox, public AutoWidget
     virtual ~AutoSpinBox();
 
     virtual void updateValue() override;
-    virtual void paramsChanged() override;
 
     void setField(int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
     void setField(unsigned int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);

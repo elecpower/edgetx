@@ -34,7 +34,6 @@ class AutoLineEdit: public QLineEdit, public AutoWidget
     virtual ~AutoLineEdit();
 
     virtual void updateValue() override;
-    virtual void paramsChanged() override;
 
     // TODO: remove passing len
     void setField(char * field, int len, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);

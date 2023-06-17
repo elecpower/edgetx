@@ -30,7 +30,12 @@ AutoComboBox::AutoComboBox(QWidget * parent):
   m_next(0),
   m_hasModel(false)
 {
+  // ui signals to monitor and process
   connect(this, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoComboBox::onCurrentIndexChanged);
+
+  // param signals to monitor and process
+  connect(params(), &AutoWidgetParams::offsetChanged, [=] (float val) { updateValue(); });
+  connect(params(), &AutoWidgetParams::intFuncsChanged, [=] () { updateValue(); });
 }
 
 AutoComboBox::~AutoComboBox()

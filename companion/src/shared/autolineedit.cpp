@@ -29,10 +29,15 @@ AutoLineEdit::AutoLineEdit(QWidget * parent, bool updateOnChange):
   m_charField(NULL),
   m_strField(nullptr)
 {
+  // ui signals to monitor and process
   if (updateOnChange)
     connect(this, &QLineEdit::textChanged, this, &AutoLineEdit::onEdited);
   else
     connect(this, &QLineEdit::editingFinished, this, &AutoLineEdit::onEdited);
+
+  // param signals to monitor and process
+  connect(params(), &AutoWidgetParams::sizeChanged, [=] (int val) { QLineEdit::setMaxLength(val); updateValue(); });
+  connect(params(), &AutoWidgetParams::inputMaskChanged, [=] (QString val) { QLineEdit::setInputMask(val); updateValue(); });
 }
 
 AutoLineEdit::~AutoLineEdit()
@@ -60,16 +65,7 @@ void AutoLineEdit::setField(QString & field, int len, GenericPanel * panel, Auto
 void AutoLineEdit::initField(int len, GenericPanel * panel, AutoWidgetParams * params)
 {
   init(panel, params);
-  if (len > 0)
-    this->params()->setSize(len);
-  setInputMask(this->params()->inputMask());
-  paramsChanged();
-}
-
-void AutoLineEdit::paramsChanged()
-{
-  if (params()->size())
-    setMaxLength(params()->size());
+  this->params()->setSize(len);
 }
 
 void AutoLineEdit::updateValue()

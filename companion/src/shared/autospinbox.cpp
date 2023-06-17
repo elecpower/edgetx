@@ -26,7 +26,18 @@ AutoSpinBox::AutoSpinBox(QWidget * parent):
   AutoWidget(),
   m_field(nullptr)
 {
+  // ui signals to monitor and process
   connect(this, QOverload<int>::of(&QSpinBox::valueChanged), this, &AutoSpinBox::onValueChanged);
+
+  // param signals to monitor and process
+  connect(params(), &AutoWidgetParams::minChanged, [=] (float val) { setMinimum((int)val); updateValue(); });
+  connect(params(), &AutoWidgetParams::maxChanged, [=] (float val) { setMaximum((int)val); updateValue(); });
+  connect(params(), &AutoWidgetParams::stepChanged, [=] (float val) { setSingleStep((int)val); });
+  connect(params(), &AutoWidgetParams::offsetChanged, [=] (float val) { updateValue(); });
+  connect(params(), &AutoWidgetParams::prefixChanged, [=] (QString val) { setPrefix(val); });
+  connect(params(), &AutoWidgetParams::suffixChanged, [=] (QString val) { setSuffix(val); });
+  connect(params(), &AutoWidgetParams::intFuncsChanged, [=] () { updateValue(); });
+  connect(params(), &AutoWidgetParams::bitMappingChanged, [=] () { updateValue(); });
 }
 
 AutoSpinBox::~AutoSpinBox()
@@ -43,23 +54,6 @@ void AutoSpinBox::setField(unsigned int & field, GenericPanel * panel, AutoWidge
 {
   m_field = (int *)&field;
   init(panel, params);
-}
-
-void AutoSpinBox::paramsChanged()
-{
-  setSingleStep(params()->step());
-  setMinimum(params()->min());
-
-  if (params()->max() != 0)
-    setMaximum(params()->max());
-
-  if (!params()->prefix().isEmpty())
-    setPrefix(params()->prefix());
-
-  if (!params()->suffix().isEmpty())
-    setSuffix(params()->suffix());
-
-  updateValue();
 }
 
 void AutoSpinBox::updateValue()

@@ -38,7 +38,6 @@ class AutoWidget
 
   protected:
     virtual void updateValue() = 0;
-    virtual void paramsChanged() { updateValue(); }
 
     void init(GenericPanel * panel, AutoWidgetParams * params);
 
