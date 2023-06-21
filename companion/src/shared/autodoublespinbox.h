@@ -37,9 +37,18 @@ class AutoDoubleSpinBox : public QDoubleSpinBox, public AutoWidget
 
     void setField(int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
     void setField(unsigned int & field, GenericPanel * panel = nullptr, AutoWidgetParams * params = nullptr);
+
     // depreciated
-    void setDecimals(int precision);
     void setOffset(int offset);
+
+    // depreciated overriden Qt functions
+    void setDecimals(int prec);
+    void setMaximum(double max);
+    void setMinimum(double min);
+    void setPrefix(const QString &prefix);
+    void setRange(double min, double max);
+    void setSingleStep(double val);
+    void setSuffix(const QString &suffix)
 
   signals:
     void currentDataChanged(double value);

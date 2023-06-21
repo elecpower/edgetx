@@ -32,14 +32,33 @@ AutoDoubleSpinBox::AutoDoubleSpinBox(QWidget * parent):
   connect(this, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &AutoDoubleSpinBox::onValueChanged);
 
   // param signals to monitor and process
-  connect(params(), &AutoWidgetParams::precisionChanged, [=] (int val) { QDoubleSpinBox::setDecimals(val); updateValue(); });
-  connect(params(), &AutoWidgetParams::minChanged, [=] (float val) { setMinimum(val); updateValue(); });
-  connect(params(), &AutoWidgetParams::maxChanged, [=] (float val) { setMaximum(val); updateValue(); });
-  connect(params(), &AutoWidgetParams::stepChanged, [=] (float val) { setSingleStep(val); });
-  connect(params(), &AutoWidgetParams::offsetChanged, [=] (float val) { updateValue(); });
-  connect(params(), &AutoWidgetParams::prefixChanged, [=] (QString val) { setPrefix(val); });
-  connect(params(), &AutoWidgetParams::suffixChanged, [=] (QString val) { setSuffix(val); });
-  connect(params(), &AutoWidgetParams::floatFuncsChanged, [=] () { updateValue(); });
+  connect(params(), &AutoWidgetParams::funcsChanged, [=] () {
+    updateValue();
+  });
+  connect(params(), &AutoWidgetParams::maximumChanged, [=] (float val) {
+    QDoubleSpinBox::setMaximum(val);
+    updateValue();
+  });
+  connect(params(), &AutoWidgetParams::minimumChanged, [=] (float val) {
+    QDoubleSpinBox::setMinimum(val);
+    updateValue();
+  });
+  connect(params(), &AutoWidgetParams::offsetChanged, [=] (float val) {
+    updateValue();
+  });
+  connect(params(), &AutoWidgetParams::precisionChanged, [=] (int val) {
+    QDoubleSpinBox::setDecimals(val);
+    updateValue();
+  });
+  connect(params(), &AutoWidgetParams::prefixChanged, [=] (QString val) {
+    QDoubleSpinBox::setPrefix(val);
+  });
+  connect(params(), &AutoWidgetParams::stepChanged, [=] (float val) {
+    QDoubleSpinBox::setSingleStep(val);
+  });
+  connect(params(), &AutoWidgetParams::suffixChanged, [=] (QString val) {
+    QDoubleSpinBox::setSuffix(val);
+  });
 }
 
 AutoDoubleSpinBox::~AutoDoubleSpinBox()
@@ -58,24 +77,12 @@ void AutoDoubleSpinBox::setField(unsigned int & field, GenericPanel * panel, Aut
   init(panel, params);
 }
 
-// depreciated
-void AutoDoubleSpinBox::setDecimals(int precision)
-{
-  params()->setPrecision(precision);
-}
-
-// depreciated
-void AutoDoubleSpinBox::setOffset(int offset)
-{
-  params()->setOffset(offset);
-}
-
 void AutoDoubleSpinBox::updateValue()
 {
   if (m_field) {
     setLock(true);
-    const float val = params()->hasFloatFuncs() ? (params()->floatReadFunc())(*m_field) :
-                                                   float(*m_field) / pow(10, params()->precision()) + params()->offset();
+    const double val = params()->hasDblFuncs() ? (params()->dblReadFunc())(*m_field) :
+                                                 (double)(*m_field + params()->offset()) / params()->precision() ;
     setValue(val);
     setLock(false);
   }
@@ -84,10 +91,52 @@ void AutoDoubleSpinBox::updateValue()
 void AutoDoubleSpinBox::onValueChanged(double value)
 {
   if (m_field && !lock()) {
-    const int val = params()->hasFloatFuncs() ? (params()->floatWriteFunc())(value) :
-                                                 (int)((value - params()->offset()) * pow(10, params()->precision()));
+    const int val = params()->hasDblFuncs() ? (params()->dblWriteFunc())(value) :
+                                              (int)(value * params()->precision()) - params()->offset());
     *m_field = val;
     emit currentDataChanged(*m_field);
     dataChanged();
   }
+}
+
+// depreciated
+void AutoDoubleSpinBox::setOffset(int offset)
+{
+  params()->setOffset(offset);
+}
+
+// overriden Qt functions
+void AutoDoubleSpinBox::setDecimals(int prec)
+{
+  params()->setPrecision(prec);
+}
+
+void AutoDoubleSpinBox::setMaximum(double max);
+{
+  params()->setMaximum(max);
+}
+
+void AutoDoubleSpinBox::setMinimum(double min);
+{
+  params()->setMinimum(min);
+}
+
+void AutoDoubleSpinBox::setPrefix(const QString &prefix);
+{
+  params()->setPrefix(prefix);
+}
+
+void AutoDoubleSpinBox::setRange(double min, double max);
+{
+  params()->setRange(min, max);
+}
+
+void AutoDoubleSpinBox::setSingleStep(double val);
+{
+  params()->setSingleStep(val);
+}
+
+void AutoDoubleSpinBox::setSuffix(const QString &suffix)
+{
+  params()->setSuffix(suffix);
 }

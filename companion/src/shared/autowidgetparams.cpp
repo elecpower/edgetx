@@ -33,9 +33,9 @@ AutoWidgetParams::~AutoWidgetParams()
 void AutoWidgetParams::clear()
 {
   m_size = 0;
-  m_precision = 0;
-  m_min = 0;
-  m_max = 0;
+  m_precision = pow(10, 0);
+  m_minimum = 0;
+  m_maximum = 0;
   m_step = 1.0;
   m_offset = 0;
   m_invert = false;
@@ -51,8 +51,8 @@ AutoWidgetParams& AutoWidgetParams::operator=(const AutoWidgetParams& rhs)
 {
   setSize(rhs.m_size);
   setPrecision(rhs.m_precision);
-  setMin(rhs.m_min);
-  setMax(rhs.m_max);
+  setMinimum(rhs.m_minimum);
+  setMaximum(rhs.m_maximum);
   setStep(rhs.m_step);
   setOffset(rhs.m_offset);
   setInvert(rhs.m_invert);
@@ -64,8 +64,8 @@ AutoWidgetParams& AutoWidgetParams::operator=(const AutoWidgetParams& rhs)
     case AWPT_BITMAPPED:
       setBitMapping(rhs.m_u.m_bitmapping.m_bits, rhs.m_u.m_bitmapping.m_shift, rhs.m_u.m_bitmapping.m_index);
       break;
-    case AWPT_FLOAT_FUNCS:
-      setCustomFuncs(rhs.m_u.m_awp_float.m_read, rhs.m_u.m_awp_float.m_write);
+    case AWPT_DBL_FUNCS:
+      setCustomFuncs(rhs.m_u.m_awp_dbl.m_read, rhs.m_u.m_awp_dbl.m_write);
       break;
     case AWPT_INT_FUNCS:
       setCustomFuncs(rhs.m_u.m_awp_int.m_read, rhs.m_u.m_awp_int.m_write);
@@ -80,28 +80,34 @@ AutoWidgetParams& AutoWidgetParams::operator=(const AutoWidgetParams& rhs)
 /*
   Custom set functions
 */
-void AutoWidgetParams::setMin(const float & val)
+void AutoWidgetParams::setMinimum(const double & val)
 {
-  if (val != m_min) {
-    if (val > m_max)
-      m_min = m_max;
+  if (val != m_minimum) {
+    if (val > m_maximum)
+      m_minimum = m_maximum;
     else
-      m_min = val;
+      m_minimum = val;
 
-    emit minChanged(m_min);
+    emit minimumChanged(m_minimum);
   }
 }
 
-void AutoWidgetParams::setMax(const float & val)
+void AutoWidgetParams::setMaximum(const double & val)
 {
-  if (val != m_max) {
-    if (val < m_min)
-      m_max = m_min;
+  if (val != m_maximum) {
+    if (val < m_minimum)
+      m_maximum = m_minimum;
     else
-      m_max = val;
+      m_maximum = val;
 
-    emit maxChanged(m_max);
+    emit maximumChanged(m_maximum);
   }
+}
+
+void AutoWidgetParams::setPrecision(int prec)
+{
+  m_precision = pow(10, prec);
+  emit precisionChanged(prec);
 }
 
 void AutoWidgetParams::setBitMapping(const int bits, const int shift, const int index)
@@ -115,13 +121,13 @@ void AutoWidgetParams::setBitMapping(const int bits, const int shift, const int 
   }
 }
 
-void AutoWidgetParams::setCustomFuncs(awp_float_read_func read, awp_float_write_func write)
+void AutoWidgetParams::setCustomFuncs(awp_dbl_read_func read, awp_dbl_write_func write)
 {
   if (read && write) {
-    m_type = AWPT_FLOAT_FUNCS;
-    m_u.m_awp_float.m_read = read;
-    m_u.m_awp_float.m_write = write;
-    emit floatFuncsChanged();
+    m_type = AWPT_DBL_FUNCS;
+    m_u.m_awp_dbl.m_read = read;
+    m_u.m_awp_dbl.m_write = write;
+    emit funcsChanged();
   }
 }
 
@@ -131,7 +137,7 @@ void AutoWidgetParams::setCustomFuncs(awp_int_read_func read, awp_int_write_func
     m_type = AWPT_INT_FUNCS;
     m_u.m_awp_int.m_read = read;
     m_u.m_awp_int.m_write = write;
-    emit intFuncsChanged();
+    emit funcsChanged();
   }
 }
 
@@ -139,16 +145,16 @@ void AutoWidgetParams::setCustomFuncs(awp_int_read_func read, awp_int_write_func
   Helper functions
 */
 
-void AutoWidgetParams::setRange(const float & min, const float & max)
+void AutoWidgetParams::setRange(double min, double max)
 {
   if (min < max) {
     if (min < m_max) {
-      setMin(min);
-      setMax(max);
+      setMinimum(min);
+      setMaximum(max);
     }
     else {
-      setMax(max);
-      setMin(min);
+      setMaximum(max);
+      setMinimum(min);
     }
   }
 }

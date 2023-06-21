@@ -29,9 +29,9 @@ class AutoWidgetParams : public QObject
 
   public:
     // Note: internal data structs store numbers as int/unsigned int and
-    //       use precision/decimals to convert to float for ui
-    typedef float (*awp_float_read_func)(int);
-    typedef int (*awp_float_write_func)(float);
+    //       use precision/decimals to convert to double for ui
+    typedef double (*awp_dbl_read_func)(int);
+    typedef int (*awp_dbl_write_func)(double);
 
     typedef int (*awp_int_read_func)(int);
     typedef int (*awp_int_write_func)(int);
@@ -39,7 +39,7 @@ class AutoWidgetParams : public QObject
     enum AutoWidgetParamsType {
       AWPT_DEFAULT,
       AWPT_BITMAPPED,
-      AWPT_FLOAT_FUNCS,
+      AWPT_DBL_FUNCS,
       AWPT_INT_FUNCS,
       AWPT_LAST
     };
@@ -51,10 +51,10 @@ class AutoWidgetParams : public QObject
 
     void clear();
 
-    void setRange(const float & min, const float & max);
+    void setRange(double min, double max);
 
     inline bool isBitMapped() { return m_type == AWPT_BITMAPPED && m_u.m_bitmapping.m_bits; }
-    inline bool hasFloatFuncs() { return (m_type == AWPT_FLOAT_FUNCS && m_u.m_awp_float.m_read && m_u.m_awp_float.m_write); }
+    inline bool hasDblFuncs() { return (m_type == AWPT_DBL_FUNCS && m_u.m_awp_dbl.m_read && m_u.m_awp_dbl.m_write); }
     inline bool hasIntFuncs() { return (m_type == AWPT_INT_FUNCS && m_u.m_awp_int.m_read && m_u.m_awp_int.m_write); }
 
     void setBitMapping(const int bits, const int shift = 0, const int index = 0);
@@ -62,9 +62,9 @@ class AutoWidgetParams : public QObject
     inline int bitsShift() const { return m_type == AWPT_BITMAPPED ? m_u.m_bitmapping.m_shift : 0; }
     inline int bitsIndex() const { return m_type == AWPT_BITMAPPED ? m_u.m_bitmapping.m_index : 0; }
 
-    void setCustomFuncs(awp_float_read_func read, awp_float_write_func write);
-    inline awp_float_read_func floatReadFunc() const { return m_type == AWPT_FLOAT_FUNCS ? m_u.m_awp_float.m_read : nullptr; }
-    inline awp_float_write_func floatWriteFunc() const { return m_type == AWPT_FLOAT_FUNCS ? m_u.m_awp_float.m_write : nullptr; }
+    void setCustomFuncs(awp_dbl_read_func read, awp_dbl_write_func write);
+    inline awp_dbl_read_func dblReadFunc() const { return m_type == AWPT_DBL_FUNCS ? m_u.m_awp_dbl.m_read : nullptr; }
+    inline awp_dbl_write_func dblWriteFunc() const { return m_type == AWPT_DBL_FUNCS ? m_u.m_awp_dbl.m_write : nullptr; }
 
     void setCustomFuncs(awp_int_read_func read, awp_int_write_func write);
     inline awp_int_read_func intReadFunc() const { return m_type == AWPT_INT_FUNCS ? m_u.m_awp_int.m_read : nullptr; }
@@ -93,11 +93,11 @@ class AutoWidgetParams : public QObject
     void set##NAME1(const TYPE &val);
 
     PARAM_DFLT(int, size, Size)               // used for ui display/edit size
-    PARAM_DFLT(int, precision, Precision)     // converts internal to/from ui value and is applied to accepting ui widgets
-    PARAM_CUST(float, min, Min)               // ui min value
-    PARAM_CUST(float, max, Max)               // ui max value
-    PARAM_DFLT(float, step, Step)             // used to increment/decrement ui value
-    PARAM_DFLT(float, offset, Offset)         // adjusts internal to/from ui value eg internal 2 + offset 5 = ui 7 - offset 5 = internal 2
+    PARAM_CUST(int, precision, Precision)     // converts internal to/from ui value and is applied to accepting ui widgets
+    PARAM_CUST(double, minimum, Minimum)      // ui min value
+    PARAM_CUST(double, maximum, Maximum)      // ui max value
+    PARAM_DFLT(double, step, Step)            // used to increment/decrement ui value
+    PARAM_DFLT(int, offset, Offset)           // adjusts internal to/from ui value eg internal 2 + offset 5 = ui 7 - offset 5 = internal 2
     PARAM_DFLT(bool, invert, Invert)          // used for flipping booleans
     PARAM_DFLT(QString, inputMask, InputMask) // used for ui display/edit for fields supporting parameter eg QLineEdit
     PARAM_DFLT(QString, prefix, Prefix)       // ui display
@@ -105,11 +105,11 @@ class AutoWidgetParams : public QObject
 
   signals:
     void bitMappingChanged();
-    void floatFuncsChanged();
-    void intFuncsChanged();
+    void funcsChanged();
 
   private:
-    AutoWidgetParamsType m_type;            // indicates the union struct in use especially important in struct copy
+
+    AutoWidgetParamsType m_type;              // indicates the union struct in use especially important in struct copy
     union {
       // use for compound int/unsigned int fields
       // value calculation is m_shift + (m_index x m_bits) for m_bits
@@ -123,9 +123,9 @@ class AutoWidgetParams : public QObject
       // custom function pointers can be passed
       // all conversions between internal and ui are assumed to be handled by the functions
       struct {
-        awp_float_read_func m_read;
-        awp_float_write_func m_write;
-      } m_awp_float;
+        awp_dbl_read_func m_read;
+        awp_dbl_write_func m_write;
+      } m_awp_dbl;
       struct {
         awp_int_read_func m_read;
         awp_int_write_func m_write;
