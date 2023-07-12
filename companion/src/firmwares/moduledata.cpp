@@ -90,8 +90,9 @@ bool ModuleData::isAvailable(PulsesProtocol proto, int port)
           case PULSES_CROSSFIRE:
             return fw->getCapability(HasIntModuleCRSF) || fw->getCapability(HasIntModuleELRS);
           case PULSES_FLYSKY_AFHDS2A:
+            return IS_FLYSKY_NV14(board);
           case PULSES_FLYSKY_AFHDS3:
-            return fw->getCapability(HasIntModuleFlySky);
+            //return IS_FLYSKY_EL18(board);
           default:
             return false;
         }
@@ -452,7 +453,7 @@ int ModuleData::getTypeFromProtocol(unsigned int protocol)
                           { PULSES_XJT_LITE_LR12,       MODULE_TYPE_XJT_LITE_PXX2 },
 
                           { PULSES_FLYSKY_AFHDS2A,      MODULE_TYPE_FLYSKY_AFHDS2A },
-                          { PULSES_FLYSKY_AFHDS3,       MODULE_TYPE_FLYSKY_AFHDS2A },
+                          { PULSES_FLYSKY_AFHDS3,       MODULE_TYPE_FLYSKY_AFHDS3 },
 
                           { PULSES_LEMON_DSMP,          MODULE_TYPE_LEMON_DSMP },
                       };
@@ -552,8 +553,6 @@ bool ModuleData::isProtocolAvailable(int moduleidx, unsigned int protocol, Gener
           case PULSES_SBUS:
           case PULSES_MULTIMODULE:
           case PULSES_CROSSFIRE:
-          case PULSES_FLYSKY_AFHDS2A:
-          case PULSES_FLYSKY_AFHDS3:
           case PULSES_GHOST:
           case PULSES_LEMON_DSMP:
             return true;
@@ -567,6 +566,10 @@ bool ModuleData::isProtocolAvailable(int moduleidx, unsigned int protocol, Gener
           case PULSES_XJT_LITE_D8:
           case PULSES_XJT_LITE_LR12:
             return (IS_TARANIS_XLITE(board) || IS_TARANIS_X9LITE(board) || IS_RADIOMASTER_ZORRO(board));
+          case PULSES_FLYSKY_AFHDS2A:
+            return IS_FLYSKY_NV14(board);
+          case PULSES_FLYSKY_AFHDS3:
+            //return IS_FLYSKY_EL18(board);
           default:
             return false;
         }
