@@ -523,10 +523,13 @@ void ModulePanel::update()
         if (pdef.disableChannelMap)
           mask |= MASK_CHANNELMAP;
         break;
-      case PULSES_AFHDS3:
-        module.channelsCount = 18;
+      case PULSES_FLYSKY_AFHDS2A:
         mask |= MASK_CHANNELS_RANGE| MASK_CHANNELS_COUNT | MASK_FAILSAFES;
-        mask |= MASK_SUBTYPES | MASK_RX_FREQ | MASK_RF_POWER;
+        mask |= MASK_RX_FREQ | MASK_RF_POWER;
+        break;
+      case PULSES_FLYSKY_AFHDS3:
+        mask |= MASK_CHANNELS_RANGE| MASK_CHANNELS_COUNT | MASK_FAILSAFES;
+        mask |= MASK_RF_POWER;
         break;
       case PULSES_LEMON_DSMP:
         mask |= MASK_CHANNELS_RANGE;
@@ -632,9 +635,6 @@ void ModulePanel::update()
       if (firmware->getCapability(HasModuleR9MFlex))
         i = 2;
       break;
-    case PULSES_AFHDS3:
-        numEntries = 4;
-        break;
     case PULSES_PPM:
         numEntries = PPM_NUM_SUBTYPES;
         break;
@@ -752,8 +752,8 @@ void ModulePanel::update()
   // Failsafes
   ui->label_failsafeMode->setVisible(mask & MASK_FAILSAFES);
   ui->failsafeMode->setVisible(mask & MASK_FAILSAFES);
-  //hide reciever mode for afhds3
-  qobject_cast<QListView *>(ui->failsafeMode->view())->setRowHidden(FAILSAFE_RECEIVER, protocol == PULSES_AFHDS3);
+  //hide receiver mode for afhds2a or afhds3
+  qobject_cast<QListView *>(ui->failsafeMode->view())->setRowHidden(FAILSAFE_RECEIVER, (protocol == PULSES_FLYSKY_AFHDS2A || protocol == PULSES_FLYSKY_AFHDS3));
 
   if ((mask & MASK_FAILSAFES) && module.failsafeMode == FAILSAFE_CUSTOM) {
     if (ui->failsafesGroupBox->isHidden()) {
@@ -807,6 +807,9 @@ void ModulePanel::onProtocolChanged(int index)
         ui->telemetryBaudrate->setCurrentIndex(1);
       }
     }
+    else if (module.protocol == PULSES_FLYSKY_AFHDS2A) {
+      module.flysky.setDefault();
+    }
 
     emit updateItemModels();
     emit modified();
@@ -825,7 +828,11 @@ void ModulePanel::on_r9mPower_currentIndexChanged(int index)
 {
   if (!lock) {
 
-    if (module.protocol == PULSES_AFHDS3 && module.afhds3.rfPower != (unsigned int)index) {
+    if (module.protocol == PULSES_FLYSKY_AFHDS2A && module.flysky.rfPower != (unsigned int)index) {
+      module.flysky.rfPower = index;
+      emit modified();
+    }
+    else if (module.protocol == PULSES_FLYSKY_AFHDS3 && module.afhds3.rfPower != (unsigned int)index) {
       module.afhds3.rfPower = index;
       emit modified();
     }
@@ -971,19 +978,17 @@ void ModulePanel::onSubTypeChanged()
   if (!lock && module.subType != type) {
     lock=true;
     module.subType = type;
-    if (module.protocol != PULSES_AFHDS3) {
-      update();
-    }
     emit modified();
     lock =  false;
   }
 }
 
 void ModulePanel::onRfFreqChanged(int freq) {
-  if (module.afhds3.rxFreq != (unsigned int)freq) {
-    module.afhds3.rxFreq = (unsigned int)freq;
-    emit modified();
-  }
+  //  TODO fix for AFHDS2A
+  //if (module.afhds3.rxFreq != (unsigned int)freq) {
+  //  module.afhds3.rxFreq = (unsigned int)freq;
+  //  emit modified();
+  //}
 }
 
 void ModulePanel::on_disableTelem_stateChanged(int state)

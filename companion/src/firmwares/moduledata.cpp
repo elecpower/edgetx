@@ -89,8 +89,10 @@ bool ModuleData::isAvailable(PulsesProtocol proto, int port)
             return fw->getCapability(HasIntModuleMulti);
           case PULSES_CROSSFIRE:
             return fw->getCapability(HasIntModuleCRSF) || fw->getCapability(HasIntModuleELRS);
-          case PULSES_AFHDS3:
-            return fw->getCapability(HasIntModuleFlySky);
+          case PULSES_FLYSKY_AFHDS2A:
+            return IS_FLYSKY_NV14(board);
+          case PULSES_FLYSKY_AFHDS3:
+            //return IS_FLYSKY_EL18(board);
           default:
             return false;
         }
@@ -111,7 +113,8 @@ bool ModuleData::isAvailable(PulsesProtocol proto, int port)
           case PULSES_SBUS:
           case PULSES_MULTIMODULE:
           case PULSES_CROSSFIRE:
-          case PULSES_AFHDS3:
+          case PULSES_FLYSKY_AFHDS2A:
+          case PULSES_FLYSKY_AFHDS3:
           case PULSES_GHOST:
             return true;
           case PULSES_ACCESS_R9M:
@@ -259,11 +262,9 @@ QString ModuleData::subTypeToString(int type) const
     case PULSES_MULTIMODULE:
       return Multiprotocols::subTypeToString((int)multi.rfProtocol, (unsigned)type);
     case PULSES_PPM:
-      return CHECK_IN_ARRAY(ppmSubTypeStrings, type); 
+      return CHECK_IN_ARRAY(ppmSubTypeStrings, type);
     case PULSES_PXX_R9M:
       return CHECK_IN_ARRAY(strings, type);
-    case PULSES_AFHDS3:
-      return Afhds3Data::protocolToString(type);
     default:
       return CPN_STR_UNKNOWN_ITEM;
   }
@@ -272,7 +273,7 @@ QString ModuleData::subTypeToString(int type) const
 QString ModuleData::powerValueToString(Firmware * fw) const
 {
   const QStringList & strRef = powerValueStrings((enum PulsesProtocol)protocol, subType, fw);
-  return strRef.value(protocol == PULSES_AFHDS3 ? afhds3.rfPower : pxx.power, CPN_STR_UNKNOWN_ITEM);
+  return strRef.value(protocol == PULSES_FLYSKY_AFHDS3 ? afhds3.rfPower : pxx.power, CPN_STR_UNKNOWN_ITEM);
 }
 
 // static
@@ -312,7 +313,7 @@ QString ModuleData::protocolToString(unsigned int protocol)
     tr("FrSky ACCESS R9M Lite"),
     tr("FrSky ACCESS R9M Lite Pro"),
     tr("FrSky XJT lite (D16)"), tr("FrSky XJT lite (D8)"), tr("FrSky XJT lite (LR12)"),
-    tr("AFHDS3"),
+    tr("Flysky AFHDS2A"), tr("Flysky AFHDS3"),
     tr("Ghost"),
     tr("Lemon-Rx DSMP"),
   };
@@ -334,7 +335,7 @@ QStringList ModuleData::powerValueStrings(enum PulsesProtocol protocol, int subT
   };
 
   switch(protocol) {
-    case PULSES_AFHDS3:
+    case PULSES_FLYSKY_AFHDS3:
       return afhds3Strings;
     default:
       int strIdx = 0;
@@ -358,7 +359,8 @@ bool ModuleData::hasFailsafes(Firmware * fw) const
     protocol == PULSES_ACCESS_R9M_LITE_PRO ||
     protocol == PULSES_XJT_LITE_X16 ||
     protocol == PULSES_MULTIMODULE ||
-    protocol == PULSES_AFHDS3
+    protocol == PULSES_FLYSKY_AFHDS2A ||
+    protocol == PULSES_FLYSKY_AFHDS3
     );
 }
 
@@ -396,7 +398,9 @@ int ModuleData::getMaxChannelCount()
       else
         return 16;
       break;
-    case PULSES_AFHDS3:
+    case PULSES_FLYSKY_AFHDS2A:
+      return 14;
+    case PULSES_FLYSKY_AFHDS3:
       return 18;
     case PULSES_LEMON_DSMP:
       return 12;
@@ -449,7 +453,8 @@ int ModuleData::getTypeFromProtocol(unsigned int protocol)
                           { PULSES_XJT_LITE_D8,         MODULE_TYPE_XJT_LITE_PXX2 },
                           { PULSES_XJT_LITE_LR12,       MODULE_TYPE_XJT_LITE_PXX2 },
 
-                          { PULSES_AFHDS3,              MODULE_TYPE_FLYSKY },
+                          { PULSES_FLYSKY_AFHDS2A,      MODULE_TYPE_FLYSKY_AFHDS2A },
+                          { PULSES_FLYSKY_AFHDS3,       MODULE_TYPE_FLYSKY_AFHDS3 },
 
                           { PULSES_LEMON_DSMP,          MODULE_TYPE_LEMON_DSMP },
                       };
@@ -494,7 +499,8 @@ QString ModuleData::typeToString(int type)
     "R9MLP ACCESS",
     "SBUS",
     "XJT Lite",
-    "FLYSKY",
+    "Flysky AFHDS2A",
+    "Flysky AFHDS3",
     "Lemon-Rx DSMP",
   };
 
@@ -548,7 +554,6 @@ bool ModuleData::isProtocolAvailable(int moduleidx, unsigned int protocol, Gener
           case PULSES_SBUS:
           case PULSES_MULTIMODULE:
           case PULSES_CROSSFIRE:
-          case PULSES_AFHDS3:
           case PULSES_GHOST:
           case PULSES_LEMON_DSMP:
             return true;
@@ -562,6 +567,10 @@ bool ModuleData::isProtocolAvailable(int moduleidx, unsigned int protocol, Gener
           case PULSES_XJT_LITE_D8:
           case PULSES_XJT_LITE_LR12:
             return (IS_TARANIS_XLITE(board) || IS_TARANIS_X9LITE(board) || IS_RADIOMASTER_ZORRO(board));
+          case PULSES_FLYSKY_AFHDS2A:
+            return IS_FLYSKY_NV14(board);
+          case PULSES_FLYSKY_AFHDS3:
+            //return IS_FLYSKY_EL18(board);
           default:
             return false;
         }
