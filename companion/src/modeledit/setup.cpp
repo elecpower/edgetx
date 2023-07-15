@@ -760,20 +760,20 @@ void ModulePanel::update()
   // AFHFS
   if (mask & MASK_AFHDS) {
     if (protocol == PULSES_FLYSKY_AFHDS2A) {
-      ui->label_afhds->setText(tr("Type"));
+      ui->label_afhds->setText(tr("Options"));
       ui->cboAfhdsOpt1->setModel(ModuleData::afhds2aMode1ItemModel());
       ui->cboAfhdsOpt1->setCurrentIndex(Helpers::getBitmappedValue(module.flysky.mode, 2));
 
-      ui->cboAfhdsOpt2->setModel(ModuleData::afhds2aMode1ItemModel());
+      ui->cboAfhdsOpt2->setModel(ModuleData::afhds2aMode2ItemModel());
       ui->cboAfhdsOpt2->setCurrentIndex(Helpers::getBitmappedValue(module.flysky.mode, 1));
     }
     else {
-      ui->label_afhds->setText(tr("Options"));
+      ui->label_afhds->setText(tr("Type"));
       ui->cboAfhdsOpt1->setModel(ModuleData::afhds3PhyModeItemModel());
-      ui->cboAfhdsOpt1->setCurrentIndex(module.afhds3.phyMode);
+      ui->cboAfhdsOpt1->setCurrentIndex(ui->cboAfhdsOpt1->findData(module.afhds3.phyMode));
 
       ui->cboAfhdsOpt2->setModel(ModuleData::afhds3EmiItemModel());
-      ui->cboAfhdsOpt2->setCurrentIndex(module.afhds3.emi);
+      ui->cboAfhdsOpt2->setCurrentIndex(ui->cboAfhdsOpt2->findData(module.afhds3.emi));
     }
   }
 
@@ -839,6 +839,9 @@ void ModulePanel::onProtocolChanged(int index)
     }
     else if (module.protocol == PULSES_FLYSKY_AFHDS2A) {
       module.flysky.setDefault();
+    }
+    else if (module.protocol == PULSES_FLYSKY_AFHDS3) {
+      module.afhds3.setDefault();
     }
 
     emit updateItemModels();

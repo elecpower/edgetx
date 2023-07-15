@@ -166,6 +166,14 @@ class ModuleData {
       unsigned int phyMode;
       unsigned int reserved;
       unsigned int rfPower;
+
+      void setDefault() {
+        emi = 1;
+        telemetry = 0;
+        phyMode = 0;
+        reserved = 0;
+        rfPower = 0;
+      }
     } afhds3;
 
     struct PXX {
