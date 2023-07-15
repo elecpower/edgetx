@@ -413,7 +413,7 @@
          </spacer>
         </item>
         <item row="5" column="0">
-         <widget class="QLabel" name="label_afhds2aOptions">
+         <widget class="QLabel" name="label_afhds">
           <property name="text">
            <string>Options</string>
           </property>
@@ -422,10 +422,10 @@
         <item row="5" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QComboBox" name="cboAfhds2aOpt1"/>
+           <widget class="QComboBox" name="cboAfhdsOpt1"/>
           </item>
           <item>
-           <widget class="QComboBox" name="cboAfhds2aOpt2"/>
+           <widget class="QComboBox" name="cboAfhdsOpt2"/>
           </item>
          </layout>
         </item>
