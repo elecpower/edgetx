@@ -21,7 +21,6 @@
 #include "moduledata.h"
 #include "eeprominterface.h"
 #include "multiprotocols.h"
-#include "afhds3.h"
 #include "radiodataconversionstate.h"
 #include "compounditemmodels.h"
 #include "generalsettings.h"
