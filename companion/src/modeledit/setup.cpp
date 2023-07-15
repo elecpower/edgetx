@@ -224,6 +224,7 @@ void TimerPanel::onModeChanged(int index)
 #define MASK_MULTI_DSM_OPT         (1<<19)
 #define MASK_CHANNELMAP            (1<<20)
 #define MASK_MULTI_BAYANG_OPT      (1<<21)
+#define MASK_AFHDS2A_OPTIONS       (1<<22)
 
 quint8 ModulePanel::failsafesValueDisplayType = ModulePanel::FAILSAFE_DISPLAY_PERCENT;
 
@@ -292,6 +293,8 @@ ModulePanel::ModulePanel(QWidget * parent, ModelData & model, ModuleData & modul
   }
 
   ui->multiProtocol->setModel(Multiprotocols::protocolItemModel());
+  ui->cboAfhds2aOpt1->setModel(ModuleData::afhds2aMode1ItemModel());
+  ui->cboAfhds2aOpt2->setModel(ModuleData::afhds2aMode2ItemModel());
 
   ui->btnGrpValueType->setId(ui->optPercent, FAILSAFE_DISPLAY_PERCENT);
   ui->btnGrpValueType->setId(ui->optUs, FAILSAFE_DISPLAY_USEC);
@@ -314,6 +317,16 @@ ModulePanel::ModulePanel(QWidget * parent, ModelData & model, ModuleData & modul
   connect(ui->clearRx1, SIGNAL(clicked()), this, SLOT(onClearAccessRxClicked()));
   connect(ui->clearRx2, SIGNAL(clicked()), this, SLOT(onClearAccessRxClicked()));
   connect(ui->clearRx3, SIGNAL(clicked()), this, SLOT(onClearAccessRxClicked()));
+  connect(ui->cboAfhds2aOpt1, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=] (int index)
+    {
+      Helpers::setBitmappedValue(this->module.flysky.mode, index, 2);
+      emit modified();
+    });
+  connect(ui->cboAfhds2aOpt2, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=] (int index)
+    {
+      Helpers::setBitmappedValue(this->module.flysky.mode, index, 1);
+      emit modified();
+    });
 
   lock = false;
 
@@ -525,11 +538,11 @@ void ModulePanel::update()
         break;
       case PULSES_FLYSKY_AFHDS2A:
         mask |= MASK_CHANNELS_RANGE| MASK_CHANNELS_COUNT | MASK_FAILSAFES;
-        mask |= MASK_RX_FREQ | MASK_RF_POWER;
+        mask |= MASK_AFHDS2A_OPTIONS;
         break;
       case PULSES_FLYSKY_AFHDS3:
         mask |= MASK_CHANNELS_RANGE| MASK_CHANNELS_COUNT | MASK_FAILSAFES;
-        mask |= MASK_RF_POWER;
+        mask |= MASK_RF_POWER || MASK_RX_NUMBER;
         break;
       case PULSES_LEMON_DSMP:
         mask |= MASK_CHANNELS_RANGE;
@@ -749,11 +762,18 @@ void ModulePanel::update()
   ui->clearRx3->setVisible((mask & MASK_ACCESS) && (module.access.receivers & (1 << 2)));
   ui->rx3->setVisible((mask & MASK_ACCESS) && (module.access.receivers & (1 << 2)));
 
+  // AFHFS2A
+  if (mask & MASK_AFHDS2A_OPTIONS) {
+    ui->cboAfhds2aOpt1->setCurrentIndex(Helpers::getBitmappedValue(module.flysky.mode, 2));
+    ui->cboAfhds2aOpt2->setCurrentIndex(Helpers::getBitmappedValue(module.flysky.mode, 1));
+  }
+  ui->label_afhds2aOptions->setVisible(mask & MASK_AFHDS2A_OPTIONS);
+  ui->cboAfhds2aOpt1->setVisible(mask & MASK_AFHDS2A_OPTIONS);
+  ui->cboAfhds2aOpt2->setVisible(mask & MASK_AFHDS2A_OPTIONS);
+
   // Failsafes
   ui->label_failsafeMode->setVisible(mask & MASK_FAILSAFES);
   ui->failsafeMode->setVisible(mask & MASK_FAILSAFES);
-  //hide receiver mode for afhds2a or afhds3
-  qobject_cast<QListView *>(ui->failsafeMode->view())->setRowHidden(FAILSAFE_RECEIVER, (protocol == PULSES_FLYSKY_AFHDS2A || protocol == PULSES_FLYSKY_AFHDS3));
 
   if ((mask & MASK_FAILSAFES) && module.failsafeMode == FAILSAFE_CUSTOM) {
     if (ui->failsafesGroupBox->isHidden()) {
