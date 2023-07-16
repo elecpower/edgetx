@@ -317,17 +317,30 @@ ModulePanel::ModulePanel(QWidget * parent, ModelData & model, ModuleData & modul
   connect(ui->clearRx3, SIGNAL(clicked()), this, SLOT(onClearAccessRxClicked()));
   connect(ui->cboAfhdsOpt1, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=] (int index)
     {
-      Helpers::setBitmappedValue(this->module.flysky.mode, index, 2);
+      if (lock)
+        return;
+
+      if (this->module.protocol == PULSES_FLYSKY_AFHDS2A)
+        Helpers::setBitmappedValue(this->module.flysky.mode, ui->cboAfhdsOpt1->currentData().toInt(), 1);
+      else
+        this->module.afhds3.phyMode = ui->cboAfhdsOpt1->currentData().toInt();
+
       emit modified();
     });
   connect(ui->cboAfhdsOpt2, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=] (int index)
     {
-      Helpers::setBitmappedValue(this->module.flysky.mode, index, 1);
+      if (lock)
+        return;
+
+      if (this->module.protocol == PULSES_FLYSKY_AFHDS2A)
+        Helpers::setBitmappedValue(this->module.flysky.mode, ui->cboAfhdsOpt2->currentData().toInt(), 0);
+      else
+        this->module.afhds3.emi = ui->cboAfhdsOpt2->currentData().toInt();
+
       emit modified();
     });
 
   lock = false;
-
 }
 
 ModulePanel::~ModulePanel()
@@ -762,10 +775,10 @@ void ModulePanel::update()
     if (protocol == PULSES_FLYSKY_AFHDS2A) {
       ui->label_afhds->setText(tr("Options"));
       ui->cboAfhdsOpt1->setModel(ModuleData::afhds2aMode1ItemModel());
-      ui->cboAfhdsOpt1->setCurrentIndex(Helpers::getBitmappedValue(module.flysky.mode, 2));
+      ui->cboAfhdsOpt1->setCurrentIndex(Helpers::getBitmappedValue(module.flysky.mode, 1));
 
       ui->cboAfhdsOpt2->setModel(ModuleData::afhds2aMode2ItemModel());
-      ui->cboAfhdsOpt2->setCurrentIndex(Helpers::getBitmappedValue(module.flysky.mode, 1));
+      ui->cboAfhdsOpt2->setCurrentIndex(Helpers::getBitmappedValue(module.flysky.mode, 0));
     }
     else {
       ui->label_afhds->setText(tr("Type"));

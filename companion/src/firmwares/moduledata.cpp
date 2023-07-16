@@ -730,9 +730,8 @@ AbstractStaticItemModel * ModuleData::afhds3EmiItemModel()
   AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
   mdl->setName("moduledata.afhds3Emi");
 
-   // Note: 1 based
-  for (int i = 1; i <= afhds3EmiList.size(); i++) {
-    mdl->appendToItemList(afhds3EmiList.at(i), i);
+  for (int i = 0; i < afhds3EmiList.size(); i++) {
+    mdl->appendToItemList(afhds3EmiList.at(i), i + 1); // Note: 1 based
   }
 
   mdl->loadItemList();
