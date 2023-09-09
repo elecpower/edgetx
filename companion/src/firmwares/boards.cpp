@@ -893,7 +893,6 @@ QString Boards::potTypeToString(int value)
   }
 }
 
-
 //  static
 QString Boards::sliderTypeToString(int value)
 {
@@ -919,6 +918,8 @@ QString Boards::switchTypeToString(int value)
       return tr("2 Positions");
     case SWITCH_3POS:
       return tr("3 Positions");
+    case SWITCH_FSWITCH:
+      return tr("Function");
     default:
       return CPN_STR_UNKNOWN_ITEM;
   }

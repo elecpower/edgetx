@@ -134,4 +134,5 @@ namespace DataHelpers
   std::string getStringTagMappingTag(const StringTagMappingTable& lut, unsigned int index);
   int getStringTagMappingSeq(const StringTagMappingTable& lut, unsigned int index);
   std::string getStringSeqMappingTag(const StringTagMappingTable& lut, unsigned int seq);
+  std::string getStringNameMappingTag(const StringTagMappingTable& lut, const char * name);
 }

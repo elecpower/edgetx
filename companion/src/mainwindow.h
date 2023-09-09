@@ -28,6 +28,7 @@
 
 class MdiChild;
 class UpdateFactories;
+class BoardFactories;
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -149,6 +150,7 @@ class MainWindow : public QMainWindow
 
     QString installer_fileName;
     UpdateFactories *updateFactories;
+    BoardFactories *boardFactories;
 
     QVector<QAction *> recentFileActs;
     QVector<QAction *> profileActs;

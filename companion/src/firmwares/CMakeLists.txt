@@ -48,6 +48,8 @@ set(firmwares_SRCS
   edgetx/yaml_usbjoystickdata.cpp
   datahelpers.cpp
   customisation_data.cpp
+  jsonboard.cpp
+  boardfactories.cpp
   )
 
 string(REPLACE ".cpp" ".h" firmwares_HDRS "${firmwares_SRCS}")

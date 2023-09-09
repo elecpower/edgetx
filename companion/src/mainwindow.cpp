@@ -47,6 +47,7 @@
 #include "constants.h"
 #include "updates/updates.h"
 #include "updates/updatefactories.h"
+#include "boardfactories.h"
 
 #include <QtGui>
 #include <QFileInfo>
@@ -57,6 +58,7 @@
 
 MainWindow::MainWindow():
   updateFactories(nullptr),
+  boardFactories(nullptr),
   windowsListActions(new QActionGroup(this))
 {
   // setUnifiedTitleAndToolBarOnMac(true);
@@ -147,6 +149,7 @@ MainWindow::MainWindow():
   }
 
   updateFactories = new UpdateFactories();
+  boardFactories = new BoardFactories();
 
   if (checkProfileRadioExists(g.sessionId()))
     QTimer::singleShot(updateDelay, this, &MainWindow::autoCheckForUpdates);
@@ -159,6 +162,11 @@ MainWindow::~MainWindow()
   if (windowsListActions) {
     delete windowsListActions;
     windowsListActions = nullptr;
+  }
+
+  if (boardFactories) {
+    delete boardFactories;
+    boardFactories = nullptr;
   }
 
   if (updateFactories) {

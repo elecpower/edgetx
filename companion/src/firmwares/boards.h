@@ -99,6 +99,7 @@ namespace Board {
     SWITCH_TOGGLE,
     SWITCH_2POS,
     SWITCH_3POS,
+    SWITCH_FSWITCH,
     SWITCH_TYPE_COUNT
   };
 
@@ -210,14 +211,16 @@ class Boards
       setBoardType(board);
     }
 
+    virtual ~Boards() {}
+
     void setBoardType(const Board::Type & board);
     Board::Type getBoardType() const { return m_boardType; }
 
     const uint32_t getFourCC() const { return getFourCC(m_boardType); }
     const int getEEpromSize() const { return getEEpromSize(m_boardType); }
     const int getFlashSize() const { return getFlashSize(m_boardType); }
-    const Board::SwitchInfo getSwitchInfo(int index) const { return getSwitchInfo(m_boardType, index); }
-    const int getCapability(Board::Capability capability) const { return getCapability(m_boardType, capability); }
+    virtual const Board::SwitchInfo getSwitchInfo(int index) const { return getSwitchInfo(m_boardType, index); }
+    virtual const int getCapability(Board::Capability capability) const { return getCapability(m_boardType, capability); }
     const QString getAnalogInputName(int index) const { return getAnalogInputName(m_boardType, index); }
     const bool isBoardCompatible(Board::Type board2) const { return isBoardCompatible(m_boardType, board2); }
 

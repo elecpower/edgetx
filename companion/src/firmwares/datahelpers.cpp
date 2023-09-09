@@ -114,3 +114,18 @@ std::string DataHelpers::getStringSeqMappingTag(const StringTagMappingTable& lut
 
   return std::string();
 }
+
+std::string DataHelpers::getStringNameMappingTag(const StringTagMappingTable& lut, const char * name)
+{
+  auto it =
+    find_if(lut.begin(), lut.end(), [=](const StringTagMapping& elmt) {
+      if (elmt.name == name) return true;
+      return false;
+    });
+
+  if (it != lut.end()) {
+    return it->tag;
+  }
+
+  return std::string();
+}
