@@ -830,6 +830,27 @@ bool GeneralSettings::convertLegacyConfiguration(Board::Type board)
   return true;
 }
 
+void GeneralSettings::validateFlexSwitches()
+{
+  Board::Type board = getCurrentBoard();
+
+  for (int i = 0; i < CPN_MAX_FLEX_SWITCHES; i++) {
+    if (inputConfig[flexSwitch[i]].flexType != Board::FLEX_SWITCH)
+      flexSwitch[i] = 0;
+
+    int idx = Boards::getSwitchIndex(board, QString("FL%").arg(i));
+    if (idx >= 0) {
+      if (switchConfig[idx].type == Board::SWITCH_NOT_AVAILABLE)
+        flexSwitch[i] = 0;
+    }
+
+    for (int j = i + 1; j < CPN_MAX_FLEX_SWITCHES; j++) {
+      if (flexSwitch[j] == flexSwitch[i])
+        flexSwitch[j] = 0;
+    }
+  }
+}
+
 /*
     TrainerMix
 */

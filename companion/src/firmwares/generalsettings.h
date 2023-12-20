@@ -358,7 +358,9 @@ class GeneralSettings {
       bool inverted;
     };
 
-    SwitchConfig switchConfig[CPN_MAX_SWITCHES];
+    SwitchConfig switchConfig[CPN_MAX_SWITCHES + CPN_MAX_FLEX_SWITCHES];
+
+    int flexSwitch[CPN_MAX_FLEX_SWITCHES];
 
     bool switchPositionAllowedTaranis(int index) const;
     bool switchSourceAllowedTaranis(int index) const;
@@ -371,6 +373,7 @@ class GeneralSettings {
     bool isSliderAvailable(int index) const;
     bool isSwitchAvailable(int index) const;
     bool isMultiPosPot(int index) const;
+
     QString antennaModeToString() const;
     QString bluetoothModeToString() const;
     QString serialPortModeToString(int port_nr) const;
@@ -394,4 +397,6 @@ class GeneralSettings {
     static AbstractStaticItemModel * stickDeadZoneItemModel();
     static AbstractStaticItemModel * uartSampleModeItemModel();
     static AbstractStaticItemModel * hatsModeItemModel(bool radio_setup = true);
+
+    void validateFlexSwitches();
 };

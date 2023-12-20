@@ -38,6 +38,7 @@
 #define CPN_MAX_STICKS                 Board::STICK_AXIS_COUNT
 #define CPN_MAX_TRIMS                  Board::TRIM_AXIS_COUNT
 #define CPN_MAX_CYC                    3
+#define CPN_MAX_FLEX_SWITCHES          4 // v2.10 cmake parameter FLEXSW
 #define CPN_MAX_SWITCHES               32
 #define CPN_MAX_FUNCTION_SWITCHES      6
 #define CPN_MAX_SENSORS                60

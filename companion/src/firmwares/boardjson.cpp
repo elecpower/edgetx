@@ -80,7 +80,7 @@ BoardJson::~BoardJson()
 }
 
 // static
-void BoardJson::addGyroAxes(Board::Type board, InputsTable * inputs)
+void BoardJson::afterLoadFixups(Board::Type board, InputsTable * inputs, SwitchesTable * switches)
 {
   // TODO json files do not contain gyro defs
   // Radio cmake directive IMU is currently used
@@ -107,6 +107,16 @@ void BoardJson::addGyroAxes(Board::Type board, InputsTable * inputs)
       inputs->insert(inputs->end(), defn);
     }
   }
+
+  //  Flex switches are not listed in json file
+  for (int i = 0; i < CPN_MAX_FLEX_SWITCHES; i++) {
+    QString tag = QString("FL%1").arg(i);
+    if (getSwitchIndex(switches, tag) < 0) {
+      SwitchDefn defn;
+      defn.tag = tag.toStdString();
+      switches->insert(switches->end(), defn);
+    }
+  }
 }
 
 // called from Boards::getCapability if no capability match
@@ -118,6 +128,13 @@ const int BoardJson::getCapability(const Board::Capability capability) const
 
     case Board::FunctionSwitches:
       return m_funcSwitchesCnt;
+
+    case Board::FlexSwitches:
+      {
+      int sw = (IS_FAMILY_HORUS_OR_T16(m_board) || IS_TARANIS(m_board)) ? 2 : 0;
+      assert(sw <= CPN_MAX_FLEX_SWITCHES);
+      return sw;
+      }
 
     case GyroAxes:
       return m_gyroAxesCnt;
@@ -504,8 +521,7 @@ bool BoardJson::loadDefinition()
   if (!loadFile(m_board, m_hwdefn, m_inputs, m_switches, m_trims))
     return false;
 
-  // json files do not normally define joysticks or gyros
-  addGyroAxes(m_board, m_inputs);
+  afterLoadFixups(m_board, m_inputs, m_switches);
 
   m_flexCnt = setFlexCount(m_inputs);
   m_gyroAxesCnt = setGyroAxesCount(m_inputs);

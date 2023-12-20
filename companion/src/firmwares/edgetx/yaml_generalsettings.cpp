@@ -262,12 +262,6 @@ Node convert<GeneralSettings>::encode(const GeneralSettings& rhs)
     }
   }
 
-  Node switchConfig;
-  switchConfig = YamlSwitchConfig(rhs.switchConfig);
-  if (switchConfig && switchConfig.IsMap()) {
-    node["switchConfig"] = switchConfig;
-  }
-
   Node sticksConfig;
   sticksConfig = YamlStickConfig(rhs.inputConfig);
   if (sticksConfig && sticksConfig.IsMap()) {
@@ -278,6 +272,18 @@ Node convert<GeneralSettings>::encode(const GeneralSettings& rhs)
   potsConfig = YamlPotConfig(rhs.inputConfig);
   if (potsConfig && potsConfig.IsMap()) {
     node["potsConfig"] = potsConfig;
+  }
+
+  Node switchConfig;
+  switchConfig = YamlSwitchConfig(rhs.switchConfig);
+  if (switchConfig && switchConfig.IsMap()) {
+    node["switchConfig"] = switchConfig;
+  }
+
+  Node flexSwitches;
+  flexSwitches = YamlFlexSwitches(&rhs.flexSwitch[0], &rhs.inputConfig[0]);
+  if (flexSwitches && flexSwitches.IsMap()) {
+    node["flexSwitches"] = flexSwitches;
   }
 
   node["ownerRegistrationID"] = rhs.registrationId;
@@ -517,10 +523,6 @@ bool convert<GeneralSettings>::decode(const Node& node, GeneralSettings& rhs)
 
   node["customFn"] >> rhs.customFn;
 
-  YamlSwitchConfig switchConfig;
-  node["switchConfig"] >> switchConfig;
-  switchConfig.copy(rhs.switchConfig);
-
   YamlStickConfig stickConfig;
   node["sticksConfig"] >> stickConfig;
   stickConfig.copy(rhs.inputConfig);
@@ -534,6 +536,16 @@ bool convert<GeneralSettings>::decode(const Node& node, GeneralSettings& rhs)
     YamlSliderConfig slidersConfig;
     node["slidersConfig"] >> slidersConfig;
     slidersConfig.copy(rhs.inputConfig);
+  }
+
+  YamlSwitchConfig switchConfig;
+  node["switchConfig"] >> switchConfig;
+  switchConfig.copy(rhs.switchConfig);
+
+  if (node["flexSwitches"]) {
+    YamlFlexSwitches flexSwitches;
+    node["flexSwitches"] >> flexSwitches;
+    flexSwitches.copy(&rhs.flexSwitch[0]);
   }
 
   node["ownerRegistrationID"] >> rhs.registrationId;
@@ -565,6 +577,9 @@ bool convert<GeneralSettings>::decode(const Node& node, GeneralSettings& rhs)
   node["modelSFDisabled"] >> rhs.modelSFDisabled;
   node["modelCustomScriptsDisabled"] >> rhs.modelCustomScriptsDisabled;
   node["modelTelemetryDisabled"] >> rhs.modelTelemetryDisabled;
+
+  // fix ups
+  rhs.validateFlexSwitches();
 
   return true;
 }

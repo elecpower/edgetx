@@ -128,8 +128,7 @@ private:
     unsigned int m_vbatCnt;
 
     static bool loadFile(Board::Type board, QString hwdefn, InputsTable * inputs, SwitchesTable * switches, TrimsTable * trims);
-    // post loadFile fix ups
-    static void addGyroAxes(Board::Type board, InputsTable * inputs);
+    static void afterLoadFixups(Board::Type board, InputsTable * inputs, SwitchesTable * switches);
     static std::string setStickName(int index);
 
     static int getInputsCalibrated(const InputsTable * inputs);

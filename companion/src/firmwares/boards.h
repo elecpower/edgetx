@@ -155,6 +155,7 @@ namespace Board {
     FactoryInstalledPots,
     FactoryInstalledSwitches,
     FlexInputs,
+    FlexSwitches,
     FunctionSwitches,
     Gyros,
     GyroAxes,
