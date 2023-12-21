@@ -43,6 +43,7 @@ constexpr char AIM_GS_INTMODULEBAUDRATE[]  {"gs.intmodulebaudrate"};
 constexpr char AIM_GS_STICKDEADZONE[]      {"gs.stickdeadzone"};
 constexpr char AIM_GS_UARTSAMPLEMODE[]     {"gs.uartsamplemode"};
 constexpr char AIM_GS_HATSMODE[]           {"gs.hatsmode"};
+constexpr char AIM_GS_FLEXSWITCHES[]       {"gs.flexswitches"};
 constexpr char AIM_TRAINERMIX_MODE[]       {"trainermix.mode"};
 constexpr char AIM_TRAINERMIX_SRC[]        {"trainermix.src"};
 
@@ -358,7 +359,7 @@ class GeneralSettings {
       bool inverted;
     };
 
-    SwitchConfig switchConfig[CPN_MAX_SWITCHES + CPN_MAX_FLEX_SWITCHES];
+    SwitchConfig switchConfig[CPN_MAX_SWITCHES];
 
     int flexSwitch[CPN_MAX_FLEX_SWITCHES];
 
@@ -372,6 +373,7 @@ class GeneralSettings {
     bool isPotAvailable(int index) const;
     bool isSliderAvailable(int index) const;
     bool isSwitchAvailable(int index) const;
+    bool isSwitchFlex(int index) const;
     bool isMultiPosPot(int index) const;
 
     QString antennaModeToString() const;
@@ -397,6 +399,7 @@ class GeneralSettings {
     static AbstractStaticItemModel * stickDeadZoneItemModel();
     static AbstractStaticItemModel * uartSampleModeItemModel();
     static AbstractStaticItemModel * hatsModeItemModel(bool radio_setup = true);
+    static AbstractStaticItemModel * flexSwitchesItemModel();
 
     void validateFlexSwitches();
 };

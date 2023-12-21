@@ -155,8 +155,6 @@ namespace Board {
     FactoryInstalledPots,
     FactoryInstalledSwitches,
     FlexInputs,
-    FlexSwitches,
-    FunctionSwitches,
     Gyros,
     GyroAxes,
     HasAudioMuteGPIO,
@@ -184,6 +182,10 @@ namespace Board {
     SportMaxBaudRate,
     Sticks,
     Switches,
+    SwitchesFlex,
+    SwitchesFunction,
+    FunctionSwitches,   // TODO legacy use SwitchesFunction
+    SwitchesStd,
     SwitchPositions,
   };
 
@@ -332,6 +334,8 @@ class Boards
     static bool isInputIgnored(Board::Type board, int index);
     static bool isInputPot(Board::Type board, int index);
     static bool isInputStick(Board::Type board, int index);
+
+    static bool isSwitchFlex(Board::Type board, int index);
 
     static QString flexTypeToString(int value);
     static AbstractStaticItemModel * flexTypeItemModel();

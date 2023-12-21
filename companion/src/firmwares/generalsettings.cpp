@@ -136,12 +136,17 @@ bool GeneralSettings::isSliderAvailable(int index) const
 
 bool GeneralSettings::isSwitchAvailable(int index) const
 {
-  if (index < 0 || index >= Boards::getCapability(getCurrentBoard(), Board::Sticks))
+  if (index < 0 || index >= Boards::getCapability(getCurrentBoard(), Board::Switches))
     return false;
 
   const SwitchConfig &config = switchConfig[index];
 
   return config.type != Board::SWITCH_NOT_AVAILABLE;
+}
+
+bool GeneralSettings::isSwitchFlex(int index) const
+{
+  return Boards::isSwitchFlex(getCurrentBoard(), index);
 }
 
 void GeneralSettings::clear()
@@ -849,6 +854,22 @@ void GeneralSettings::validateFlexSwitches()
         flexSwitch[j] = 0;
     }
   }
+}
+
+//  static
+AbstractStaticItemModel * GeneralSettings::flexSwitchesItemModel(bool radio_setup)
+{
+  AbstractStaticItemModel * mdl = new AbstractStaticItemModel();
+  mdl->setName(AIM_GS_FLEXSWITCHES);
+
+  for (int i = 0; i < Boards::getCapability(board, Board::Inputs); i++) {
+    if (inputConfig[i].flexType == Board::FLEX_SWITCH)
+      QString
+      mdl->appendToItemList(Boards::getInputName(board, i), i);
+  }
+
+  mdl->loadItemList();
+  return mdl;
 }
 
 /*

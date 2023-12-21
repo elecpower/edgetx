@@ -90,7 +90,8 @@ HardwarePanel::HardwarePanel(QWidget * parent, GeneralSettings & generalSettings
   editorItemModels(sharedItemModels),
   serialPortUSBVCP(nullptr),
   params(new QList<QWidget *>),
-  row(0)
+  row(0),
+  exclInputFlexSwitchesGroup(nullptr)
 {
   editorItemModels->registerItemModel(Boards::flexTypeItemModel());
   int id = editorItemModels->registerItemModel(Boards::switchTypeItemModel());
@@ -145,8 +146,12 @@ HardwarePanel::HardwarePanel(QWidget * parent, GeneralSettings & generalSettings
   count = Boards::getCapability(board, Board::Switches);
 
   if (count) {
+    // All values except 0 are mutually exclusive
+    exclFlexSwitchesGroup = new ExclusiveComboGroup(
+        this, [=](const QVariant &value) { return value == 0; });
+
     addSection(tr("Switches"));
-    for (int i = 0; i < count && i < CPN_MAX_SWITCHES; i++) {
+    for (int i = 0; i < count && i < CPN_MAX_SWITCHES); i++) {
       addSwitch(i);
     }
   }
@@ -420,6 +425,16 @@ void HardwarePanel::addSwitch(int index)
   AutoLineEdit *name = new AutoLineEdit(this);
   name->setField(config.name, HARDWARE_NAME_LEN, this);
   params->append(name);
+
+  if (generalSettings.isSwitchFlex(index)) {
+    const AbstractStaticItemModel *fsim = generalSettings.flexSwitchesItemModel();
+    AutoComboBox *input = new AutoComboBox(this);
+    input->setModel(fsim);
+    int idx = Boards::getSwitchFlexNum(board, index) - 1;
+    input->setField(generalSettings.flexSwitch[idx], this);
+    exclFlexSwitchesGroup->addCombo(input);
+    params->append(input);
+  }
 
   AutoComboBox *type = new AutoComboBox(this);
   Board::SwitchInfo switchInfo = Boards::getSwitchInfo(board, index);

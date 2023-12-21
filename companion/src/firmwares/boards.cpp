@@ -868,10 +868,15 @@ bool Boards::isInputIgnored(Board::Type board, int index)
 
 bool Boards::isInputPot(Board::Type board, int index)
 {
-  return getBoardJson(board)->isInputPot(index);
+  return getBoardJson(board)->isInputFlexPot(index);
 }
 
 bool Boards::isInputStick(Board::Type board, int index)
 {
   return getBoardJson(board)->isInputStick(index);
+}
+
+bool Boards::isSwitchFlex(Board::Type board, int index)
+{
+  return getBoardJson(board)->isSwitchFlex(index);
 }
