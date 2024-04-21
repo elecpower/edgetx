@@ -126,6 +126,30 @@ void BoardJson::afterLoadFixups(Board::Type board, InputsTable * inputs, Switche
       switches->insert(switches->end(), defn);
     }
   }
+
+  //  Function switches names are not in the json file and are relative to last real switch name
+  std::string lastswitch;
+
+  for (const auto &swtch : *switches) {
+    if (isSwitchStd(swtch) && lastswitch < swtch.name)
+      lastswitch = swtch.name;
+  }
+
+  if (lastswitch.size() == 2) {
+    const std::string prfx = lastswitch.substr(0, 1);
+    char lastsw[1];
+    lastswitch.copy(lastsw, 1, 1);
+
+    for (auto &swtch : *switches) {
+      if (isSwitchFunc(swtch)) {
+        swtch.name = prfx;
+        char fsnum[1];
+        swtch.tag.copy(fsnum, 1, swtch.tag.size() - 1);
+        char swnum = lastsw[0] + fsnum[0] - '0';
+        swtch.name += std::string(1, swnum);
+      }
+    }
+  }
 }
 
 // called from Boards::getCapability if no capability match

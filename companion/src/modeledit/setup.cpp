@@ -1263,7 +1263,7 @@ FunctionSwitchesPanel::FunctionSwitchesPanel(QWidget * parent, ModelData & model
 
   for (int i = 0; i < switchcnt; i++) {
     QLabel * lblSwitchId = new QLabel(this);
-    lblSwitchId->setText(tr("SW%1").arg(i + 1));
+    lblSwitchId->setText(Boards::getSwitchName(Boards::getSwitchIndex(QString("SW%1").arg(i + 1), Board::LVT_TAG)));
 
     AutoLineEdit * aleName = new AutoLineEdit(this);
     aleName->setProperty("index", i);

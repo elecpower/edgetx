@@ -157,9 +157,8 @@ RawSwitch YamlRawSwitchDecode(const std::string& sw_str)
       rhs.index = tsw_idx + 1;
     }
 
-  } else if ((val_len >= 4 && (
-              (val[0] == 'F' && val[1] == 'L') ||
-              (val[0] == 'S' && val[1] == 'W')) &&
+  } else if ((val_len >= 4 &&
+              val[0] == 'F' && val[1] == 'L' &&
               val[2] >= '1' && val[2] <= '9' &&
               val[val_len - 1] >= '0' && val[val_len - 1] <= '2') ||
              (val_len >= 3 && val[0] == 'S' &&
@@ -169,6 +168,14 @@ RawSwitch YamlRawSwitchDecode(const std::string& sw_str)
     int sw_idx = Boards::getSwitchYamlIndex(sw_str_tmp.substr(0, val_len - 1).c_str(), BoardJson::YLT_REF);
     if (sw_idx >= 0) {
       rhs.type = SWITCH_TYPE_SWITCH;
+
+      if (modelSettingsVersion < SemanticVersion(QString(CPN_ADC_REFACTOR_VERSION))) {
+        if (IS_JUMPER_TPRO(board) && sw_idx >= 4) {
+          // added support for real switches SE & SF so need to shift function switches
+          sw_idx += 2;
+        }
+      }
+
       rhs.index = sw_idx * 3 + (val[val_len - 1] - '0' + 1);
     }
 
